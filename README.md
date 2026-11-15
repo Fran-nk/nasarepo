@@ -53,13 +53,10 @@ corepack pnpm test
 ## Estructura
 
 ```
-app/                 pantallas (Mi chacra, clima, semillas, calendario, recomendaciones)
-components/          tarjetas, mapa, semillero, calendario
-lib/contratos/       tipos del contrato con el backend
-lib/api/cliente.ts   datos de prueba o backend real (NEXT_PUBLIC_USE_MOCKS)
-lib/textos.ts        todos los textos de la interfaz (para traducir)
-lib/mensajes.ts      convierte datos en frases sencillas
-lib/busqueda/        búsqueda fonética (Y/LL/I, H muda, B/V, S/C/Z…)
-lib/almacen.ts       datos del agricultor en IndexedDB (Dexie)
-mocks/               escenarios de prueba y catálogo de 32 semillas
+app/(front)/         rutas de las pantallas, sin cambiar las URL
+app/front/components/ tarjetas, mapa, semillero y calendario
+app/front/lib/       cliente API, contratos, textos, búsqueda e IndexedDB
+app/front/mocks/     escenarios de prueba y catálogo de semillas
+app/api/             rutas HTTP del backend
+app/back/            lógica de servidor y modelo
 ```

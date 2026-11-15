@@ -8,10 +8,10 @@ NEXT_PUBLIC_USE_MOCKS=false
 NEXT_PUBLIC_API_URL=https://tu-backend.example.com
 ```
 
-- **Tipos exactos (fuente de verdad):** [`lib/contratos/tipos.ts`](../lib/contratos/tipos.ts)
-- **Ejemplos reales de respuesta:** [`mocks/escenarios/*.json`](../mocks/escenarios). Cada clave del archivo es la respuesta de un endpoint. En los mocks, `"D+3"` significa "hoy + 3 días"; el backend debe enviar fechas reales `YYYY-MM-DD`.
-- **Catálogo de semillas de ejemplo:** [`mocks/semillas.json`](../mocks/semillas.json)
-- **Cliente que consume la API:** [`lib/api/cliente.ts`](../lib/api/cliente.ts)
+- **Tipos exactos (fuente de verdad):** [`app/front/lib/contratos/tipos.ts`](../app/front/lib/contratos/tipos.ts)
+- **Ejemplos reales de respuesta:** [`app/front/mocks/escenarios/`](../app/front/mocks/escenarios). Cada clave del archivo es la respuesta de un endpoint. En los mocks, `"D+3"` significa "hoy + 3 días"; el backend debe enviar fechas reales `YYYY-MM-DD`.
+- **Catálogo de semillas de ejemplo:** [`app/front/mocks/semillas.json`](../app/front/mocks/semillas.json)
+- **Cliente que consume la API:** [`app/front/lib/api/cliente.ts`](../app/front/lib/api/cliente.ts)
 
 ## Reglas generales
 

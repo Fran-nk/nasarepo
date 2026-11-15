@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Roboto_Condensed } from "next/font/google";
-import { Armazon } from "@/components/Armazon";
-import { APP_NOMBRE } from "@/lib/textos";
+import { Armazon } from "@/app/front/components/Armazon";
+import { APP_NOMBRE } from "@/app/front/lib/textos";
 import "./globals.css";
 
 const inter = Inter({
