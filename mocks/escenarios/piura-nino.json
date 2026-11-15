@@ -1,0 +1,52 @@
+{
+  "nombre": "Piura · Costa norte con El Niño",
+  "punto": { "lat": -5.09, "lon": -80.16 },
+  "contexto": {
+    "lugar": "Chulucanas, Morropón, Piura",
+    "altitud_m": 92,
+    "zona": "chala",
+    "cultivos_comunes": ["maiz_amarillo", "arroz", "frijol", "mango", "camote", "yuca", "aji", "platano"]
+  },
+  "semana": {
+    "fuente": "Open-Meteo (pronóstico) — dato de prueba",
+    "dias": [
+      { "fecha": "D+0", "cielo": "nubes", "lluvia_mm": 1.5, "prob_lluvia": 0.4, "tmin": 23, "tmax": 33 },
+      { "fecha": "D+1", "cielo": "tormenta", "lluvia_mm": 28, "prob_lluvia": 0.9, "tmin": 24, "tmax": 31 },
+      { "fecha": "D+2", "cielo": "lluvia", "lluvia_mm": 15, "prob_lluvia": 0.8, "tmin": 24, "tmax": 30 },
+      { "fecha": "D+3", "cielo": "tormenta", "lluvia_mm": 35, "prob_lluvia": 0.9, "tmin": 24, "tmax": 30 },
+      { "fecha": "D+4", "cielo": "lluvia", "lluvia_mm": 9, "prob_lluvia": 0.7, "tmin": 23, "tmax": 32 },
+      { "fecha": "D+5", "cielo": "nubes", "lluvia_mm": 2, "prob_lluvia": 0.4, "tmin": 23, "tmax": 34 },
+      { "fecha": "D+6", "cielo": "sol", "lluvia_mm": 0, "prob_lluvia": 0.15, "tmin": 22, "tmax": 35 }
+    ]
+  },
+  "alertas": {
+    "fuente": "SENAMHI / NASA GPM — dato de prueba",
+    "alertas": [
+      { "tipo": "lluvia_fuerte", "nivel": "peligro", "desde": "D+1", "hasta": "D+3" },
+      { "tipo": "huaico", "nivel": "atencion", "desde": "D+1", "hasta": "D+4" },
+      { "tipo": "calor", "nivel": "atencion", "desde": "D+5", "hasta": "D+6" }
+    ]
+  },
+  "vsNormal": {
+    "mes": 0, "lluvia_mm": 62, "lluvia_normal_mm": 4, "temp_media": 27.8, "temp_normal": 25.1,
+    "lluvia": "mas_lluvioso", "temperatura": "mas_calido",
+    "fuente": "NASA POWER (promedio histórico) + GPM IMERG — dato de prueba"
+  },
+  "elNino": {
+    "estado": "alerta", "fenomeno": "nino_costero", "magnitud": "fuerte", "efecto_zona": "mas_lluvia",
+    "comunicado": { "numero": "15-2026 (dato de prueba)", "fecha": "2026-11-01", "url": "https://enfen.imarpe.gob.pe/" }
+  },
+  "semaforo": { "color": "amarillo", "motivo": "lluvia_excesiva" },
+  "riego": { "regar": "no", "humedad_suelo": 0.72, "lluvia_3dias_mm": 78, "fuente": "NASA SMAP / POWER — dato de prueba" },
+  "recomendaciones": {
+    "modelo": "datos de prueba",
+    "recomendaciones": [
+      { "semillaId": "frijol", "puntaje": 0.87, "motivos": ["ciclo_corto", "fija_nitrogeno", "aprovecha_lluvias"], "en_rescate": false },
+      { "semillaId": "arroz", "puntaje": 0.84, "motivos": ["aprovecha_lluvias", "comun_en_zona"], "en_rescate": false },
+      { "semillaId": "choloque", "puntaje": 0.8, "motivos": ["especie_en_rescate", "aguanta_sequia"], "en_rescate": true },
+      { "semillaId": "camote", "puntaje": 0.78, "motivos": ["ciclo_corto", "clima_ideal"], "en_rescate": false },
+      { "semillaId": "maiz_amarillo", "puntaje": 0.75, "motivos": ["comun_en_zona"], "en_rescate": false },
+      { "semillaId": "yuca", "puntaje": 0.7, "motivos": ["aguanta_sequia", "clima_ideal"], "en_rescate": false }
+    ]
+  }
+}

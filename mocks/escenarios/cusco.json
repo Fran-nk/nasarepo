@@ -1,0 +1,49 @@
+{
+  "nombre": "Cusco · Zona Quechua",
+  "punto": { "lat": -13.53, "lon": -71.97 },
+  "contexto": {
+    "lugar": "San Sebastián, Cusco",
+    "altitud_m": 3350,
+    "zona": "quechua",
+    "cultivos_comunes": ["papa", "maiz_amilaceo", "haba", "cebada", "quinua", "tarwi", "oca", "olluco", "trigo", "arveja"]
+  },
+  "semana": {
+    "fuente": "Open-Meteo (pronóstico) — dato de prueba",
+    "dias": [
+      { "fecha": "D+0", "cielo": "nubes", "lluvia_mm": 0.4, "prob_lluvia": 0.3, "tmin": 6, "tmax": 20 },
+      { "fecha": "D+1", "cielo": "lluvia", "lluvia_mm": 4.2, "prob_lluvia": 0.7, "tmin": 7, "tmax": 18 },
+      { "fecha": "D+2", "cielo": "sol", "lluvia_mm": 0, "prob_lluvia": 0.1, "tmin": 4, "tmax": 21 },
+      { "fecha": "D+3", "cielo": "tormenta", "lluvia_mm": 12.5, "prob_lluvia": 0.85, "tmin": 7, "tmax": 17 },
+      { "fecha": "D+4", "cielo": "lluvia", "lluvia_mm": 3.1, "prob_lluvia": 0.6, "tmin": 6, "tmax": 18 },
+      { "fecha": "D+5", "cielo": "nubes", "lluvia_mm": 0.2, "prob_lluvia": 0.25, "tmin": 5, "tmax": 20 },
+      { "fecha": "D+6", "cielo": "sol", "lluvia_mm": 0, "prob_lluvia": 0.1, "tmin": 3, "tmax": 22 }
+    ]
+  },
+  "alertas": {
+    "fuente": "SENAMHI / NASA GPM — dato de prueba",
+    "alertas": [{ "tipo": "granizo", "nivel": "atencion", "desde": "D+3", "hasta": "D+3" }]
+  },
+  "vsNormal": {
+    "mes": 0, "lluvia_mm": 45, "lluvia_normal_mm": 76, "temp_media": 13.4, "temp_normal": 12.6,
+    "lluvia": "mas_seco", "temperatura": "normal",
+    "fuente": "NASA POWER (promedio histórico) + GPM IMERG — dato de prueba"
+  },
+  "elNino": {
+    "estado": "alerta", "fenomeno": "nino_costero", "magnitud": "fuerte", "efecto_zona": "menos_lluvia",
+    "comunicado": { "numero": "15-2026 (dato de prueba)", "fecha": "2026-11-01", "url": "https://enfen.imarpe.gob.pe/" }
+  },
+  "semaforo": { "color": "verde", "motivo": "buena_lluvia" },
+  "riego": { "regar": "poco", "humedad_suelo": 0.34, "lluvia_3dias_mm": 16.7, "fuente": "NASA SMAP / POWER — dato de prueba" },
+  "recomendaciones": {
+    "modelo": "datos de prueba",
+    "recomendaciones": [
+      { "semillaId": "tarwi", "puntaje": 0.91, "motivos": ["fija_nitrogeno", "aguanta_sequia", "especie_en_rescate"], "en_rescate": true },
+      { "semillaId": "haba", "puntaje": 0.88, "motivos": ["fija_nitrogeno", "comun_en_zona"], "en_rescate": false },
+      { "semillaId": "papa", "puntaje": 0.86, "motivos": ["clima_ideal", "comun_en_zona"], "en_rescate": false },
+      { "semillaId": "maiz_amilaceo", "puntaje": 0.82, "motivos": ["clima_ideal", "aprovecha_lluvias"], "en_rescate": false },
+      { "semillaId": "quinua", "puntaje": 0.8, "motivos": ["aguanta_sequia", "aguanta_helada"], "en_rescate": false },
+      { "semillaId": "oca", "puntaje": 0.74, "motivos": ["clima_ideal", "especie_en_rescate"], "en_rescate": true },
+      { "semillaId": "cebada", "puntaje": 0.7, "motivos": ["ciclo_corto", "comun_en_zona"], "en_rescate": false }
+    ]
+  }
+}

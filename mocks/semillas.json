@@ -1,0 +1,302 @@
+{
+  "semillas": [
+    {
+      "id": "papa", "nombre": "Papa", "nombres_locales": ["patata", "papa nativa"], "cientifico": "Solanum tuberosum",
+      "familia": "Solanáceas", "categoria": "tuberculo", "rareza": "comun", "emoji": "🥔",
+      "stats": { "agua": 3, "frio": 3, "calor": 2 }, "altura_min_m": 2000, "altura_max_m": 4200, "ciclo_dias": 150, "perenne": false,
+      "habilidades": ["Da mucha comida por surco"],
+      "despues_de_bien": ["haba", "tarwi", "arveja", "cebada"], "despues_de_mal": ["papa", "tomate", "aji", "oca", "olluco", "mashua"],
+      "usos": ["Alimento", "Venta", "Chuño y moraya"],
+      "guardar_semilla": "Guarda papas medianas y sanas en un lugar oscuro, fresco y ventilado. Que broten antes de sembrar."
+    },
+    {
+      "id": "maiz_amilaceo", "nombre": "Maíz choclo", "nombres_locales": ["choclo", "maiz amilaceo", "sara", "mote"], "cientifico": "Zea mays",
+      "familia": "Poáceas", "categoria": "cereal", "rareza": "comun", "emoji": "🌽",
+      "stats": { "agua": 3, "frio": 2, "calor": 3 }, "altura_min_m": 1500, "altura_max_m": 3500, "ciclo_dias": 180, "perenne": false,
+      "habilidades": ["Su caña sirve de forraje"],
+      "despues_de_bien": ["haba", "frijol", "tarwi", "arveja"], "despues_de_mal": ["maiz_amilaceo", "maiz_amarillo"],
+      "usos": ["Alimento", "Chicha", "Forraje"],
+      "guardar_semilla": "Escoge las mazorcas más grandes y sanas. Sécalas colgadas y desgrana solo el centro de la mazorca."
+    },
+    {
+      "id": "maiz_amarillo", "nombre": "Maíz amarillo duro", "nombres_locales": ["maiz duro", "maiz amarillo"], "cientifico": "Zea mays",
+      "familia": "Poáceas", "categoria": "cereal", "rareza": "comun", "emoji": "🌽",
+      "stats": { "agua": 3, "frio": 1, "calor": 4 }, "altura_min_m": 0, "altura_max_m": 1500, "ciclo_dias": 140, "perenne": false,
+      "habilidades": ["Muy buscado para alimento de animales"],
+      "despues_de_bien": ["frijol", "arveja"], "despues_de_mal": ["maiz_amarillo", "maiz_amilaceo", "arroz"],
+      "usos": ["Alimento de aves y cerdos", "Venta"],
+      "guardar_semilla": "Conviene comprar semilla certificada: la semilla híbrida pierde fuerza si la vuelves a sembrar."
+    },
+    {
+      "id": "haba", "nombre": "Haba", "nombres_locales": ["habas", "jawas"], "cientifico": "Vicia faba",
+      "familia": "Fabáceas", "categoria": "leguminosa", "rareza": "comun", "emoji": "🫘",
+      "stats": { "agua": 3, "frio": 4, "calor": 2 }, "altura_min_m": 2500, "altura_max_m": 3900, "ciclo_dias": 160, "perenne": false,
+      "habilidades": ["Fija nitrógeno: mejora tu tierra", "Aguanta el frío"],
+      "despues_de_bien": ["papa", "maiz_amilaceo", "cebada", "trigo"], "despues_de_mal": ["haba", "arveja", "tarwi"],
+      "usos": ["Alimento", "Venta en verde o seca"],
+      "guardar_semilla": "Deja secar las vainas en la planta, guarda los granos sin manchas en costales limpios."
+    },
+    {
+      "id": "arveja", "nombre": "Arveja", "nombres_locales": ["alverja", "chicharo"], "cientifico": "Pisum sativum",
+      "familia": "Fabáceas", "categoria": "leguminosa", "rareza": "comun", "emoji": "🫛",
+      "stats": { "agua": 3, "frio": 3, "calor": 2 }, "altura_min_m": 1500, "altura_max_m": 3600, "ciclo_dias": 110, "perenne": false,
+      "habilidades": ["Fija nitrógeno: mejora tu tierra", "Ciclo corto"],
+      "despues_de_bien": ["papa", "maiz_amilaceo", "trigo"], "despues_de_mal": ["arveja", "haba", "frijol"],
+      "usos": ["Alimento", "Venta en verde"],
+      "guardar_semilla": "Guarda granos secos y sanos en frascos cerrados con un poco de ceniza para evitar gorgojos."
+    },
+    {
+      "id": "frijol", "nombre": "Frijol", "nombres_locales": ["frejol", "poroto", "caraota"], "cientifico": "Phaseolus vulgaris",
+      "familia": "Fabáceas", "categoria": "leguminosa", "rareza": "comun", "emoji": "🫘",
+      "stats": { "agua": 3, "frio": 1, "calor": 3 }, "altura_min_m": 0, "altura_max_m": 2800, "ciclo_dias": 100, "perenne": false,
+      "habilidades": ["Fija nitrógeno: mejora tu tierra", "Ciclo corto"],
+      "despues_de_bien": ["maiz_amarillo", "maiz_amilaceo", "arroz", "yuca"], "despues_de_mal": ["frijol", "arveja"],
+      "usos": ["Alimento", "Venta"],
+      "guardar_semilla": "Seca bien los granos al sol y guárdalos en envases cerrados."
+    },
+    {
+      "id": "quinua", "nombre": "Quinua", "nombres_locales": ["kinua", "kinwa", "jupha"], "cientifico": "Chenopodium quinoa",
+      "familia": "Amarantáceas", "categoria": "pseudocereal", "rareza": "comun", "emoji": "🌾",
+      "stats": { "agua": 2, "frio": 4, "calor": 2 }, "altura_min_m": 0, "altura_max_m": 4000, "ciclo_dias": 150, "perenne": false,
+      "habilidades": ["Aguanta sequía", "Aguanta helada", "Muy nutritiva"],
+      "despues_de_bien": ["papa", "haba", "tarwi"], "despues_de_mal": ["quinua", "canihua", "kiwicha"],
+      "usos": ["Alimento", "Venta", "Exportación"],
+      "guardar_semilla": "Trilla, lava solo si vas a comer. Para semilla, guárdala sin lavar en un lugar seco."
+    },
+    {
+      "id": "kiwicha", "nombre": "Kiwicha", "nombres_locales": ["achita", "amaranto", "coyo"], "cientifico": "Amaranthus caudatus",
+      "familia": "Amarantáceas", "categoria": "pseudocereal", "rareza": "en_rescate", "emoji": "🌺",
+      "stats": { "agua": 2, "frio": 2, "calor": 3 }, "altura_min_m": 1500, "altura_max_m": 3200, "ciclo_dias": 150, "perenne": false,
+      "habilidades": ["Aguanta sequía", "Muy nutritiva"],
+      "despues_de_bien": ["papa", "haba", "maiz_amilaceo"], "despues_de_mal": ["kiwicha", "quinua", "canihua"],
+      "usos": ["Alimento", "Hojas para comer", "Venta"],
+      "guardar_semilla": "Corta la panoja cuando amarillee, sécala bajo techo y sacúdela para soltar la semilla.",
+      "historia_rescate": "Cultivo de los incas que casi desapareció en la colonia. Hoy se siembra poco aunque es de los granos más nutritivos del mundo."
+    },
+    {
+      "id": "canihua", "nombre": "Cañihua", "nombres_locales": ["kañiwa", "cañahua", "kañawa"], "cientifico": "Chenopodium pallidicaule",
+      "familia": "Amarantáceas", "categoria": "pseudocereal", "rareza": "en_rescate", "emoji": "🌾",
+      "stats": { "agua": 1, "frio": 5, "calor": 1 }, "altura_min_m": 3500, "altura_max_m": 4400, "ciclo_dias": 140, "perenne": false,
+      "habilidades": ["Aguanta helada fuerte", "Aguanta sequía"],
+      "despues_de_bien": ["papa", "haba"], "despues_de_mal": ["canihua", "quinua"],
+      "usos": ["Alimento", "Harina tostada (cañihuaco)"],
+      "guardar_semilla": "Cosecha antes de que se caiga el grano, seca en mantas y guarda en costales.",
+      "historia_rescate": "Crece donde casi nada crece: en la puna y con heladas. Cada vez se siembra menos en el altiplano."
+    },
+    {
+      "id": "tarwi", "nombre": "Tarwi", "nombres_locales": ["chocho", "lupino", "tauri"], "cientifico": "Lupinus mutabilis",
+      "familia": "Fabáceas", "categoria": "leguminosa", "rareza": "en_rescate", "emoji": "🪻",
+      "stats": { "agua": 2, "frio": 3, "calor": 2 }, "altura_min_m": 2500, "altura_max_m": 3800, "ciclo_dias": 240, "perenne": false,
+      "habilidades": ["Fija nitrógeno: mejora mucho tu tierra", "Aguanta sequía", "Las plagas no la comen"],
+      "despues_de_bien": ["papa", "maiz_amilaceo", "cebada", "quinua"], "despues_de_mal": ["tarwi", "haba", "arveja"],
+      "usos": ["Alimento (desamargado)", "Abono verde"],
+      "guardar_semilla": "Guarda granos secos y enteros; duran varios años si están en un lugar seco.",
+      "historia_rescate": "Legumbre andina con más proteína que la soya. Recupera la tierra cansada después de la papa."
+    },
+    {
+      "id": "oca", "nombre": "Oca", "nombres_locales": ["okka", "apilla"], "cientifico": "Oxalis tuberosa",
+      "familia": "Oxalidáceas", "categoria": "tuberculo", "rareza": "en_rescate", "emoji": "🍠",
+      "stats": { "agua": 3, "frio": 4, "calor": 1 }, "altura_min_m": 2800, "altura_max_m": 4000, "ciclo_dias": 220, "perenne": false,
+      "habilidades": ["Aguanta frío", "Se asocia bien con papa y olluco"],
+      "despues_de_bien": ["haba", "tarwi", "cebada"], "despues_de_mal": ["oca", "papa", "olluco", "mashua"],
+      "usos": ["Alimento", "Postres soleados (endulzada al sol)"],
+      "guardar_semilla": "Guarda tubérculos sanos en troje o pirwa, en oscuridad y con paja.",
+      "historia_rescate": "Segundo tubérculo andino después de la papa; se siembra cada vez menos y se pierden variedades."
+    },
+    {
+      "id": "olluco", "nombre": "Olluco", "nombres_locales": ["ulluco", "melloco", "lisas", "papalisa"], "cientifico": "Ullucus tuberosus",
+      "familia": "Baseláceas", "categoria": "tuberculo", "rareza": "en_rescate", "emoji": "🟡",
+      "stats": { "agua": 3, "frio": 4, "calor": 1 }, "altura_min_m": 2800, "altura_max_m": 4000, "ciclo_dias": 200, "perenne": false,
+      "habilidades": ["Aguanta frío", "Se vende bien en mercados"],
+      "despues_de_bien": ["haba", "tarwi", "cebada"], "despues_de_mal": ["olluco", "papa", "oca"],
+      "usos": ["Alimento (olluquito)", "Venta"],
+      "guardar_semilla": "Guarda tubérculos pequeños y sanos en oscuridad para que no se pongan verdes.",
+      "historia_rescate": "Tubérculo colorido de los Andes; muchas variedades se están perdiendo."
+    },
+    {
+      "id": "mashua", "nombre": "Mashua", "nombres_locales": ["isaño", "añu", "mashwa"], "cientifico": "Tropaeolum tuberosum",
+      "familia": "Tropeoláceas", "categoria": "tuberculo", "rareza": "en_rescate", "emoji": "🍠",
+      "stats": { "agua": 3, "frio": 4, "calor": 1 }, "altura_min_m": 3000, "altura_max_m": 4100, "ciclo_dias": 210, "perenne": false,
+      "habilidades": ["Ahuyenta plagas de la papa", "Aguanta frío"],
+      "despues_de_bien": ["haba", "tarwi", "cebada"], "despues_de_mal": ["mashua", "papa", "oca"],
+      "usos": ["Alimento", "Medicina tradicional", "Repelente natural en el borde de la chacra"],
+      "guardar_semilla": "Guarda tubérculos sanos en troje con paja, sin golpes.",
+      "historia_rescate": "Protege a la papa de plagas cuando se siembra en el borde. Cada vez menos familias la conservan."
+    },
+    {
+      "id": "cebada", "nombre": "Cebada", "nombres_locales": ["sebada"], "cientifico": "Hordeum vulgare",
+      "familia": "Poáceas", "categoria": "cereal", "rareza": "comun", "emoji": "🌾",
+      "stats": { "agua": 2, "frio": 4, "calor": 2 }, "altura_min_m": 2500, "altura_max_m": 4000, "ciclo_dias": 140, "perenne": false,
+      "habilidades": ["Aguanta frío", "Buena para cerrar la rotación"],
+      "despues_de_bien": ["papa", "haba", "tarwi", "oca"], "despues_de_mal": ["cebada", "trigo", "avena"],
+      "usos": ["Alimento", "Forraje", "Venta a cerveceras"],
+      "guardar_semilla": "Guarda el grano seco y limpio en costales sobre tarimas, lejos de ratones."
+    },
+    {
+      "id": "trigo", "nombre": "Trigo", "nombres_locales": [], "cientifico": "Triticum aestivum",
+      "familia": "Poáceas", "categoria": "cereal", "rareza": "comun", "emoji": "🌾",
+      "stats": { "agua": 2, "frio": 3, "calor": 2 }, "altura_min_m": 2500, "altura_max_m": 3800, "ciclo_dias": 150, "perenne": false,
+      "habilidades": ["Buena para cerrar la rotación"],
+      "despues_de_bien": ["papa", "haba", "arveja"], "despues_de_mal": ["trigo", "cebada", "avena"],
+      "usos": ["Alimento", "Harina", "Paja"],
+      "guardar_semilla": "Guarda el grano seco y limpio en costales sobre tarimas."
+    },
+    {
+      "id": "avena", "nombre": "Avena", "nombres_locales": [], "cientifico": "Avena sativa",
+      "familia": "Poáceas", "categoria": "cereal", "rareza": "comun", "emoji": "🌾",
+      "stats": { "agua": 2, "frio": 4, "calor": 2 }, "altura_min_m": 2800, "altura_max_m": 4200, "ciclo_dias": 120, "perenne": false,
+      "habilidades": ["Forraje para el ganado", "Aguanta frío"],
+      "despues_de_bien": ["papa", "haba"], "despues_de_mal": ["avena", "cebada", "trigo"],
+      "usos": ["Forraje", "Alimento"],
+      "guardar_semilla": "Guarda el grano seco en costales en un lugar ventilado."
+    },
+    {
+      "id": "yuca", "nombre": "Yuca", "nombres_locales": ["mandioca", "rumu"], "cientifico": "Manihot esculenta",
+      "familia": "Euforbiáceas", "categoria": "tuberculo", "rareza": "comun", "emoji": "🪵",
+      "stats": { "agua": 2, "frio": 0, "calor": 5 }, "altura_min_m": 0, "altura_max_m": 1500, "ciclo_dias": 300, "perenne": false,
+      "habilidades": ["Aguanta sequía", "Aguanta calor"],
+      "despues_de_bien": ["frijol", "maiz_amarillo"], "despues_de_mal": ["yuca", "camote"],
+      "usos": ["Alimento", "Masato", "Almidón"],
+      "guardar_semilla": "Se siembra por estacas: corta tallos maduros de 20 cm y siémbralos pronto."
+    },
+    {
+      "id": "platano", "nombre": "Plátano", "nombres_locales": ["platano de seda", "bellaco", "guineo"], "cientifico": "Musa × paradisiaca",
+      "familia": "Musáceas", "categoria": "frutal", "rareza": "comun", "emoji": "🍌",
+      "stats": { "agua": 4, "frio": 0, "calor": 5 }, "altura_min_m": 0, "altura_max_m": 1500, "ciclo_dias": 365, "perenne": true,
+      "habilidades": ["Da sombra al cacao y al café"],
+      "despues_de_bien": [], "despues_de_mal": [],
+      "usos": ["Alimento", "Venta", "Sombra"],
+      "guardar_semilla": "Se propaga con los hijuelos que salen al pie de la planta madre."
+    },
+    {
+      "id": "cafe", "nombre": "Café", "nombres_locales": [], "cientifico": "Coffea arabica",
+      "familia": "Rubiáceas", "categoria": "frutal", "rareza": "comun", "emoji": "☕",
+      "stats": { "agua": 4, "frio": 1, "calor": 3 }, "altura_min_m": 800, "altura_max_m": 2000, "ciclo_dias": 1095, "perenne": true,
+      "habilidades": ["Cultivo de venta", "Mejor con sombra de árboles"],
+      "despues_de_bien": [], "despues_de_mal": [],
+      "usos": ["Venta", "Exportación"],
+      "guardar_semilla": "Usa granos maduros de plantas sanas; siembra en almácigo a la sombra."
+    },
+    {
+      "id": "cacao", "nombre": "Cacao", "nombres_locales": [], "cientifico": "Theobroma cacao",
+      "familia": "Malváceas", "categoria": "frutal", "rareza": "comun", "emoji": "🍫",
+      "stats": { "agua": 4, "frio": 0, "calor": 5 }, "altura_min_m": 0, "altura_max_m": 1200, "ciclo_dias": 1095, "perenne": true,
+      "habilidades": ["Cultivo de venta", "Mejor con sombra de plátano"],
+      "despues_de_bien": [], "despues_de_mal": [],
+      "usos": ["Venta", "Chocolate"],
+      "guardar_semilla": "Las semillas pierden fuerza rápido: siémbralas apenas salen de la mazorca."
+    },
+    {
+      "id": "arroz", "nombre": "Arroz", "nombres_locales": [], "cientifico": "Oryza sativa",
+      "familia": "Poáceas", "categoria": "cereal", "rareza": "comun", "emoji": "🍚",
+      "stats": { "agua": 5, "frio": 0, "calor": 5 }, "altura_min_m": 0, "altura_max_m": 1000, "ciclo_dias": 130, "perenne": false,
+      "habilidades": ["Muy buscado en el mercado"],
+      "despues_de_bien": ["frijol"], "despues_de_mal": ["arroz", "maiz_amarillo"],
+      "usos": ["Alimento", "Venta"],
+      "guardar_semilla": "Usa semilla certificada o grano limpio y seco de tu mejor poza."
+    },
+    {
+      "id": "camote", "nombre": "Camote", "nombres_locales": ["batata", "apichu"], "cientifico": "Ipomoea batatas",
+      "familia": "Convolvuláceas", "categoria": "tuberculo", "rareza": "comun", "emoji": "🍠",
+      "stats": { "agua": 2, "frio": 1, "calor": 4 }, "altura_min_m": 0, "altura_max_m": 2500, "ciclo_dias": 120, "perenne": false,
+      "habilidades": ["Aguanta sequía", "Cubre el suelo y frena la maleza"],
+      "despues_de_bien": ["maiz_amarillo", "frijol"], "despues_de_mal": ["camote", "yuca"],
+      "usos": ["Alimento", "Hojas para animales"],
+      "guardar_semilla": "Se siembra con guías (esquejes) de plantas sanas."
+    },
+    {
+      "id": "cebolla", "nombre": "Cebolla", "nombres_locales": ["sebolla"], "cientifico": "Allium cepa",
+      "familia": "Amarilidáceas", "categoria": "hortaliza", "rareza": "comun", "emoji": "🧅",
+      "stats": { "agua": 3, "frio": 2, "calor": 3 }, "altura_min_m": 0, "altura_max_m": 3200, "ciclo_dias": 150, "perenne": false,
+      "habilidades": ["Cultivo de venta"],
+      "despues_de_bien": ["frijol", "arveja", "maiz_amilaceo"], "despues_de_mal": ["cebolla"],
+      "usos": ["Alimento", "Venta"],
+      "guardar_semilla": "Deja florecer algunas cebollas y guarda la semilla negra bien seca."
+    },
+    {
+      "id": "zanahoria", "nombre": "Zanahoria", "nombres_locales": ["sanahoria"], "cientifico": "Daucus carota",
+      "familia": "Apiáceas", "categoria": "hortaliza", "rareza": "comun", "emoji": "🥕",
+      "stats": { "agua": 3, "frio": 3, "calor": 2 }, "altura_min_m": 500, "altura_max_m": 3500, "ciclo_dias": 110, "perenne": false,
+      "habilidades": ["Ciclo corto"],
+      "despues_de_bien": ["papa", "haba", "arveja"], "despues_de_mal": ["zanahoria"],
+      "usos": ["Alimento", "Venta"],
+      "guardar_semilla": "Es más fácil comprar semilla; producirla toma dos campañas."
+    },
+    {
+      "id": "tomate", "nombre": "Tomate", "nombres_locales": [], "cientifico": "Solanum lycopersicum",
+      "familia": "Solanáceas", "categoria": "hortaliza", "rareza": "comun", "emoji": "🍅",
+      "stats": { "agua": 3, "frio": 1, "calor": 4 }, "altura_min_m": 0, "altura_max_m": 2000, "ciclo_dias": 120, "perenne": false,
+      "habilidades": ["Cultivo de venta"],
+      "despues_de_bien": ["frijol", "maiz_amarillo"], "despues_de_mal": ["tomate", "papa", "aji"],
+      "usos": ["Alimento", "Venta"],
+      "guardar_semilla": "Saca las semillas de frutos maduros, déjalas fermentar 2 días en agua, lávalas y sécalas."
+    },
+    {
+      "id": "aji", "nombre": "Ají", "nombres_locales": ["aji amarillo", "rocoto", "uchu"], "cientifico": "Capsicum spp.",
+      "familia": "Solanáceas", "categoria": "hortaliza", "rareza": "comun", "emoji": "🌶️",
+      "stats": { "agua": 3, "frio": 1, "calor": 4 }, "altura_min_m": 0, "altura_max_m": 2500, "ciclo_dias": 150, "perenne": false,
+      "habilidades": ["Cultivo de venta"],
+      "despues_de_bien": ["frijol", "maiz_amarillo"], "despues_de_mal": ["aji", "tomate", "papa"],
+      "usos": ["Alimento", "Venta"],
+      "guardar_semilla": "Seca frutos maduros a la sombra y guarda las semillas en sobres de papel."
+    },
+    {
+      "id": "yacon", "nombre": "Yacón", "nombres_locales": ["llacon", "aricoma", "yakon"], "cientifico": "Smallanthus sonchifolius",
+      "familia": "Asteráceas", "categoria": "tuberculo", "rareza": "en_rescate", "emoji": "🍠",
+      "stats": { "agua": 3, "frio": 2, "calor": 3 }, "altura_min_m": 1000, "altura_max_m": 3200, "ciclo_dias": 240, "perenne": false,
+      "habilidades": ["Raíz dulce que no sube el azúcar", "Crece en bordes de chacra"],
+      "despues_de_bien": ["haba", "maiz_amilaceo"], "despues_de_mal": ["yacon"],
+      "usos": ["Alimento", "Jarabe", "Venta a tiendas naturistas"],
+      "guardar_semilla": "Se siembra con los trozos de la cepa (corona) que quedan al cosechar.",
+      "historia_rescate": "Raíz andina dulce que se sembraba en casi todas las chacras y hoy pocos la conocen."
+    },
+    {
+      "id": "maca", "nombre": "Maca", "nombres_locales": ["maka", "ayak chichira"], "cientifico": "Lepidium meyenii",
+      "familia": "Brasicáceas", "categoria": "tuberculo", "rareza": "en_rescate", "emoji": "🫚",
+      "stats": { "agua": 2, "frio": 5, "calor": 0 }, "altura_min_m": 3800, "altura_max_m": 4500, "ciclo_dias": 240, "perenne": false,
+      "habilidades": ["Crece en la puna", "Aguanta helada fuerte"],
+      "despues_de_bien": ["avena", "cebada"], "despues_de_mal": ["maca"],
+      "usos": ["Alimento", "Venta", "Exportación"],
+      "guardar_semilla": "Deja algunas raíces para que den semilla al año siguiente; guárdala seca.",
+      "historia_rescate": "Planta de Junín y Pasco. La tierra necesita varios años de descanso después de sembrarla."
+    },
+    {
+      "id": "sacha_inchi", "nombre": "Sacha inchi", "nombres_locales": ["mani del monte", "sacha mani", "inca inchi"], "cientifico": "Plukenetia volubilis",
+      "familia": "Euforbiáceas", "categoria": "agroforestal", "rareza": "en_rescate", "emoji": "⭐",
+      "stats": { "agua": 4, "frio": 0, "calor": 5 }, "altura_min_m": 100, "altura_max_m": 1500, "ciclo_dias": 240, "perenne": true,
+      "habilidades": ["Trepa sobre tutores o árboles", "Semilla con mucho aceite"],
+      "despues_de_bien": [], "despues_de_mal": [],
+      "usos": ["Aceite", "Snack tostado", "Venta"],
+      "guardar_semilla": "Usa semillas de frutos maduros (estrellas secas) de plantas productivas.",
+      "historia_rescate": "Planta amazónica que usaban los pueblos originarios; buena para sistemas con árboles."
+    },
+    {
+      "id": "choloque", "nombre": "Choloque", "nombres_locales": ["boliche", "chumbimbo", "jaboncillo", "sullucu"], "cientifico": "Sapindus saponaria",
+      "familia": "Sapindáceas", "categoria": "agroforestal", "rareza": "en_rescate", "emoji": "🧼",
+      "stats": { "agua": 2, "frio": 1, "calor": 4 }, "altura_min_m": 0, "altura_max_m": 2000, "ciclo_dias": 1825, "perenne": true,
+      "habilidades": ["Jabón natural: su fruto hace espuma", "Árbol de borde y sombra"],
+      "despues_de_bien": [], "despues_de_mal": [],
+      "usos": ["Jabón y detergente natural", "Lavar fibra de alpaca", "Sombra y cerco vivo"],
+      "guardar_semilla": "Las semillas son duras: remójalas 24 horas en agua tibia antes de sembrar.",
+      "historia_rescate": "Árbol del norte peruano cuyo fruto se usaba como jabón. Ya casi no se siembra y no está bien registrado en bancos de semillas."
+    },
+    {
+      "id": "camu_camu", "nombre": "Camu camu", "nombres_locales": ["camocamo"], "cientifico": "Myrciaria dubia",
+      "familia": "Mirtáceas", "categoria": "frutal", "rareza": "rara", "emoji": "🍒",
+      "stats": { "agua": 5, "frio": 0, "calor": 5 }, "altura_min_m": 0, "altura_max_m": 400, "ciclo_dias": 1095, "perenne": true,
+      "habilidades": ["Aguanta inundación", "Mucha vitamina C"],
+      "despues_de_bien": [], "despues_de_mal": [],
+      "usos": ["Refrescos", "Venta", "Exportación"],
+      "guardar_semilla": "Siembra las semillas frescas de frutos maduros; no aguantan secarse."
+    },
+    {
+      "id": "mango", "nombre": "Mango", "nombres_locales": [], "cientifico": "Mangifera indica",
+      "familia": "Anacardiáceas", "categoria": "frutal", "rareza": "comun", "emoji": "🥭",
+      "stats": { "agua": 3, "frio": 0, "calor": 5 }, "altura_min_m": 0, "altura_max_m": 800, "ciclo_dias": 1460, "perenne": true,
+      "habilidades": ["Cultivo de exportación"],
+      "despues_de_bien": [], "despues_de_mal": [],
+      "usos": ["Venta", "Exportación"],
+      "guardar_semilla": "Se propaga con injertos sobre patrones de semilla."
+    }
+  ]
+}

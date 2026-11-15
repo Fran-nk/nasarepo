@@ -1,36 +1,65 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Semilla Siguiente
 
-## Getting Started
+App para agricultores del Perú: **qué sembrar ahora en tu chacra**, con datos de la NASA explicados en palabras sencillas.
 
-First, run the development server:
+Esta parte es el **frontend** (Next.js 16 + Tailwind 4), con un diseño súper simple pensado para ver los datos en pantalla. Por ahora funciona con **datos de prueba**. El backend se conecta después siguiendo el [contrato de datos](docs/contrato-datos.md).
+
+## Pantallas
+
+- **🏡 Mi chacra:** mapa Mapbox para dibujar el terreno o usar la ubicación actual; zona Pulgar Vidal y altitud; los 3 últimos cultivos (buscador que entiende "oyuco", "abas", "chocho"…) y el botón "¿Qué siembro ahora?".
+- **🌦️ Clima:**
+  - alertas de peligro (helada, granizo, sequía, calor, lluvia fuerte, huaico);
+  - **El Niño hoy** (estado del ENFEN y su efecto en tu zona);
+  - lluvia de la semana;
+  - semáforo de siembra;
+  - ¿Riego hoy?;
+  - este año comparado con lo normal.
+- **🌱 Semillas:** el Semillero, con fichas coleccionables (agua, frío y calor, habilidades, rotación, usos y cómo guardar la semilla) y pestañas Mis semillas, Para mí, Todas y ⭐ En rescate.
+- **📅 Calendario:** siembra, crecimiento y cosecha de cada cultivo, más las actividades anotadas (riego, abono, quema, cosecha).
+- **Interfaz en dos niveles:** **Sencillo** (frases y qué hacer) y **Avanzado** ("Ver datos", con números y fuente). Cada tarjeta tiene 🔊 para escucharla.
+
+Los datos del agricultor (terreno, historial, mis semillas, actividades) se guardan **solo en su celular** (IndexedDB).
+
+## Cómo correrlo
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+corepack pnpm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+```bash
+cp .env.example .env.local
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+En `.env.local` pon tu token público de Mapbox en `NEXT_PUBLIC_MAPBOX_TOKEN`. Sin token, la app funciona igual pero muestra un aviso en lugar del mapa.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+corepack pnpm dev
+```
 
-## Learn More
+Abre http://localhost:3000. Con el menú ⚙️ del encabezado cambias entre los 3 escenarios de demostración:
+- Cusco (Quechua);
+- Piura con El Niño;
+- Puno con helada.
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+corepack pnpm test
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Documentos
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- [docs/contrato-datos.md](docs/contrato-datos.md): endpoints y formatos que debe entregar el backend.
+- [docs/plan-modelo.md](docs/plan-modelo.md): variables, capas de datos y red neuronal acordadas.
 
-## Deploy on Vercel
+## Estructura
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```
+app/                 pantallas (Mi chacra, clima, semillas, calendario, recomendaciones)
+components/          tarjetas, mapa, semillero, calendario
+lib/contratos/       tipos del contrato con el backend
+lib/api/cliente.ts   datos de prueba o backend real (NEXT_PUBLIC_USE_MOCKS)
+lib/textos.ts        todos los textos de la interfaz (para traducir)
+lib/mensajes.ts      convierte datos en frases sencillas
+lib/busqueda/        búsqueda fonética (Y/LL/I, H muda, B/V, S/C/Z…)
+lib/almacen.ts       datos del agricultor en IndexedDB (Dexie)
+mocks/               escenarios de prueba y catálogo de 32 semillas
+```
