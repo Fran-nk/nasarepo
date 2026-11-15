@@ -1,5 +1,5 @@
 /**
- * Preferencias por dispositivo (modo de interfaz y escenario de demo) en localStorage.
+ * Preferencias por dispositivo (escenario de demo y cultivo abierto) en localStorage.
  * Se leen con useSyncExternalStore para evitar diferencias entre servidor y cliente.
  */
 "use client";
@@ -7,9 +7,7 @@
 import { useSyncExternalStore } from "react";
 import { ESCENARIO_INICIAL, LISTA_ESCENARIOS, type IdEscenario } from "@/lib/escenarios";
 
-export type Modo = "sencillo" | "avanzado";
-
-const CLAVES = { modo: "ss.modo", escenario: "ss.escenario" } as const;
+const CLAVES = { escenario: "ss.escenario", cultivo: "ss.cultivo" } as const;
 const EVENTO = "ss-preferencias";
 
 function leer(clave: string): string | null {
@@ -41,15 +39,6 @@ function suscribir(cb: () => void) {
   };
 }
 
-export function useModo(): [Modo, (m: Modo) => void] {
-  const valor = useSyncExternalStore(
-    suscribir,
-    () => (leer(CLAVES.modo) ?? memoria[CLAVES.modo]) === "avanzado" ? "avanzado" : "sencillo",
-    () => "sencillo" as Modo,
-  );
-  return [valor, (m) => escribir(CLAVES.modo, m)];
-}
-
 export function useEscenario(): [IdEscenario, (e: IdEscenario) => void] {
   const valor = useSyncExternalStore(
     suscribir,
@@ -60,4 +49,17 @@ export function useEscenario(): [IdEscenario, (e: IdEscenario) => void] {
     () => ESCENARIO_INICIAL,
   );
   return [valor, (e) => escribir(CLAVES.escenario, e)];
+}
+
+/** id del cultivo que se está mirando (null = ninguno elegido: se usa el más reciente). */
+export function useCultivoActivo(): [number | null, (id: number) => void] {
+  const valor = useSyncExternalStore(
+    suscribir,
+    () => {
+      const n = Number(leer(CLAVES.cultivo) ?? memoria[CLAVES.cultivo]);
+      return Number.isInteger(n) && n > 0 ? n : null;
+    },
+    () => null,
+  );
+  return [valor, (id) => escribir(CLAVES.cultivo, String(id))];
 }

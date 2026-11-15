@@ -2,17 +2,16 @@
 
 import type { ReactNode } from "react";
 import { BotonVoz } from "@/components/BotonVoz";
-import { useModo } from "@/lib/preferencias";
-import { MODO } from "@/lib/textos";
 
 export type Tono = "verde" | "ambar" | "rojo" | "neutral" | "violeta";
 
-const BORDES: Record<Tono, string> = {
-  verde: "border-l-green-600",
-  ambar: "border-l-amber-500",
-  rojo: "border-l-red-600",
-  neutral: "border-l-stone-300",
-  violeta: "border-l-violet-600",
+/** Color de la franja superior (guía "Territorio"). */
+const ACENTOS: Record<Tono, string> = {
+  verde: "bg-bosque",
+  ambar: "bg-senal",
+  rojo: "bg-terracota",
+  neutral: "bg-petroleo",
+  violeta: "bg-terracota",
 };
 
 export interface DatoTecnico {
@@ -37,51 +36,51 @@ interface Props {
 
 /**
  * Tarjeta base: pregunta → respuesta en una frase → qué hacer.
- * En modo Avanzado agrega "Ver datos" con números y fuente.
+ * "Ver datos" (plegado) muestra los números y la fuente.
  */
 export function TarjetaDato({ emoji, pregunta, respuesta, detalle, queHacer, tono = "neutral", children, datos, fuente }: Props) {
-  const [modo] = useModo();
   const textoVoz = [pregunta, respuesta, detalle, queHacer && `Qué hacer: ${queHacer}`].filter(Boolean).join(". ");
 
   return (
-    <section className={`rounded-2xl border border-stone-200 border-l-8 ${BORDES[tono]} bg-white p-4 shadow-sm`}>
+    <section className="relative overflow-clip rounded-[20px] border border-white bg-white px-5 pt-[18px] pb-4">
+      <div aria-hidden className={`absolute inset-x-0 top-0 h-1 ${ACENTOS[tono]}`} />
       <div className="flex items-start gap-3">
-        <span className="text-4xl leading-none" aria-hidden>
+        <span className="text-[32px] leading-[38px]" aria-hidden>
           {emoji}
         </span>
         <div className="min-w-0 flex-1">
-          <h2 className="text-base font-medium text-stone-500">{pregunta}</h2>
-          <p className="mt-1 text-xl font-bold leading-snug text-stone-900">{respuesta}</p>
-          {detalle && <p className="mt-1 text-lg text-stone-700">{detalle}</p>}
+          <h2 className="text-[13px] leading-[18px] font-normal text-secundario">{pregunta}</h2>
+          <p className="mt-1 text-[20px] leading-[26px] font-semibold text-tinta">{respuesta}</p>
+          {detalle && <p className="mt-1 text-[16px] leading-[24px] text-secundario">{detalle}</p>}
         </div>
-        <BotonVoz texto={textoVoz} />
+        <BotonVoz texto={textoVoz} pequeno />
       </div>
 
       {children && <div className="mt-3">{children}</div>}
 
       {queHacer && (
-        <p className="mt-3 rounded-xl bg-stone-100 p-3 text-lg text-stone-800">
+        <p className="mt-3 rounded-[4px] bg-arena p-3 text-[16px] leading-[24px] text-tinta">
           <span className="font-semibold">Qué hacer: </span>
           {queHacer}
         </p>
       )}
 
-      {modo === "avanzado" && (Boolean(datos?.length) || Boolean(fuente)) && (
-        <details className="mt-3 rounded-xl border border-stone-200 p-3 text-base">
-          <summary className="cursor-pointer font-semibold text-stone-700">{MODO.verDatos}</summary>
+      {(Boolean(datos?.length) || Boolean(fuente)) && (
+        <details className="mt-3 rounded-[4px] bg-arena/60 p-3 text-[14px] leading-[20px]">
+          <summary className="cursor-pointer font-semibold text-tinta">Ver datos</summary>
           {datos && datos.length > 0 && (
             <dl className="mt-2 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1">
               {datos.map((d) => (
                 <div key={d.etiqueta} className="contents">
-                  <dt className="text-stone-500">{d.etiqueta}</dt>
-                  <dd className="text-right font-mono text-stone-900">{d.valor}</dd>
+                  <dt className="text-secundario">{d.etiqueta}</dt>
+                  <dd className="text-right font-semibold text-tinta">{d.valor}</dd>
                 </div>
               ))}
             </dl>
           )}
           {fuente && (
-            <p className="mt-2 text-sm text-stone-500">
-              {MODO.fuente}: {fuente}
+            <p className="mt-2 text-[11px] leading-[15px] text-secundario">
+              Fuente: {fuente}
             </p>
           )}
         </details>
@@ -92,7 +91,7 @@ export function TarjetaDato({ emoji, pregunta, respuesta, detalle, queHacer, ton
 
 export function TarjetaCargando({ texto = "Cargando…" }: { texto?: string }) {
   return (
-    <div className="animate-pulse rounded-2xl border border-stone-200 bg-white p-4 text-lg text-stone-400">
+    <div className="animate-pulse rounded-[20px] bg-white p-4 text-[16px] leading-[24px] text-secundario">
       {texto}
     </div>
   );
@@ -100,7 +99,7 @@ export function TarjetaCargando({ texto = "Cargando…" }: { texto?: string }) {
 
 export function TarjetaError({ texto }: { texto: string }) {
   return (
-    <div className="rounded-2xl border border-red-200 bg-red-50 p-4 text-lg text-red-800">
+    <div className="rounded-[20px] bg-terracota/15 p-4 text-[16px] leading-[24px] text-tinta">
       😕 No pudimos traer este dato. {texto}
     </div>
   );

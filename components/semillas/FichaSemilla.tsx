@@ -2,24 +2,39 @@
 
 import Link from "next/link";
 import { BotonVoz } from "@/components/BotonVoz";
+import { CHIP, FICHA_ARENA, ROTULO_FICHA, TARJETA_BLANCA, TITULO_SECCION, VALOR_FICHA } from "@/components/estilos";
+import { IconoLinea, type NombreIconoLinea } from "@/components/IconoLinea";
 import { TarjetaCargando } from "@/components/tarjetas/TarjetaDato";
 import { alternarMiSemilla } from "@/lib/almacen";
 import { useCatalogo, useMisSemillas } from "@/lib/hooks";
 import { formatoMiles } from "@/lib/mensajes";
-import { useModo } from "@/lib/preferencias";
 import { CATEGORIAS, RAREZA } from "@/lib/textos";
 import { BarraStat } from "./BarraStat";
 
+/** Bloque blanco de la ficha con su título en Roboto (sin emojis: el diseño usa pocos colores). */
 function Seccion({ titulo, children }: { titulo: string; children: React.ReactNode }) {
   return (
-    <section className="rounded-2xl border border-stone-200 bg-white p-4">
-      <h2 className="mb-2 text-lg font-bold">{titulo}</h2>
+    <section className={`${TARJETA_BLANCA} flex flex-col gap-2.5`}>
+      <h2 className={TITULO_SECCION}>{titulo}</h2>
       {children}
     </section>
   );
 }
 
-function duracion(dias: number): string {
+/** Ficha arena con un dato (como los widgets de "Tu cultivo hoy"). */
+function Dato({ icono, etiqueta, valor }: { icono: NombreIconoLinea; etiqueta: string; valor: string }) {
+  return (
+    <div className={`${FICHA_ARENA} flex flex-col gap-1`}>
+      <dt className="flex items-center gap-1.5">
+        <IconoLinea nombre={icono} className="size-4 shrink-0 text-tinta" />
+        <span className={ROTULO_FICHA}>{etiqueta}</span>
+      </dt>
+      <dd className={VALOR_FICHA}>{valor}</dd>
+    </div>
+  );
+}
+
+export function duracion(dias: number): string {
   if (dias >= 365) {
     const anios = Math.round(dias / 365);
     return anios === 1 ? "1 año" : `${anios} años`;
@@ -28,18 +43,22 @@ function duracion(dias: number): string {
   return meses === 1 ? "1 mes" : `${meses} meses`;
 }
 
-/** Ficha completa de una semilla (estilo coleccionable, diseño propio). */
+const TEXTO = "text-[15px] leading-[22px] text-tinta";
+
+/** Ficha completa de una semilla con el estilo del panel: tarjetas blancas, fichas arena e íconos de línea. */
 export function FichaSemilla({ id }: { id: string }) {
   const { porId, cargando } = useCatalogo();
   const mias = useMisSemillas();
-  const [modo] = useModo();
   const s = porId.get(id);
 
   if (cargando) return <TarjetaCargando />;
   if (!s)
     return (
-      <p className="rounded-2xl bg-white p-4 text-lg">
-        No encontramos esta semilla. <Link href="/semillas" className="font-semibold text-green-800 underline">Volver</Link>
+      <p className={`${TARJETA_BLANCA} ${TEXTO}`}>
+        No encontramos esta semilla.{" "}
+        <Link href="/semillas" className="font-semibold text-tinta underline">
+          Volver
+        </Link>
       </p>
     );
 
@@ -49,7 +68,7 @@ export function FichaSemilla({ id }: { id: string }) {
     ids
       .map((x) => porId.get(x))
       .filter((x) => !!x)
-      .map((x) => `${x!.emoji} ${x!.nombre}`);
+      .map((x) => x!);
   const bien = nombres(s.despues_de_bien);
   const mal = nombres(s.despues_de_mal);
   const textoVoz = [
@@ -65,111 +84,148 @@ export function FichaSemilla({ id }: { id: string }) {
 
   return (
     <div className="flex flex-col gap-3">
-      <Link href="/semillas" className="text-lg font-semibold text-green-800">
+      <Link href="/semillas" className="w-max text-[18px] leading-[28px] font-semibold text-tinta">
         ← Semillero
       </Link>
 
-      <header className={`rounded-3xl border-4 p-4 text-center ${enRescate ? "border-violet-500 bg-violet-50" : "border-amber-300 bg-amber-50"}`}>
-        <div className="flex justify-end">
-          <BotonVoz texto={textoVoz} />
-        </div>
-        <div className="text-7xl" aria-hidden>
+      {/* Cabecera como la de "Mi Cultivo": dibujo grande a la izquierda, nombre y chips a la derecha. */}
+      <header className={`${TARJETA_BLANCA} relative flex items-center gap-3 ${enRescate ? "border-terracota" : ""}`}>
+        <span
+          aria-hidden
+          className="flex size-[88px] shrink-0 items-center justify-center rounded-[12px] border-[0.5px] border-borde bg-arena text-[48px] lg:size-[80px] lg:text-[44px]"
+        >
           {s.emoji}
+        </span>
+        <div className="flex min-w-0 flex-1 flex-col gap-1">
+          <h1 className="pr-8 font-titulo text-[28px] leading-[30px] font-bold text-tinta">{s.nombre}</h1>
+          <p className="text-[12px] leading-[16px] text-secundario italic">
+            {s.cientifico} · {s.familia}
+          </p>
+          <div className="flex flex-wrap gap-1 pt-0.5">
+            <span className={`${CHIP} ${CATEGORIAS[s.categoria].color}`}>{CATEGORIAS[s.categoria].nombre}</span>
+            <span className={`${CHIP} ${RAREZA[s.rareza].color}`}>{RAREZA[s.rareza].nombre}</span>
+            {s.perenne && <span className={`${CHIP} bg-pradera/50 text-tinta`}>Vive varios años</span>}
+          </div>
         </div>
-        <h1 className="mt-2 text-3xl font-bold">{s.nombre}</h1>
-        {s.nombres_locales.length > 0 && (
-          <p className="text-base text-stone-600">También le dicen: {s.nombres_locales.join(", ")}</p>
-        )}
-        {modo === "avanzado" && <p className="text-base italic text-stone-500">{s.cientifico} · {s.familia}</p>}
-        <div className="mt-2 flex flex-wrap justify-center gap-2">
-          <span className={`rounded-full px-3 py-1 text-sm font-semibold ${CATEGORIAS[s.categoria].color}`}>
-            {CATEGORIAS[s.categoria].nombre}
-          </span>
-          <span className={`rounded-full px-3 py-1 text-sm font-semibold ${RAREZA[s.rareza].color}`}>{RAREZA[s.rareza].nombre}</span>
-          {s.perenne && <span className="rounded-full bg-emerald-100 px-3 py-1 text-sm font-semibold text-emerald-900">Vive varios años</span>}
-        </div>
+        <span className="absolute top-3 right-3">
+          <BotonVoz texto={textoVoz} pequeno className="bg-white" />
+        </span>
       </header>
+      {s.nombres_locales.length > 0 && (
+        <p className="text-[13px] leading-[18px] text-secundario">También le dicen: {s.nombres_locales.join(", ")}</p>
+      )}
 
       {enRescate && s.historia_rescate && (
-        <section className="rounded-2xl bg-violet-600 p-4 text-white">
-          <h2 className="text-lg font-bold">⭐ ¿Por qué rescatarla?</h2>
-          <p className="mt-1 text-lg">{s.historia_rescate}</p>
+        <section className="flex flex-col gap-1.5 rounded-[20px] bg-tinta p-4 text-papel">
+          <h2 className="flex items-center gap-1.5 font-titulo text-[20px] leading-[24px] font-bold text-senal">
+            <IconoLinea nombre="estrella" className="size-5 shrink-0" />
+            ¿Por qué rescatarla?
+          </h2>
+          <p className="text-[15px] leading-[22px]">{s.historia_rescate}</p>
         </section>
       )}
 
-      <Seccion titulo="📋 Sus características">
+      <Seccion titulo="Sus características">
         <div className="flex flex-col gap-2">
           <BarraStat stat="agua" valor={s.stats.agua} />
           <BarraStat stat="frio" valor={s.stats.frio} />
           <BarraStat stat="calor" valor={s.stats.calor} />
         </div>
-        <dl className="mt-3 grid grid-cols-2 gap-2 text-center">
-          <div className="rounded-xl bg-stone-50 p-2">
-            <dt className="text-sm text-stone-500">⛰️ Crece a</dt>
-            <dd className="text-lg font-bold">
-              {formatoMiles(s.altura_min_m)}–{formatoMiles(s.altura_max_m)} m
-            </dd>
-          </div>
-          <div className="rounded-xl bg-stone-50 p-2">
-            <dt className="text-sm text-stone-500">🧺 {s.perenne ? "Primera cosecha en" : "Se cosecha en"}</dt>
-            <dd className="text-lg font-bold">{duracion(s.ciclo_dias)}</dd>
-          </div>
+        <dl className="grid grid-cols-2 gap-2 pt-1 lg:gap-[6px]">
+          <Dato icono="montana" etiqueta="Crece a" valor={`${formatoMiles(s.altura_min_m)}–${formatoMiles(s.altura_max_m)} m`} />
+          <Dato icono="reloj" etiqueta={s.perenne ? "Primera cosecha" : "Se cosecha en"} valor={duracion(s.ciclo_dias)} />
         </dl>
       </Seccion>
 
       {s.habilidades.length > 0 && (
-        <Seccion titulo="✨ Habilidades">
-          <ul className="flex flex-col gap-1 text-lg">
+        <Seccion titulo="Habilidades">
+          <ul className="flex flex-col gap-1.5">
             {s.habilidades.map((h) => (
-              <li key={h}>✔️ {h}</li>
+              <li key={h} className={`flex gap-2 ${TEXTO}`}>
+                <IconoLinea nombre="check" className="mt-[3px] size-4 shrink-0 text-tinta" />
+                {h}
+              </li>
             ))}
           </ul>
         </Seccion>
       )}
 
       {!s.perenne && (bien.length > 0 || mal.length > 0) && (
-        <Seccion titulo="🔄 Rotación">
-          {bien.length > 0 && (
-            <p className="text-lg">
-              <span className="font-semibold text-green-800">👍 Siémbrala después de: </span>
-              {bien.join(", ")}
-            </p>
-          )}
-          {mal.length > 0 && (
-            <p className="mt-2 text-lg">
-              <span className="font-semibold text-red-700">👎 No la siembres después de: </span>
-              {mal.join(", ")}
-            </p>
-          )}
+        <Seccion titulo="Rotación">
+          {bien.length > 0 && <ListaRotacion titulo="Siémbrala después de" icono="check" semillas={bien} />}
+          {mal.length > 0 && <ListaRotacion titulo="No la siembres después de" icono="equis" semillas={mal} mala />}
         </Seccion>
       )}
       {s.perenne && (
-        <Seccion titulo="🌳 Cómo sembrarla">
-          <p className="text-lg">Vive varios años: siémbrala en el borde de la chacra, como sombra o junto a otros árboles. No entra en la rotación.</p>
+        <Seccion titulo="Cómo sembrarla">
+          <p className={TEXTO}>
+            Vive varios años: siémbrala en el borde de tu terreno, como sombra o junto a otros árboles. No entra en la rotación.
+          </p>
         </Seccion>
       )}
 
-      <Seccion titulo="🍽️ Para qué sirve">
-        <div className="flex flex-wrap gap-2">
+      <Seccion titulo="Para qué sirve">
+        <div className="flex flex-wrap gap-1.5">
           {s.usos.map((u) => (
-            <span key={u} className="rounded-full bg-stone-100 px-3 py-1 text-lg">
+            <span key={u} className={`${FICHA_ARENA} px-2.5 py-1 text-[14px] leading-[20px] text-tinta`}>
               {u}
             </span>
           ))}
         </div>
       </Seccion>
 
-      <Seccion titulo="🫙 Cómo guardar tu semilla">
-        <p className="text-lg">{s.guardar_semilla}</p>
+      <Seccion titulo="Cómo guardar tu semilla">
+        <p className={TEXTO}>{s.guardar_semilla}</p>
       </Seccion>
 
       <button
         type="button"
         onClick={() => void alternarMiSemilla(s.id)}
-        className={`sticky bottom-24 rounded-2xl px-4 py-4 text-xl font-bold shadow-lg ${tengo ? "border-2 border-green-700 bg-white text-green-800" : "bg-green-700 text-white"}`}
+        aria-pressed={tengo}
+        className={`sticky bottom-[76px] flex items-center justify-center gap-2 rounded-[14px] px-4 py-3 text-[16px] leading-[24px] font-semibold shadow-[0_2px_8px_rgba(38,59,53,0.25)] transition-colors lg:bottom-0 ${
+          tengo ? "border-[1.6px] border-tinta bg-white text-tinta" : "bg-tinta text-white hover:bg-tinta/90"
+        }`}
       >
-        {tengo ? "✅ La tengo (tocar para quitar)" : "➕ Tengo esta semilla"}
+        <IconoLinea nombre={tengo ? "check" : "estrella"} className="size-5 shrink-0" />
+        {tengo ? "La tengo (tocar para quitar)" : "Tengo esta semilla"}
       </button>
+    </div>
+  );
+}
+
+/** Fichas arena con las semillas que van bien (o mal) antes de esta. */
+function ListaRotacion({
+  titulo,
+  icono,
+  semillas,
+  mala = false,
+}: {
+  titulo: string;
+  icono: NombreIconoLinea;
+  semillas: { id: string; nombre: string; emoji: string }[];
+  mala?: boolean;
+}) {
+  return (
+    <div className="flex flex-col gap-1.5">
+      <p className={`flex items-center gap-1.5 text-[13px] leading-[18px] font-semibold ${mala ? "text-terracota" : "text-tinta"}`}>
+        <IconoLinea nombre={icono} className="size-4 shrink-0" />
+        {titulo}
+      </p>
+      <ul className="flex flex-wrap gap-1.5">
+        {semillas.map((x) => (
+          <li key={x.id}>
+            <Link
+              href={`/semillas/${x.id}`}
+              className={`${FICHA_ARENA} flex items-center gap-1.5 px-2 py-1 text-[14px] leading-[20px] text-tinta hover:bg-arena/70`}
+            >
+              <span aria-hidden className="text-[18px] leading-none">
+                {x.emoji}
+              </span>
+              {x.nombre}
+            </Link>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

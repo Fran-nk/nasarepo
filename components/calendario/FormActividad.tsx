@@ -5,6 +5,7 @@ import { db, type TipoActividad } from "@/lib/almacen";
 import { useCatalogo, useMisSemillas } from "@/lib/hooks";
 import { hoyISO } from "@/lib/mensajes";
 import { ACTIVIDADES } from "@/lib/textos";
+import { BOTON_OSCURO, CAMPO, ROTULO_BLOQUE } from "@/components/estilos";
 
 /** Anotar lo que hizo en la chacra (RF 8). Se guarda solo en el celular. */
 export function FormActividad({ onListo }: { onListo: () => void }) {
@@ -26,9 +27,9 @@ export function FormActividad({ onListo }: { onListo: () => void }) {
   }
 
   return (
-    <section className="rounded-2xl border-2 border-green-700 bg-white p-4">
-      <h2 className="text-xl font-bold">✏️ ¿Qué hiciste?</h2>
-      <div className="mt-3 grid grid-cols-3 gap-2">
+    <section className="flex flex-col">
+      <h3 className="font-titulo text-[20px] leading-[24px] font-bold text-tinta">¿Qué hiciste?</h3>
+      <div className="mt-2 grid grid-cols-3 gap-1.5">
         {(Object.keys(ACTIVIDADES) as TipoActividad[]).map((t) => (
           <button
             key={t}
@@ -38,9 +39,11 @@ export function FormActividad({ onListo }: { onListo: () => void }) {
               setError(null);
             }}
             aria-pressed={tipo === t}
-            className={`flex flex-col items-center rounded-xl border-2 p-2 text-base font-semibold ${tipo === t ? "border-green-700 bg-green-50" : "border-stone-200"}`}
+            className={`flex flex-col items-center gap-1 rounded-[12px] border p-2 text-[12px] leading-[15px] font-semibold text-tinta transition-colors ${
+              tipo === t ? "border-tinta bg-pradera/30" : "border-borde bg-arena hover:bg-arena/70"
+            }`}
           >
-            <span className="text-3xl" aria-hidden>
+            <span className="text-[24px] leading-none" aria-hidden>
               {ACTIVIDADES[t].emoji}
             </span>
             {ACTIVIDADES[t].nombre}
@@ -48,14 +51,14 @@ export function FormActividad({ onListo }: { onListo: () => void }) {
         ))}
       </div>
 
-      <label className="mt-3 block text-base font-semibold text-stone-700">
-        ¿En qué cultivo? {tipo !== "sembre" && <span className="font-normal text-stone-500">(opcional)</span>}
+      <label className={`mt-3 block ${ROTULO_BLOQUE}`}>
+        ¿En qué cultivo? {tipo !== "sembre" && <span className="font-normal text-secundario normal-case">(opcional)</span>}
         <select
           value={semillaId}
           onChange={(e) => setSemillaId(e.target.value)}
-          className="mt-1 w-full rounded-xl border border-stone-300 bg-white px-3 py-3 text-lg"
+          className={`mt-1 ${CAMPO} font-sans font-normal normal-case`}
         >
-          <option value="">— Toda la chacra —</option>
+          <option value="">— Todo el terreno —</option>
           {ordenadas.map((s) => (
             <option key={s.id} value={s.id}>
               {s.emoji} {s.nombre}
@@ -65,34 +68,34 @@ export function FormActividad({ onListo }: { onListo: () => void }) {
         </select>
       </label>
 
-      <label className="mt-3 block text-base font-semibold text-stone-700">
+      <label className={`mt-3 block ${ROTULO_BLOQUE}`}>
         ¿Cuándo?
         <input
           type="date"
           value={fecha}
           max={hoyISO()}
           onChange={(e) => setFecha(e.target.value)}
-          className="mt-1 w-full rounded-xl border border-stone-300 px-3 py-3 text-lg"
+          className={`mt-1 ${CAMPO} font-sans font-normal normal-case`}
         />
       </label>
 
-      <label className="mt-3 block text-base font-semibold text-stone-700">
-        Nota <span className="font-normal text-stone-500">(opcional)</span>
+      <label className={`mt-3 block ${ROTULO_BLOQUE}`}>
+        Nota <span className="font-normal text-secundario normal-case">(opcional)</span>
         <input
           value={nota}
           onChange={(e) => setNota(e.target.value)}
           placeholder="Ej.: 2 sacos de guano de isla"
-          className="mt-1 w-full rounded-xl border border-stone-300 px-3 py-3 text-lg"
+          className={`mt-1 ${CAMPO} font-sans font-normal normal-case`}
         />
       </label>
 
-      {error && <p className="mt-2 text-base font-semibold text-red-700">{error}</p>}
+      {error && <p className="mt-2 text-[13px] leading-[18px] font-semibold text-terracota">{error}</p>}
 
       <div className="mt-4 flex gap-2">
-        <button type="button" onClick={() => void guardar()} className="flex-1 rounded-xl bg-green-700 py-3 text-lg font-bold text-white">
+        <button type="button" onClick={() => void guardar()} className={`${BOTON_OSCURO} flex-1`}>
           Guardar
         </button>
-        <button type="button" onClick={onListo} className="flex-1 rounded-xl border border-stone-300 py-3 text-lg text-stone-600">
+        <button type="button" onClick={onListo} className="flex-1 rounded-[12px] border border-borde py-3 text-[14px] leading-[20px] font-semibold text-secundario hover:bg-arena/60">
           Cancelar
         </button>
       </div>

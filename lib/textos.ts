@@ -16,29 +16,25 @@ import type {
 export const APP_NOMBRE = "Semilla Siguiente";
 
 export const NAV = {
-  chacra: "Mi chacra",
-  clima: "Clima",
+  mapa: "Mi Cultivo",
   semillas: "Semillas",
-  calendario: "Calendario",
+  perfil: "Mi Perfil",
 };
 
-export const MODO = {
-  sencillo: "Sencillo",
-  avanzado: "Avanzado",
-  verDatos: "Ver datos",
-  fuente: "Fuente",
-};
+export type Region = "costa" | "sierra" | "selva";
 
-export const ZONAS: Record<ZonaPulgarVidal, { nombre: string; descripcion: string }> = {
-  chala: { nombre: "Chala (costa)", descripcion: "Costa cálida y seca, cerca del mar." },
-  yunga_maritima: { nombre: "Yunga", descripcion: "Valles cálidos de la vertiente del Pacífico." },
-  quechua: { nombre: "Quechua", descripcion: "Valles templados de la sierra." },
-  suni: { nombre: "Suni (jalca)", descripcion: "Tierras altas y frías, con heladas." },
-  puna: { nombre: "Puna", descripcion: "Altiplano muy frío; pastos y pocos cultivos." },
-  janca: { nombre: "Janca (cordillera)", descripcion: "Nieves y roca; casi no se cultiva." },
-  yunga_fluvial: { nombre: "Yunga fluvial", descripcion: "Valles templados hacia la selva." },
-  rupa_rupa: { nombre: "Rupa Rupa (selva alta)", descripcion: "Selva alta, lluviosa y cálida." },
-  omagua: { nombre: "Omagua (selva baja)", descripcion: "Llano amazónico, muy cálido y húmedo." },
+export const REGIONES: Record<Region, string> = { costa: "Costa", sierra: "Sierra", selva: "Selva" };
+
+export const ZONAS: Record<ZonaPulgarVidal, { nombre: string; region: Region; descripcion: string }> = {
+  chala: { nombre: "Chala", region: "costa", descripcion: "Costa cálida y seca, cerca del mar." },
+  yunga_maritima: { nombre: "Yunga", region: "costa", descripcion: "Valles cálidos de la vertiente del Pacífico." },
+  quechua: { nombre: "Quechua", region: "sierra", descripcion: "Valles templados de la sierra." },
+  suni: { nombre: "Suni", region: "sierra", descripcion: "Tierras altas y frías (jalca), con heladas." },
+  puna: { nombre: "Puna", region: "sierra", descripcion: "Altiplano muy frío; pastos y pocos cultivos." },
+  janca: { nombre: "Janca", region: "sierra", descripcion: "Cordillera: nieves y roca; casi no se cultiva." },
+  yunga_fluvial: { nombre: "Yunga fluvial", region: "selva", descripcion: "Valles templados hacia la selva." },
+  rupa_rupa: { nombre: "Rupa Rupa", region: "selva", descripcion: "Selva alta, lluviosa y cálida." },
+  omagua: { nombre: "Omagua", region: "selva", descripcion: "Selva baja: llano amazónico, muy cálido y húmedo." },
 };
 
 export const CIELO: Record<Cielo, { emoji: string; nombre: string }> = {
@@ -139,20 +135,21 @@ export const MOTIVOS: Record<MotivoRecomendacion, string> = {
   especie_en_rescate: "Es una planta nativa que estamos rescatando.",
 };
 
+// Colores de la guía "Territorio": arena, pradera, señal, bosque y terracota en dosis suaves.
 export const CATEGORIAS: Record<Categoria, { nombre: string; color: string }> = {
-  cereal: { nombre: "Cereal", color: "bg-amber-100 text-amber-900" },
-  pseudocereal: { nombre: "Grano andino", color: "bg-orange-100 text-orange-900" },
-  leguminosa: { nombre: "Menestra", color: "bg-lime-100 text-lime-900" },
-  tuberculo: { nombre: "Tubérculo", color: "bg-yellow-100 text-yellow-900" },
-  hortaliza: { nombre: "Hortaliza", color: "bg-red-100 text-red-900" },
-  frutal: { nombre: "Frutal", color: "bg-pink-100 text-pink-900" },
-  agroforestal: { nombre: "Árbol / chacra con árboles", color: "bg-emerald-100 text-emerald-900" },
+  cereal: { nombre: "Cereal", color: "bg-senal/70 text-tinta" },
+  pseudocereal: { nombre: "Grano andino", color: "bg-senal/40 text-tinta" },
+  leguminosa: { nombre: "Menestra", color: "bg-pradera/70 text-tinta" },
+  tuberculo: { nombre: "Tubérculo", color: "bg-arena text-tinta" },
+  hortaliza: { nombre: "Hortaliza", color: "bg-terracota/20 text-tinta" },
+  frutal: { nombre: "Frutal", color: "bg-terracota/35 text-tinta" },
+  agroforestal: { nombre: "Árbol / terreno con árboles", color: "bg-bosque/30 text-tinta" },
 };
 
 export const RAREZA: Record<Rareza, { nombre: string; color: string }> = {
-  comun: { nombre: "Común", color: "bg-stone-200 text-stone-800" },
-  rara: { nombre: "Rara", color: "bg-sky-100 text-sky-900" },
-  en_rescate: { nombre: "⭐ En rescate", color: "bg-violet-600 text-white" },
+  comun: { nombre: "Común", color: "bg-arena text-tinta" },
+  rara: { nombre: "Rara", color: "bg-petroleo/25 text-tinta" },
+  en_rescate: { nombre: "⭐ En rescate", color: "bg-tinta text-senal" },
 };
 
 export const STATS = {
@@ -169,6 +166,9 @@ export const ACTIVIDADES = {
   coseche: { nombre: "Coseché", emoji: "🧺" },
   otra: { nombre: "Otra cosa", emoji: "✏️" },
 } as const;
+
+/** Íconos que el agricultor puede ponerle a su chacra (el primero es el de siempre). */
+export const ICONOS_CHACRA = ["🏡", "🌽", "🥔", "🌾", "🫘", "🌻", "🍓", "🌳", "🐄", "🦙", "🐑", "💧"] as const;
 
 export const HISTORIAL_ETIQUETAS = [
   "Lo último que sembré",

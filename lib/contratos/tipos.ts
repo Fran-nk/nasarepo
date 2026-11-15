@@ -132,6 +132,8 @@ export interface PeticionRecomendaciones {
   mes: number; // 1–12
   /** [último, penúltimo, antepenúltimo] — null = "ninguno" */
   historial: [string | null, string | null, string | null];
+  /** ids de las semillas que el agricultor tiene para sembrar ("Mis semillas"). Opcional. */
+  semillas_disponibles?: string[];
 }
 
 export interface Recomendacion {

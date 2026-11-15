@@ -39,7 +39,7 @@ export function LineaTiempo({ actividades, porId }: { actividades: Actividad[]; 
 
   const filas: Fila[] = [];
   const porSemilla = new Map<string, Fila>();
-  const general: Fila = { clave: "general", titulo: "Toda la chacra", emoji: "🏡", marcas: new Map() };
+  const general: Fila = { clave: "general", titulo: "Todo el terreno", emoji: "🏡", marcas: new Map() };
 
   for (const a of [...actividades].sort((x, y) => x.fecha.localeCompare(y.fecha))) {
     const s = a.semillaId ? porId.get(a.semillaId) : undefined;
@@ -64,20 +64,23 @@ export function LineaTiempo({ actividades, porId }: { actividades: Actividad[]; 
 
   if (filas.length === 0) {
     return (
-      <p className="rounded-2xl bg-white p-4 text-center text-lg text-stone-600">
+      <p className="rounded-[12px] border-[0.5px] border-dashed border-borde bg-arena/50 p-3 text-center text-[13px] leading-[18px] text-secundario">
         Todavía no anotaste nada. Toca “Anotar actividad” y empieza con lo que sembraste.
       </p>
     );
   }
 
   return (
-    <div className="overflow-x-auto rounded-2xl border border-stone-200 bg-white p-3">
-      <table className="w-full min-w-[22rem] border-separate border-spacing-0.5 text-center">
+    <div className="overflow-x-auto [scrollbar-width:none]">
+      <table className="w-full min-w-[18rem] border-separate border-spacing-0.5 text-center">
         <thead>
           <tr>
-            <th className="w-24" />
+            <th className="w-20" />
             {columnas.map((c) => (
-              <th key={c} className={`text-xs font-semibold ${c === mesHoy ? "rounded bg-green-700 text-white" : "text-stone-500"}`}>
+              <th
+                key={c}
+                className={`font-titulo text-[11px] leading-[16px] font-bold ${c === mesHoy ? "bg-tinta text-white" : "text-secundario"}`}
+              >
                 {MESES[c % 12]}
               </th>
             ))}
@@ -86,7 +89,7 @@ export function LineaTiempo({ actividades, porId }: { actividades: Actividad[]; 
         <tbody>
           {filas.map((f) => (
             <tr key={f.clave}>
-              <th className="truncate pr-1 text-left text-sm font-semibold">
+              <th className="max-w-20 truncate pr-1 text-left font-titulo text-[13px] leading-[16px] font-bold text-tinta">
                 {f.emoji} {f.titulo}
               </th>
               {columnas.map((c) => {
@@ -97,7 +100,7 @@ export function LineaTiempo({ actividades, porId }: { actividades: Actividad[]; 
                 return (
                   <td
                     key={c}
-                    className={`h-9 rounded text-sm ${creciendo ? "bg-green-200" : "bg-stone-50"} ${c === f.cosecha ? "bg-amber-200" : ""}`}
+                    className={`h-8 rounded-[3px] text-[12px] ${c === f.cosecha ? "bg-senal" : creciendo ? "bg-pradera/60" : "bg-arena"}`}
                     title={c === f.cosecha ? "Cosecha estimada" : undefined}
                   >
                     {simbolo}
@@ -108,7 +111,20 @@ export function LineaTiempo({ actividades, porId }: { actividades: Actividad[]; 
           ))}
         </tbody>
       </table>
-      <p className="mt-2 text-sm text-stone-500">🟩 Creciendo · 🟨 Cosecha estimada · el mes verde de arriba es hoy</p>
+      <p className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] leading-[14px] text-secundario">
+        <span className="flex items-center gap-1">
+          <span aria-hidden className="size-2.5 rounded-[2px] bg-pradera/60" />
+          Creciendo
+        </span>
+        <span className="flex items-center gap-1">
+          <span aria-hidden className="size-2.5 rounded-[2px] bg-senal" />
+          Cosecha estimada
+        </span>
+        <span className="flex items-center gap-1">
+          <span aria-hidden className="size-2.5 rounded-[2px] bg-tinta" />
+          Este mes
+        </span>
+      </p>
     </div>
   );
 }

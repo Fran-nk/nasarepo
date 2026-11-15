@@ -1,7 +1,6 @@
 "use client";
 
 import type {
-  DiaClima,
   RespuestaAlertas,
   RespuestaElNino,
   RespuestaRiego,
@@ -9,9 +8,8 @@ import type {
   RespuestaSemana,
   RespuestaVsNormal,
 } from "@/lib/contratos/tipos";
-import { capitalizar, fechaCorta, fraseRiego, fraseSemana, fraseVsNormal, nombreDia, nombreMes, rangoDias } from "@/lib/mensajes";
-import { useModo } from "@/lib/preferencias";
-import { ALERTAS, CIELO, EFECTO_NINO, ESTADO_NINO, RIEGO, SEMAFORO, SEMAFORO_RESPUESTA } from "@/lib/textos";
+import { fechaCorta, fraseRiego, fraseVsNormal, nombreMes, rangoDias } from "@/lib/mensajes";
+import { ALERTAS, EFECTO_NINO, ESTADO_NINO, RIEGO, SEMAFORO, SEMAFORO_RESPUESTA } from "@/lib/textos";
 import { TarjetaDato } from "./TarjetaDato";
 
 /* 1 · Alertas de peligro */
@@ -76,9 +74,9 @@ export function TarjetaElNino({ datos }: { datos: RespuestaElNino }) {
       ]}
       fuente={`ENFEN, comunicado oficial N° ${datos.comunicado.numero}`}
     >
-      <p className="text-base text-stone-500">
+      <p className="text-base text-secundario">
         {estado.emoji} Aviso oficial del ENFEN del {fechaCorta(datos.comunicado.fecha)}.{" "}
-        <a href={datos.comunicado.url} target="_blank" rel="noopener noreferrer" className="font-semibold text-green-800 underline">
+        <a href={datos.comunicado.url} target="_blank" rel="noopener noreferrer" className="font-semibold text-tinta underline">
           Ver aviso
         </a>
       </p>
@@ -86,46 +84,10 @@ export function TarjetaElNino({ datos }: { datos: RespuestaElNino }) {
   );
 }
 
-/* 3 · ¿Llueve esta semana? */
-export function TarjetaSemana({ datos }: { datos: RespuestaSemana }) {
-  const [modo] = useModo();
-  const total = datos.dias.reduce((s, d) => s + d.lluvia_mm, 0);
-  return (
-    <TarjetaDato
-      emoji="🌧️"
-      pregunta="¿Llueve esta semana?"
-      respuesta={fraseSemana(datos.dias)}
-      tono="neutral"
-      datos={[
-        { etiqueta: "Lluvia total (7 días)", valor: `${total.toFixed(1)} mm` },
-        ...datos.dias.map((d) => ({
-          etiqueta: capitalizar(nombreDia(d.fecha)),
-          valor: `${d.lluvia_mm} mm · ${Math.round(d.prob_lluvia * 100)}%`,
-        })),
-      ]}
-      fuente={datos.fuente}
-    >
-      <ul className="grid grid-cols-7 gap-1 text-center">
-        {datos.dias.map((d: DiaClima) => (
-          <li key={d.fecha} className={`rounded-xl py-2 ${d.cielo === "tormenta" ? "bg-sky-100" : "bg-stone-50"}`}>
-            <span className="block text-xs font-semibold uppercase text-stone-500">{nombreDia(d.fecha).slice(0, 3)}</span>
-            <span className="block text-2xl" title={CIELO[d.cielo].nombre}>
-              {CIELO[d.cielo].emoji}
-            </span>
-            <span className="block text-sm font-semibold text-red-700">{Math.round(d.tmax)}°</span>
-            <span className="block text-sm text-sky-700">{Math.round(d.tmin)}°</span>
-            {modo === "avanzado" && <span className="block text-[11px] text-stone-500">{d.lluvia_mm}mm</span>}
-          </li>
-        ))}
-      </ul>
-    </TarjetaDato>
-  );
-}
-
 /* 4 · Semáforo de siembra */
 export function TarjetaSemaforo({ datos }: { datos: RespuestaSemaforo }) {
   const luces = ["rojo", "amarillo", "verde"] as const;
-  const color = { rojo: "bg-red-600", amarillo: "bg-amber-400", verde: "bg-green-600" };
+  const color = { rojo: "bg-red-600", amarillo: "bg-amber-400", verde: "bg-bosque" };
   return (
     <TarjetaDato
       emoji="🚦"
@@ -139,7 +101,7 @@ export function TarjetaSemaforo({ datos }: { datos: RespuestaSemaforo }) {
       ]}
       fuente="Modelo de siembra con NASA POWER + pronóstico"
     >
-      <div className="flex justify-center gap-3 rounded-2xl bg-stone-800 p-3" aria-hidden>
+      <div className="flex justify-center gap-3 rounded-[20px] bg-stone-800 p-3" aria-hidden>
         {luces.map((l) => (
           <span key={l} className={`h-10 w-10 rounded-full ${datos.color === l ? color[l] : "bg-stone-600 opacity-40"}`} />
         ))}
@@ -166,11 +128,11 @@ export function TarjetaRiego({ datos, semana }: { datos: RespuestaRiego; semana?
       fuente={datos.fuente}
     >
       <div className="flex items-center gap-3">
-        <span className="text-base text-stone-600">Tierra seca</span>
+        <span className="text-base text-secundario">Tierra seca</span>
         <div className="h-5 flex-1 overflow-hidden rounded-full bg-amber-100" role="img" aria-label="Humedad de la tierra">
           <div className="h-full rounded-full bg-sky-500" style={{ width: `${Math.max(4, nivel)}%` }} />
         </div>
-        <span className="text-base text-stone-600">Mojada</span>
+        <span className="text-base text-secundario">Mojada</span>
       </div>
     </TarjetaDato>
   );
@@ -197,12 +159,12 @@ export function TarjetaVsNormal({ datos }: { datos: RespuestaVsNormal }) {
       ]}
       fuente={datos.fuente}
     >
-      <p className="mb-2 text-base text-stone-600">Lluvia del mes:</p>
+      <p className="mb-2 text-base text-secundario">Lluvia del mes:</p>
       <div className="flex flex-col gap-2">
         {barras.map((b) => (
           <div key={b.etiqueta} className="flex items-center gap-2">
-            <span className="w-24 shrink-0 text-base text-stone-700">{b.etiqueta}</span>
-            <div className="h-6 flex-1 rounded-full bg-stone-100">
+            <span className="w-24 shrink-0 text-base text-secundario">{b.etiqueta}</span>
+            <div className="h-6 flex-1 rounded-full bg-arena/60">
               <div className={`h-full rounded-full ${b.color}`} style={{ width: `${Math.max(3, (b.valor / max) * 100)}%` }} />
             </div>
           </div>

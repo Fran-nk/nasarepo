@@ -40,10 +40,10 @@ NEXT_PUBLIC_API_URL=https://tu-backend.example.com
 Cuerpo de la petición (`PeticionRecomendaciones`):
 
 ```json
-{ "lat": -13.53, "lon": -71.97, "mes": 11, "historial": ["papa", "maiz_amilaceo", null] }
+{ "lat": -13.53, "lon": -71.97, "mes": 11, "historial": ["papa", "maiz_amilaceo", null], "semillas_disponibles": ["haba", "oca"] }
 ```
 
-`historial` es `[último, penúltimo, antepenúltimo]`, con ids de semilla; `null` significa "ninguno". La respuesta va ordenada de mejor a peor, y el frontend muestra las 3 primeras. Cada `motivo` (`MotivoRecomendacion`) se traduce en una frase de "por qué". Si hace falta un motivo nuevo, agrégalo al tipo y a `lib/textos.ts`.
+`historial` es `[último, penúltimo, antepenúltimo]`, con ids de semilla; `null` significa "ninguno". `semillas_disponibles` (opcional) son las semillas que el agricultor tiene guardadas para sembrar: conviene darles prioridad cuando el resto de variables empata. La respuesta va ordenada de mejor a peor, y el frontend muestra las 3 primeras. Cada `motivo` (`MotivoRecomendacion`) se traduce en una frase de "por qué". Si hace falta un motivo nuevo, agrégalo al tipo y a `lib/textos.ts`.
 
 ### Valores de las categorías
 

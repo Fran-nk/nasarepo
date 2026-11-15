@@ -1,36 +1,37 @@
 import type { Metadata, Viewport } from "next";
-import { Geist } from "next/font/google";
-import { BarraInferior } from "@/components/BarraInferior";
-import { Encabezado } from "@/components/Encabezado";
-import { SoloCliente } from "@/components/SoloCliente";
+import { Inter, Roboto_Condensed } from "next/font/google";
+import { Armazon } from "@/components/Armazon";
 import { APP_NOMBRE } from "@/lib/textos";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
+  weight: ["400", "600", "700"],
+});
+
+const robotoCondensed = Roboto_Condensed({
+  variable: "--font-roboto-condensed",
+  subsets: ["latin"],
+  weight: ["500", "700"],
 });
 
 export const metadata: Metadata = {
   title: APP_NOMBRE,
-  description: "Qué sembrar en tu chacra, con datos de la NASA y en palabras sencillas.",
+  description: "Qué sembrar en tu cultivo, con datos de la NASA y en palabras sencillas.",
 };
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#15803d",
+  themeColor: "#263b35",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="es-PE" className={`${geistSans.variable} h-full antialiased`}>
-      <body className="min-h-full bg-stone-100 text-stone-900">
-        <Encabezado />
-        <main className="mx-auto max-w-md px-4 pt-4 pb-28">
-          <SoloCliente>{children}</SoloCliente>
-        </main>
-        <BarraInferior />
+    <html lang="es-PE" className={`${inter.variable} ${robotoCondensed.variable} h-full antialiased`}>
+      <body className="min-h-full bg-arena text-tinta">
+        <Armazon>{children}</Armazon>
       </body>
     </html>
   );

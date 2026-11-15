@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
 import { db, HISTORIAL_VACIO } from "@/lib/almacen";
 import { ESCENARIOS } from "@/lib/escenarios";
-import { useEscenario } from "@/lib/preferencias";
-import { obtenerRecomendaciones, obtenerSemillas, type Punto } from "@/lib/api/cliente";
+import { useCultivoActivo, useEscenario } from "@/lib/preferencias";
+import { obtenerContexto, obtenerRecomendaciones, obtenerSemillas, type Punto } from "@/lib/api/cliente";
 import type { Semilla } from "@/lib/contratos/tipos";
 
 interface Estado<T> {
@@ -44,24 +44,39 @@ export function useConsulta<T>(clave: string | null, pedir: () => Promise<T>) {
   };
 }
 
+/** Todos los cultivos, del más antiguo al más nuevo; undefined mientras IndexedDB responde. */
+export function useCultivos() {
+  return useLiveQuery(() => db.cultivos.orderBy("creado").toArray(), []);
+}
+
 /**
- * Ubicación usada para pedir datos: la chacra guardada o, si no hay, el punto del escenario.
+ * Cultivo que se está mirando: el elegido en Perfil o, si no hay (o ya no existe), el más reciente.
+ * `cargada` es false mientras IndexedDB no responde.
+ */
+export function useCultivoAbierto() {
+  const cultivos = useCultivos();
+  const [activo] = useCultivoActivo();
+  const lista = cultivos ?? [];
+  const cultivo = lista.find((c) => c.id === activo) ?? lista.at(-1);
+  return { cultivo, cultivos: lista, cargada: cultivos !== undefined };
+}
+
+/**
+ * Ubicación usada para pedir datos: el cultivo abierto o, si no hay, el punto del escenario.
  * `clave` es null mientras IndexedDB no responde, para no pedir datos con el punto equivocado.
  */
 export function useUbicacion() {
   const [escenario] = useEscenario();
-  // undefined = cargando; null = no hay chacra guardada
-  const guardada = useLiveQuery(async () => (await db.chacra.get("principal")) ?? null, []);
-  const cargada = guardada !== undefined;
-  const chacra = guardada ?? undefined;
-  const punto: Punto = chacra ? { lat: chacra.lat, lon: chacra.lon } : ESCENARIOS[escenario].punto;
+  const { cultivo, cultivos, cargada } = useCultivoAbierto();
+  const punto: Punto = cultivo ? { lat: cultivo.lat, lon: cultivo.lon } : ESCENARIOS[escenario].punto;
   const clave = cargada ? `${escenario}|${punto.lat.toFixed(4)},${punto.lon.toFixed(4)}` : null;
-  return { punto, escenario, chacra, cargada, clave };
+  return { punto, escenario, cultivo, cultivos, cargada, clave };
 }
 
-/** Historial de cultivos; undefined mientras carga. */
+/** Historial del cultivo abierto; undefined mientras carga. */
 export function useHistorialGuardado() {
-  return useLiveQuery(async () => (await db.historial.get("principal"))?.cultivos ?? HISTORIAL_VACIO, []);
+  const { cultivo, cargada } = useCultivoAbierto();
+  return cargada ? (cultivo?.historial ?? HISTORIAL_VACIO) : undefined;
 }
 
 export function useHistorial() {
@@ -73,14 +88,32 @@ export function useMisSemillas(): Set<string> {
   return new Set((lista ?? []).map((m) => m.id));
 }
 
-/** Recomendaciones para la chacra actual con el historial guardado. */
+/** Mis semillas en el orden en que se agregaron (las más antiguas primero). */
+export function useMisSemillasLista(): string[] {
+  const lista = useLiveQuery(() => db.misSemillas.toArray(), []);
+  return (lista ?? []).toSorted((a, b) => a.agregada.localeCompare(b.agregada)).map((m) => m.id);
+}
+
+/** Lugar, altitud, zona y cultivos comunes del cultivo abierto (o del punto que se pase). */
+export function useContexto(otro?: Punto) {
+  const { punto: abierto, escenario, clave } = useUbicacion();
+  const punto = otro ?? abierto;
+  const claveFinal = clave === null ? null : otro ? `${escenario}|${otro.lat.toFixed(4)},${otro.lon.toFixed(4)}` : clave;
+  return useConsulta(claveFinal, () => obtenerContexto(punto, escenario));
+}
+
+/** Recomendaciones para el cultivo abierto, con su historial y las semillas que tiene. */
 export function useRecomendaciones() {
   const { punto, escenario, clave } = useUbicacion();
   const historial = useHistorialGuardado();
+  const mias = useMisSemillasLista();
   const mes = new Date().getMonth() + 1;
   const listo = clave !== null && historial !== undefined;
-  return useConsulta(listo ? `rec|${clave}|${mes}|${historial.join(",")}` : null, () =>
-    obtenerRecomendaciones({ lat: punto.lat, lon: punto.lon, mes, historial: historial! }, escenario),
+  return useConsulta(listo ? `rec|${clave}|${mes}|${historial.join(",")}|${mias.join(",")}` : null, () =>
+    obtenerRecomendaciones(
+      { lat: punto.lat, lon: punto.lon, mes, historial: historial!, semillas_disponibles: mias },
+      escenario,
+    ),
   );
 }
 

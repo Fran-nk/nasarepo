@@ -13,7 +13,7 @@ async function Ficha({ params }: { params: Promise<{ id: string }> }) {
 
 export default function PaginaSemilla({ params }: PageProps<"/semillas/[id]">) {
   return (
-    <Suspense fallback={<div className="animate-pulse rounded-2xl bg-white p-4 text-lg text-stone-400">Cargando…</div>}>
+    <Suspense fallback={<div className="animate-pulse rounded-[20px] bg-white p-4 text-lg text-secundario/70">Cargando…</div>}>
       <Ficha params={params} />
     </Suspense>
   );

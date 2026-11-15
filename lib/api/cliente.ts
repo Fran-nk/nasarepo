@@ -112,7 +112,8 @@ export function obtenerSemillas(): Promise<RespuestaSemillas> {
 
 /**
  * En modo prueba se imita la rotación: se quita lo que no conviene sembrar
- * después del último cultivo y se premia lo que va bien después de él.
+ * después del último cultivo, se premia lo que va bien después de él
+ * y un poco lo que el agricultor ya tiene para sembrar.
  * El backend real hará esto con la red neuronal.
  */
 export async function obtenerRecomendaciones(
@@ -130,6 +131,7 @@ export async function obtenerRecomendaciones(
     .map((r) => {
       const candidata = semillas.find((s) => s.id === r.semillaId);
       const rotaBien = !!ultimo && !!candidata?.despues_de_bien.includes(ultimo.id);
+      if (peticion.semillas_disponibles?.includes(r.semillaId)) r = { ...r, puntaje: Math.min(1, r.puntaje + 0.04) };
       return rotaBien
         ? {
             ...r,
