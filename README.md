@@ -2,14 +2,14 @@
 
 App para agricultores del Perú: **qué sembrar ahora en tu chacra**, con datos de la NASA explicados en palabras sencillas.
 
-Esta parte es el **frontend** (Next.js 16 + Tailwind 4), con un diseño súper simple pensado para ver los datos en pantalla. Por ahora funciona con **datos de prueba**. El backend se conecta después siguiendo el [contrato de datos](docs/contrato-datos.md).
+Esta parte es el **frontend** (Next.js 16 + Tailwind 4), con un diseño súper simple pensado para ver los datos en pantalla. Todos los datos son **reales y gratuitos**: clima, suelo y mar de **NASA POWER**, y el pronóstico de 7 días de **Open-Meteo**, porque la NASA no da pronóstico. El detalle está en [fuentes de datos](docs/fuentes-de-datos.md). El backend puede tomar partes siguiendo el [contrato de datos](docs/contrato-datos.md).
 
 ## Pantallas
 
 - **🏡 Mi chacra:** mapa Mapbox para dibujar el terreno o usar la ubicación actual; zona Pulgar Vidal y altitud; los 3 últimos cultivos (buscador que entiende "oyuco", "abas", "chocho"…) y el botón "¿Qué siembro ahora?".
 - **🌦️ Clima:**
-  - alertas de peligro (helada, granizo, sequía, calor, lluvia fuerte, huaico);
-  - **El Niño hoy** (estado del ENFEN y su efecto en tu zona);
+  - alertas de peligro (helada, sequía, calor, lluvia fuerte; granizo solo si el pronóstico lo trae);
+  - **El Niño hoy** (estimado con la temperatura del mar de la NASA, con enlace al aviso oficial del ENFEN, y su efecto en tu zona);
   - lluvia de la semana;
   - semáforo de siembra;
   - ¿Riego hoy?;
@@ -36,10 +36,9 @@ En `.env.local` pon tu token público de Mapbox en `NEXT_PUBLIC_MAPBOX_TOKEN`. S
 corepack pnpm dev
 ```
 
-Abre http://localhost:3000. Con el menú ⚙️ del encabezado cambias entre los 3 escenarios de demostración:
-- Cusco (Quechua);
-- Piura con El Niño;
-- Puno con helada.
+Abre http://localhost:3000. Mientras no marques un cultivo, la app muestra el clima real de un lugar de ejemplo (Cusco, Piura o Puno), que se elige en **Mi Perfil**.
+
+Pruebas unitarias (no salen a internet):
 
 ```bash
 corepack pnpm test
@@ -47,16 +46,17 @@ corepack pnpm test
 
 ## Documentos
 
-- [docs/contrato-datos.md](docs/contrato-datos.md): endpoints y formatos que debe entregar el backend.
+- [docs/fuentes-de-datos.md](docs/fuentes-de-datos.md): de dónde sale cada dato y cómo se calcula.
+- [docs/contrato-datos.md](docs/contrato-datos.md): formatos de cada respuesta (para el backend).
 - [docs/plan-modelo.md](docs/plan-modelo.md): variables, capas de datos y red neuronal acordadas.
 
 ## Estructura
 
 ```
-app/                 rutas de las pantallas, sin cambiar las URL
+app/                 rutas de las pantallas (page.tsx, perfil, semillas…)
 app/frontcode/components/ tarjetas, mapa, semillero y calendario
-app/frontcode/lib/   cliente API, contratos, textos, búsqueda e IndexedDB
-app/frontcode/mocks/ escenarios de prueba y catálogo de semillas
+app/frontcode/lib/       cliente, fuentes (NASA POWER, Open-Meteo), cálculos, contratos, textos, búsqueda e IndexedDB
+app/frontcode/datos/     catálogo de semillas (curado por el equipo)
 app/api/             rutas HTTP del backend
 app/back/            lógica de servidor y modelo
 ```

@@ -29,6 +29,12 @@ export function SelectorSemillas({ etiqueta, titulo, bajada, seleccion, maximo, 
   const idTitulo = useId();
   const idBuscar = useId();
   const [texto, setTexto] = useState("");
+  // La última semilla elegida "brota" (en la fila de arriba y en la grilla): confirma sin palabras.
+  const [brote, setBrote] = useState<string | null>(null);
+  const alternar = (id: string) => {
+    setBrote(seleccion.includes(id) ? null : id);
+    onAlternar(id);
+  };
   const { semillas, porId, cargando } = useCatalogo();
   const comunes = useContexto().datos?.cultivos_comunes ?? [];
 
@@ -61,7 +67,7 @@ export function SelectorSemillas({ etiqueta, titulo, bajada, seleccion, maximo, 
           <div className="flex items-start gap-3">
             <div className="flex min-w-0 flex-1 flex-col gap-1">
               {etiqueta && (
-                <p className="font-titulo text-[12px] leading-[16px] font-bold text-secundario uppercase">{etiqueta}</p>
+                <p className="font-titulo text-[13px] leading-[16px] font-bold text-secundario uppercase">{etiqueta}</p>
               )}
               <h2 id={idTitulo} className="font-titulo text-[26px] leading-[30px] font-bold text-tinta">
                 {titulo}
@@ -72,7 +78,7 @@ export function SelectorSemillas({ etiqueta, titulo, bajada, seleccion, maximo, 
               type="button"
               onClick={onCerrar}
               aria-label="Cerrar"
-              className="flex size-9 shrink-0 items-center justify-center rounded-[12px] border border-borde text-[18px] text-tinta"
+              className="tactil relative flex size-9 shrink-0 items-center justify-center rounded-[12px] border border-borde text-[18px] text-tinta"
             >
               ✕
             </button>
@@ -95,22 +101,22 @@ export function SelectorSemillas({ etiqueta, titulo, bajada, seleccion, maximo, 
                 <li key={s.id} className="flex w-[56px] shrink-0 flex-col items-center">
                   <button
                     type="button"
-                    onClick={() => onAlternar(s.id)}
+                    onClick={() => alternar(s.id)}
                     aria-label={`Quitar ${s.nombre}`}
                     title={`Quitar ${s.nombre}`}
                     className="relative flex h-[54px] w-full items-center justify-center rounded-[8px] border-[0.5px] border-borde bg-white"
                   >
-                    <span aria-hidden className="text-[30px] leading-none">
+                    <span aria-hidden className={`text-[30px] leading-none ${brote === s.id ? "animar-brote" : ""}`}>
                       {s.emoji}
                     </span>
                     <span
                       aria-hidden
-                      className="absolute -top-1.5 -right-1.5 flex size-5 items-center justify-center rounded-full bg-tinta text-[10px] text-white"
+                      className="absolute -top-1.5 -right-1.5 flex size-5 items-center justify-center rounded-full bg-tinta text-[11px] text-white"
                     >
                       ✕
                     </span>
                   </button>
-                  <p className="w-full truncate text-center text-[10px] leading-[15px] text-secundario">{s.nombre}</p>
+                  <p className="w-full truncate text-center text-[11px] leading-[15px] text-secundario">{s.nombre}</p>
                 </li>
               );
             })}
@@ -129,7 +135,7 @@ export function SelectorSemillas({ etiqueta, titulo, bajada, seleccion, maximo, 
             onChange={(e) => setTexto(e.target.value)}
             placeholder="🔎 Busca como la llamas: oyuco, abas, chocho…"
             autoComplete="off"
-            className="w-full rounded-[14px] border border-borde bg-white px-4 py-3 text-[16px] leading-[24px] text-tinta outline-none focus:border-tinta"
+            className="w-full rounded-[14px] border border-borde-fuerte bg-white px-4 py-3 text-[16px] leading-[24px] text-tinta outline-none focus:border-tinta"
           />
           {lleno && (
             <p className="text-[13px] leading-[18px] text-secundario">
@@ -151,24 +157,24 @@ export function SelectorSemillas({ etiqueta, titulo, bajada, seleccion, maximo, 
                   <li key={s.id}>
                     <button
                       type="button"
-                      onClick={() => onAlternar(s.id)}
+                      onClick={() => alternar(s.id)}
                       disabled={bloqueada}
                       aria-pressed={elegida}
                       className={`relative flex w-full flex-col items-center gap-1 rounded-[12px] border p-2 text-center transition-colors disabled:opacity-40 ${
                         elegida ? "border-tinta bg-pradera/30" : "border-borde bg-white hover:bg-arena/40"
                       }`}
                     >
-                      <span aria-hidden className="flex h-[48px] items-center text-[34px] leading-none">
+                      <span aria-hidden className={`flex h-[48px] items-center text-[34px] leading-none ${brote === s.id ? "animar-brote" : ""}`}>
                         {s.emoji}
                       </span>
                       <span className="w-full truncate text-[13px] leading-[18px] font-semibold text-tinta">{s.nombre}</span>
                       {comunes.includes(s.id) && (
-                        <span className="text-[10px] leading-[14px] text-secundario">Común en tu zona</span>
+                        <span className="text-[11px] leading-[14px] text-secundario">Común en tu zona</span>
                       )}
                       {elegida && (
                         <span
                           aria-hidden
-                          className="absolute top-1.5 right-1.5 flex size-5 items-center justify-center rounded-full bg-tinta text-[11px] text-white"
+                          className="absolute top-1.5 right-1.5 flex size-5 items-center justify-center rounded-full bg-tinta text-[12px] text-white"
                         >
                           ✓
                         </span>
@@ -190,6 +196,6 @@ export function SelectorSemillas({ etiqueta, titulo, bajada, seleccion, maximo, 
 
 /** Estilos de los botones del pie de la ventana. */
 export const BOTON_PIE_PRINCIPAL =
-  "flex-1 rounded-[14px] bg-petroleo px-4 py-3 text-center text-[16px] leading-[24px] font-semibold text-[#fffdf6] active:bg-petroleo/85";
+  "flex-1 rounded-[14px] bg-petroleo-fuerte px-4 py-3 text-center text-[16px] leading-[24px] font-semibold text-[#fffdf6] active:bg-petroleo-fuerte/85";
 export const BOTON_PIE_SECUNDARIO =
   "rounded-[14px] px-4 py-3 text-[16px] leading-[24px] font-semibold text-secundario underline underline-offset-2";

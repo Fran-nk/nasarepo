@@ -132,6 +132,26 @@ export async function quitarMiSemilla(id: string) {
 }
 
 /** Cambia el nombre o el ícono de un cultivo. */
+/** Borra un cultivo y lo devuelve, para poder deshacer con `restaurarCultivo`. */
+export async function quitarCultivo(cultivoId: number) {
+  const cultivo = await db.cultivos.get(cultivoId);
+  await db.cultivos.delete(cultivoId);
+  return cultivo;
+}
+
+/** Vuelve a guardar un cultivo quitado (con su mismo id). */
+export async function restaurarCultivo(cultivo: Cultivo) {
+  await db.cultivos.put(cultivo);
+}
+
 export async function actualizarCultivo(cultivoId: number, cambios: Partial<Pick<Cultivo, "nombre" | "icono">>) {
   await db.cultivos.update(cultivoId, cambios);
+}
+
+/** Cambia la forma del terreno de un cultivo (y con ella su centro y su área). */
+export async function actualizarTerreno(
+  cultivoId: number,
+  terreno: Pick<Cultivo, "lat" | "lon" | "poligono" | "area_ha">,
+) {
+  await db.cultivos.update(cultivoId, terreno);
 }

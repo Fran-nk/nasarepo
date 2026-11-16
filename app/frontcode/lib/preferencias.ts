@@ -1,5 +1,6 @@
 /**
- * Preferencias por dispositivo (nombre, escenario de demo y cultivo abierto) en localStorage.
+ * Preferencias por dispositivo (nombre de la persona, escenario de demo y cultivo abierto) en localStorage.
+ * No hay cuentas ni contraseñas: nada de esto sale del celular.
  * Se leen con useSyncExternalStore para evitar diferencias entre servidor y cliente.
  */
 "use client";
@@ -65,7 +66,10 @@ export function useCultivoActivo(): [number | null, (id: number) => void] {
   return [valor, (id) => escribir(CLAVES.cultivo, String(id))];
 }
 
-/** Nombre local del agricultor; undefined durante el primer render para evitar diferencias de hidratación. */
+/**
+ * Nombre con el que la persona entró (el "inicio" sin contraseña). `undefined` mientras no se sabe
+ * (en el servidor y en el primer dibujo), `null` si todavía no lo dio. Con "" se olvida.
+ */
 export function useNombreUsuario(): [string | null | undefined, (nombre: string) => void] {
   const valor = useSyncExternalStore<string | null | undefined>(
     suscribir,

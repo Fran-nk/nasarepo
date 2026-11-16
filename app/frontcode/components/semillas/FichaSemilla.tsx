@@ -2,13 +2,16 @@
 
 import Link from "next/link";
 import { BotonVoz } from "@/app/frontcode/components/BotonVoz";
+import { Volver } from "@/app/frontcode/components/Volver";
 import { CHIP, FICHA_ARENA, ROTULO_FICHA, TARJETA_BLANCA, TITULO_SECCION, VALOR_FICHA } from "@/app/frontcode/components/estilos";
 import { IconoLinea, type NombreIconoLinea } from "@/app/frontcode/components/IconoLinea";
 import { TarjetaCargando } from "@/app/frontcode/components/tarjetas/TarjetaDato";
 import { alternarMiSemilla } from "@/app/frontcode/lib/almacen";
+import type { ParametrosEcocrop } from "@/app/frontcode/lib/contratos/tipos";
 import { useCatalogo, useMisSemillas } from "@/app/frontcode/lib/hooks";
 import { formatoMiles } from "@/app/frontcode/lib/mensajes";
-import { CATEGORIAS, RAREZA } from "@/app/frontcode/lib/textos";
+import { AVISOS, CATEGORIAS, RAREZA } from "@/app/frontcode/lib/textos";
+import { useAviso } from "@/app/frontcode/components/Avisos";
 import { BarraStat } from "./BarraStat";
 
 /** Bloque blanco de la ficha con su título en Roboto (sin emojis: el diseño usa pocos colores). */
@@ -45,10 +48,42 @@ export function duracion(dias: number): string {
 
 const TEXTO = "text-[15px] leading-[22px] text-tinta";
 
+const grados = (n: number) => `${n < 0 ? "−" : ""}${Math.abs(n)} °C`;
+
+/**
+ * Lo que la planta necesita según la FAO (ECOCROP): rangos reales medidos para la especie, en palabras
+ * sencillas. "Ideal" es el rango óptimo; "aguanta" son los límites donde todavía crece.
+ */
+function SeccionFao({ e }: { e: ParametrosEcocrop }) {
+  const t = e.temperatura_c;
+  const l = e.lluvia_ciclo_mm;
+  return (
+    <Seccion titulo="Lo que necesita (datos de la FAO)">
+      <dl className="grid grid-cols-2 gap-2 lg:gap-[6px]">
+        <Dato icono="sol" etiqueta="Temperatura ideal" valor={`${t.optima_min}–${grados(t.optima_max)}`} />
+        <Dato icono="sol" etiqueta="Aguanta" valor={`${t.min}–${grados(t.max)}`} />
+        <Dato icono="gota" etiqueta="Lluvia ideal" valor={`${formatoMiles(l.optima_min)}–${formatoMiles(l.optima_max)} mm`} />
+        <Dato icono="copo" etiqueta="La mata el frío de" valor={grados(e.temperatura_mata_c)} />
+        <Dato icono="reloj" etiqueta="Ciclo según variedad" valor={`${e.ciclo_dias[0]}–${e.ciclo_dias[1]} días`} />
+        <Dato icono="montana" etiqueta="pH ideal del suelo" valor={`${e.ph.optimo_min}–${e.ph.optimo_max}`} />
+      </dl>
+      <p className="text-[12px] leading-[16px] text-secundario">
+        La lluvia es la que necesita durante todo el cultivo; si llueve menos, hay que regar. Fuente: FAO ECOCROP (
+        <span className="italic">{e.cientifico_ecocrop}</span>), vía{" "}
+        <a href="https://github.com/cropmodels/Recocrop" target="_blank" rel="noopener noreferrer" className="font-semibold text-tinta underline">
+          Recocrop
+        </a>
+        .
+      </p>
+    </Seccion>
+  );
+}
+
 /** Ficha completa de una semilla con el estilo del panel: tarjetas blancas, fichas arena e íconos de línea. */
 export function FichaSemilla({ id }: { id: string }) {
   const { porId, cargando } = useCatalogo();
   const mias = useMisSemillas();
+  const avisar = useAviso();
   const s = porId.get(id);
 
   if (cargando) return <TarjetaCargando />;
@@ -83,10 +118,8 @@ export function FichaSemilla({ id }: { id: string }) {
     .join(". ");
 
   return (
-    <div className="flex flex-col gap-3">
-      <Link href="/semillas" className="w-max text-[18px] leading-[28px] font-semibold text-tinta">
-        ← Semillero
-      </Link>
+    <div className="surcos flex flex-col gap-3">
+      <Volver href="/semillas" texto="Semillero" />
 
       {/* Cabecera como la de "Mi Cultivo": dibujo grande a la izquierda, nombre y chips a la derecha. */}
       <header className={`${TARJETA_BLANCA} relative flex items-center gap-3 ${enRescate ? "border-terracota" : ""}`}>
@@ -98,7 +131,7 @@ export function FichaSemilla({ id }: { id: string }) {
         </span>
         <div className="flex min-w-0 flex-1 flex-col gap-1">
           <h1 className="pr-8 font-titulo text-[28px] leading-[30px] font-bold text-tinta">{s.nombre}</h1>
-          <p className="text-[12px] leading-[16px] text-secundario italic">
+          <p className="text-[13px] leading-[16px] text-secundario italic">
             {s.cientifico} · {s.familia}
           </p>
           <div className="flex flex-wrap gap-1 pt-0.5">
@@ -135,7 +168,14 @@ export function FichaSemilla({ id }: { id: string }) {
           <Dato icono="montana" etiqueta="Crece a" valor={`${formatoMiles(s.altura_min_m)}–${formatoMiles(s.altura_max_m)} m`} />
           <Dato icono="reloj" etiqueta={s.perenne ? "Primera cosecha" : "Se cosecha en"} valor={duracion(s.ciclo_dias)} />
         </dl>
+        {!s.ecocrop && (
+          <p className="text-[12px] leading-[16px] text-secundario">
+            Esta especie no está en ECOCROP de la FAO: sus datos son de la ficha del equipo.
+          </p>
+        )}
       </Seccion>
+
+      {s.ecocrop && <SeccionFao e={s.ecocrop} />}
 
       {s.habilidades.length > 0 && (
         <Seccion titulo="Habilidades">
@@ -180,7 +220,14 @@ export function FichaSemilla({ id }: { id: string }) {
 
       <button
         type="button"
-        onClick={() => void alternarMiSemilla(s.id)}
+        onClick={() => {
+          void alternarMiSemilla(s.id);
+          avisar(
+            tengo
+              ? { texto: AVISOS.semillaQuitada(s.nombre), icono: "equis", deshacer: () => void alternarMiSemilla(s.id) }
+              : { texto: AVISOS.semillaAgregada(s.nombre) },
+          );
+        }}
         aria-pressed={tengo}
         className={`sticky bottom-[76px] flex items-center justify-center gap-2 rounded-[14px] px-4 py-3 text-[16px] leading-[24px] font-semibold shadow-[0_2px_8px_rgba(38,59,53,0.25)] transition-colors lg:bottom-0 ${
           tengo ? "border-[1.6px] border-tinta bg-white text-tinta" : "bg-tinta text-white hover:bg-tinta/90"
@@ -207,7 +254,7 @@ function ListaRotacion({
 }) {
   return (
     <div className="flex flex-col gap-1.5">
-      <p className={`flex items-center gap-1.5 text-[13px] leading-[18px] font-semibold ${mala ? "text-terracota" : "text-tinta"}`}>
+      <p className={`flex items-center gap-1.5 text-[13px] leading-[18px] font-semibold ${mala ? "text-terracota-fuerte" : "text-tinta"}`}>
         <IconoLinea nombre={icono} className="size-4 shrink-0" />
         {titulo}
       </p>

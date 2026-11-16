@@ -175,3 +175,40 @@ export const HISTORIAL_ETIQUETAS = [
   "Antes de eso",
   "Hace más tiempo",
 ] as const;
+
+/** Cuando algo falla: frases calmadas, sin tecnicismos, y siempre con una salida. */
+export const ERRORES = {
+  dato: "No llegó este dato. Revisa tu señal e intenta de nuevo.",
+  clima: "No llegó el clima de la semana.",
+  alertas: "No pudimos revisar si hay alertas.",
+  reintentar: "Intentar de nuevo",
+  mapa: "El mapa no se puede mostrar ahora. Puedes seguir usando el resto de la app.",
+} as const;
+
+/** Avisos que confirman cada acción (y permiten deshacer las que borran algo). */
+export const AVISOS = {
+  deshacer: "Deshacer",
+  actividadGuardada: "Anotado en tu calendario",
+  actividadBorrada: "Actividad borrada",
+  cultivoGuardado: "Cambios guardados",
+  cultivoQuitado: (nombre: string) => `Quitaste ${nombre}`,
+  semillaAgregada: (nombre: string) => `${nombre} está en Mis semillas`,
+  semillaQuitada: (nombre: string) => `Quitaste ${nombre} de Mis semillas`,
+  sinVoz: "Este celular no puede leer en voz alta.",
+} as const;
+
+/** Sin conexión: tranquiliza y explica qué se está viendo. */
+export const SIN_SENAL = {
+  titulo: "Sin señal",
+  texto: "Te mostramos lo último que guardamos.",
+  viejo: "Dato guardado, puede no estar al día.",
+} as const;
+
+/** Quitar un cultivo: se pregunta antes y se puede deshacer. */
+export const QUITAR_CULTIVO = {
+  boton: "Quitar este cultivo",
+  pregunta: (nombre: string) => `¿Quitar ${nombre}?`,
+  explica: "Se borra su terreno y lo que sembraste antes. Tus semillas y tu calendario se quedan.",
+  si: "Sí, quitar",
+  no: "No, dejarlo",
+} as const;

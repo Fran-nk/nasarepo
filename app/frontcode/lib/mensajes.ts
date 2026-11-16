@@ -1,8 +1,11 @@
 /** Convierte los datos del backend en frases sencillas para el agricultor. */
 import type {
   DiaClima,
+  MotivoRecomendacion,
+  Recomendacion,
   RespuestaRiego,
   RespuestaVsNormal,
+  Semilla,
 } from "@/app/frontcode/lib/contratos/tipos";
 
 const fmtDia = new Intl.DateTimeFormat("es-PE", { weekday: "long", timeZone: "UTC" });
@@ -66,8 +69,9 @@ export function fraseRiego(r: RespuestaRiego, dias: DiaClima[] | undefined, hoyI
   return `${tierra} y no se espera lluvia pronto.`;
 }
 
-/** "Este mes está más seco que otros años." */
-export function fraseVsNormal(v: RespuestaVsNormal): string {
+/** "Este mes está más seco que otros años." (o "El mes pasado estuvo…" a inicio de mes). */
+export function fraseVsNormal(v: RespuestaVsNormal, mesActual = new Date().getMonth() + 1): string {
+  const [sujeto, verbo] = v.mes === mesActual ? ["Este mes", "está"] : ["El mes pasado", "estuvo"];
   const lluvia = {
     mas_seco: "más seco",
     normal: "parecido",
@@ -79,8 +83,8 @@ export function fraseVsNormal(v: RespuestaVsNormal): string {
     mas_calido: " y más caluroso",
   }[v.temperatura];
   if (v.lluvia === "normal" && v.temperatura === "normal")
-    return "Este mes está igual que otros años.";
-  return `Este mes está ${lluvia}${temp} que otros años.`;
+    return `${sujeto} ${verbo} igual que otros años.`;
+  return `${sujeto} ${verbo} ${lluvia}${temp} que otros años.`;
 }
 
 export function capitalizar(s: string): string {
@@ -95,4 +99,62 @@ export function rangoDias(desde: string, hasta: string, hoyIso = hoyISO()): stri
 
 export function formatoMiles(n: number): string {
   return new Intl.NumberFormat("es-PE").format(Math.round(n));
+}
+
+/** Motivos en pocas palabras, para la fila de cada semilla recomendada (el detalle tiene la frase larga). */
+const MOTIVO_CORTO: Record<MotivoRecomendacion, string> = {
+  clima_ideal: "Le va bien el clima de tu zona",
+  rota_bien: "Va bien después de lo que sembraste",
+  fija_nitrogeno: "Abona tu tierra sola",
+  comun_en_zona: "Se siembra mucho en tu zona",
+  aguanta_helada: "Aguanta las heladas",
+  aguanta_sequia: "Aguanta si llueve poco",
+  aprovecha_lluvias: "Aprovecha las lluvias que vienen",
+  ciclo_corto: "Cosecha rápida",
+  especie_en_rescate: "Ayudas a rescatar esta semilla",
+};
+
+/**
+ * La razón más importante para que el agricultor elija esta semilla, en una línea:
+ * el primer motivo de la recomendación (ya vienen ordenados de más a menos importante) que no esté
+ * en `evitar` — si las tres "van bien después de papa", eso no ayuda a elegir (ver `razonesDeLista`) —,
+ * con el dato concreto cuando lo hay (qué sembró antes, en cuántos meses cosecha).
+ * Si ya tiene la semilla, se agrega, porque es lo que más facilita sembrarla.
+ */
+export function motivoCorto(
+  r: Pick<Recomendacion, "motivos">,
+  s: Pick<Semilla, "ciclo_dias">,
+  opciones: { ultimo?: Pick<Semilla, "nombre">; tengo?: boolean; evitar?: ReadonlySet<MotivoRecomendacion> } = {},
+): string {
+  const m = elegirMotivo(r, opciones.evitar);
+  let texto = "";
+  if (m === "rota_bien" && opciones.ultimo) texto = `Va bien después de ${opciones.ultimo.nombre.toLowerCase()}`;
+  else if (m === "ciclo_corto") texto = `Cosecha en ${Math.max(1, Math.round(s.ciclo_dias / 30))} meses`;
+  else if (m) texto = MOTIVO_CORTO[m];
+  if (opciones.tengo) texto = texto ? `${texto} · Ya la tienes` : "Ya tienes la semilla";
+  return texto;
+}
+
+function elegirMotivo(r: Pick<Recomendacion, "motivos">, evitar?: ReadonlySet<MotivoRecomendacion>) {
+  return r.motivos.find((x) => !evitar?.has(x)) ?? r.motivos[0];
+}
+
+/**
+ * Qué evitar en cada fila de una lista de recomendaciones para que cada una diga algo distinto:
+ * lo que tienen todas y lo que ya dijeron las filas de arriba.
+ */
+export function evitarPorFila(lista: Pick<Recomendacion, "motivos">[]): Set<MotivoRecomendacion>[] {
+  const evitar = motivosComunes(lista);
+  return lista.map((r) => {
+    const deEstaFila = new Set(evitar);
+    const elegido = elegirMotivo(r, evitar);
+    if (elegido) evitar.add(elegido);
+    return deEstaFila;
+  });
+}
+
+/** Motivos que tienen todas las recomendaciones de la lista (no sirven para elegir entre ellas). */
+export function motivosComunes(lista: Pick<Recomendacion, "motivos">[]): Set<MotivoRecomendacion> {
+  if (lista.length < 2) return new Set();
+  return new Set(lista[0].motivos.filter((m) => lista.every((r) => r.motivos.includes(m))));
 }

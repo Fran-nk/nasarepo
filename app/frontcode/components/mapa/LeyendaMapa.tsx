@@ -88,7 +88,7 @@ export function LeyendaMapa({ vista, className = "" }: { vista: Vista; className
         aria-expanded={abierta}
         aria-label={abierta ? "Ocultar la leyenda del mapa" : "Ver qué es cada color del mapa"}
         title={abierta ? "Ocultar la leyenda" : "Ver qué es cada color"}
-        className="flex size-8 items-center justify-center rounded-full bg-white shadow-[0_2px_6px_rgba(38,59,53,0.25)] lg:hidden"
+        className="tactil relative flex size-8 items-center justify-center rounded-full bg-white shadow-[0_2px_6px_rgba(38,59,53,0.25)] lg:hidden"
       >
         <span aria-hidden className="grid grid-cols-2 gap-px">
           <span className="block size-[7px] rounded-[1px] bg-[hsl(78,45%,38%)]" />
@@ -100,7 +100,7 @@ export function LeyendaMapa({ vista, className = "" }: { vista: Vista; className
       <ul className={`flex-col items-end gap-1.5 ${abierta ? "flex" : "hidden"} lg:flex`}>
         {elementos.map((e) => (
           <li key={e.texto} className="flex items-center gap-2">
-            <span className="bg-white px-1.5 py-px text-[12px] leading-[16px] font-semibold text-tinta shadow-[0_1px_3px_rgba(38,59,53,0.25)]">
+            <span className="bg-white px-1.5 py-px text-[13px] leading-[16px] font-semibold text-tinta shadow-[0_1px_3px_rgba(38,59,53,0.25)]">
               {e.texto}
             </span>
             <span className="block h-4 w-6 shrink-0 overflow-hidden rounded-[3px] shadow-[0_0_0_1px_#fff,0_1px_3px_rgba(38,59,53,0.35)]">
@@ -110,7 +110,7 @@ export function LeyendaMapa({ vista, className = "" }: { vista: Vista; className
         ))}
         {vista === "satelite" && (
           <li>
-            <span className="bg-white px-1.5 py-px text-[11px] leading-[15px] text-secundario shadow-[0_1px_3px_rgba(38,59,53,0.25)]">
+            <span className="bg-white px-1.5 py-px text-[12px] leading-[15px] text-secundario shadow-[0_1px_3px_rgba(38,59,53,0.25)]">
               En satélite se ve la foto real del terreno.
             </span>
           </li>

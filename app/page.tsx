@@ -8,7 +8,7 @@ import { ListaRecomendaciones } from "@/app/frontcode/components/ListaRecomendac
 import { WidgetsCultivo } from "@/app/frontcode/components/tarjetas/WidgetsCultivo";
 import { useUbicacion } from "@/app/frontcode/lib/hooks";
 
-/** Pestaña Mapa, "Mi Cultivo" (Figma 51:1342): el cultivo abierto, qué se sembró antes y qué sembrar ahora. */
+/** Pestaña Mapa, "Mi Cultivo" (Figma 89:905): el cultivo abierto, cómo está hoy y, lo principal, qué sembrar ahora. */
 export default function MiCultivo() {
   const { cultivo } = useUbicacion();
   const [editando, setEditando] = useState(false);
@@ -17,10 +17,7 @@ export default function MiCultivo() {
   if (!cultivo) return null;
 
   return (
-    <div className="flex flex-col gap-4">
-      <Link href="/perfil" className="w-max text-[18px] leading-[28px] font-semibold text-tinta">
-        ← Perfil
-      </Link>
+    <div className="surcos flex flex-col gap-4">
       {/* Nombre y, debajo, lo sembrado antes. El lápiz edita nombre, ícono y lo sembrado; otro cultivo se agrega en "Mi Perfil". */}
       <CabeceraCultivo cultivo={cultivo} onEditar={() => setEditando(true)} />
       {editando && <EditarCultivo cultivo={cultivo} onCerrar={() => setEditando(false)} />}
@@ -29,7 +26,7 @@ export default function MiCultivo() {
       <ListaRecomendaciones />
       <Link
         href="/clima"
-        className="rounded-[12px] border border-borde py-3 text-center text-[14px] leading-[20px] font-semibold text-tinta active:bg-arena/60 lg:hidden"
+        className="min-h-12 rounded-[12px] border border-borde py-3 text-center text-[14px] leading-[20px] font-semibold text-tinta active:bg-arena/60 lg:hidden"
       >
         🌦️ ¿Cómo viene el clima?
       </Link>

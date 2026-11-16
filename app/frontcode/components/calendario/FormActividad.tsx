@@ -4,7 +4,8 @@ import { useState } from "react";
 import { db, type TipoActividad } from "@/app/frontcode/lib/almacen";
 import { useCatalogo, useMisSemillas } from "@/app/frontcode/lib/hooks";
 import { hoyISO } from "@/app/frontcode/lib/mensajes";
-import { ACTIVIDADES } from "@/app/frontcode/lib/textos";
+import { ACTIVIDADES, AVISOS } from "@/app/frontcode/lib/textos";
+import { useAviso } from "@/app/frontcode/components/Avisos";
 import { BOTON_OSCURO, CAMPO, ROTULO_BLOQUE } from "@/app/frontcode/components/estilos";
 
 /** Anotar lo que hizo en la chacra (RF 8). Se guarda solo en el celular. */
@@ -16,6 +17,7 @@ export function FormActividad({ onListo }: { onListo: () => void }) {
   const [fecha, setFecha] = useState(hoyISO());
   const [nota, setNota] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const avisar = useAviso();
 
   const ordenadas = [...semillas].sort((a, b) => Number(mias.has(b.id)) - Number(mias.has(a.id)) || a.nombre.localeCompare(b.nombre));
 
@@ -23,6 +25,7 @@ export function FormActividad({ onListo }: { onListo: () => void }) {
     if (!tipo) return setError("Elige qué hiciste.");
     if (tipo === "sembre" && !semillaId) return setError("Elige qué sembraste.");
     await db.actividades.add({ tipo, fecha, semillaId: semillaId || undefined, nota: nota.trim() || undefined });
+    avisar({ texto: AVISOS.actividadGuardada });
     onListo();
   }
 
@@ -39,7 +42,7 @@ export function FormActividad({ onListo }: { onListo: () => void }) {
               setError(null);
             }}
             aria-pressed={tipo === t}
-            className={`flex flex-col items-center gap-1 rounded-[12px] border p-2 text-[12px] leading-[15px] font-semibold text-tinta transition-colors ${
+            className={`flex flex-col items-center gap-1 rounded-[12px] border p-2 text-[13px] leading-[15px] font-semibold text-tinta transition-colors ${
               tipo === t ? "border-tinta bg-pradera/30" : "border-borde bg-arena hover:bg-arena/70"
             }`}
           >
@@ -89,7 +92,7 @@ export function FormActividad({ onListo }: { onListo: () => void }) {
         />
       </label>
 
-      {error && <p className="mt-2 text-[13px] leading-[18px] font-semibold text-terracota">{error}</p>}
+      {error && <p className="mt-2 text-[13px] leading-[18px] font-semibold text-terracota-fuerte">{error}</p>}
 
       <div className="mt-4 flex gap-2">
         <button type="button" onClick={() => void guardar()} className={`${BOTON_OSCURO} flex-1`}>

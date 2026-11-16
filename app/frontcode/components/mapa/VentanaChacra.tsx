@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { BotonVoz } from "@/app/frontcode/components/BotonVoz";
+import { IconoLinea } from "@/app/frontcode/components/IconoLinea";
 import { cambiarIcono, type Cultivo } from "@/app/frontcode/lib/almacen";
 import { useContexto } from "@/app/frontcode/lib/hooks";
 import { formatoMiles } from "@/app/frontcode/lib/mensajes";
@@ -13,13 +14,13 @@ export function tamanoTerreno(ha: number) {
 
 /** Texto resaltado en blanco, sin redondeo (mismo estilo que la leyenda y el clima). */
 const RESALTADO = "bg-white px-1.5 py-px shadow-[0_1px_3px_rgba(38,59,53,0.25)]";
-const ROTULO = `${RESALTADO} font-titulo text-[12px] leading-[16px] font-bold text-tinta uppercase`;
+const ROTULO = `${RESALTADO} font-titulo text-[13px] leading-[16px] font-bold text-tinta uppercase`;
 
 /** Ficha arena con un dato: etiqueta pequeña y valor en grande (como los widgets de "Tu cultivo hoy"). */
 function Ficha({ etiqueta, valor }: { etiqueta: string; valor: string }) {
   return (
     <div className="flex min-w-0 flex-1 flex-col gap-0.5 rounded-[10px] border border-borde bg-arena px-2.5 py-2 shadow-[0_1px_3px_rgba(38,59,53,0.3)]">
-      <span className="text-[10px] leading-[13px] font-semibold text-secundario uppercase">{etiqueta}</span>
+      <span className="text-[11px] leading-[13px] font-semibold text-secundario uppercase">{etiqueta}</span>
       <span className="font-titulo text-[17px] leading-[20px] font-bold text-tinta">{valor}</span>
     </div>
   );
@@ -29,7 +30,16 @@ function Ficha({ etiqueta, valor }: { etiqueta: string; valor: string }) {
  * Cuadro que se abre al tocar el círculo de un cultivo en el mapa. Sin fondo propio: los textos van
  * resaltados en blanco y los datos en fichas arena. "Ver más datos" despliega el resto y el ícono.
  */
-export function VentanaChacra({ cultivo, onCerrar }: { cultivo: Cultivo; onCerrar: () => void }) {
+export function VentanaChacra({
+  cultivo,
+  onCerrar,
+  onEditarTerreno,
+}: {
+  cultivo: Cultivo;
+  onCerrar: () => void;
+  /** Solo si el cultivo tiene un terreno dibujado: pasa a mover sus esquinas en el mapa. */
+  onEditarTerreno?: () => void;
+}) {
   const contexto = useContexto({ lat: cultivo.lat, lon: cultivo.lon });
   const [mas, setMas] = useState(false);
   const ctx = contexto.datos;
@@ -56,21 +66,21 @@ export function VentanaChacra({ cultivo, onCerrar }: { cultivo: Cultivo; onCerra
           {zona ? (
             <>
               <span className={`${RESALTADO} font-titulo text-[20px] leading-[24px] font-bold text-tinta`}>Zona {zona.nombre}</span>
-              <span className="bg-senal px-2 py-0.5 font-titulo text-[11px] leading-[14px] font-bold text-tinta uppercase shadow-[0_1px_3px_rgba(38,59,53,0.25)]">
+              <span className="bg-senal px-2 py-0.5 font-titulo text-[12px] leading-[14px] font-bold text-tinta uppercase shadow-[0_1px_3px_rgba(38,59,53,0.25)]">
                 {REGIONES[zona.region]}
               </span>
             </>
           ) : contexto.error ? (
-            <span className={`${RESALTADO} text-[12px] leading-[16px] text-terracota`}>😕 No pudimos saber tu zona.</span>
+            <span className={`${RESALTADO} text-[13px] leading-[16px] text-terracota-fuerte`}>😕 No pudimos saber tu zona.</span>
           ) : (
-            <span className="h-6 w-32 animate-pulse bg-arena" />
+            <span className="esqueleto h-6 w-32" />
           )}
         </div>
         <button
           type="button"
           onClick={onCerrar}
           aria-label="Cerrar"
-          className={`${RESALTADO} flex size-7 shrink-0 items-center justify-center text-[14px] text-tinta hover:bg-arena`}
+          className={`${RESALTADO} tactil relative flex size-7 shrink-0 items-center justify-center text-[14px] text-tinta hover:bg-arena`}
         >
           ✕
         </button>
@@ -91,11 +101,22 @@ export function VentanaChacra({ cultivo, onCerrar }: { cultivo: Cultivo; onCerra
         </div>
       )}
 
+      {onEditarTerreno && (
+        <button
+          type="button"
+          onClick={onEditarTerreno}
+          className={`${RESALTADO} tactil relative flex items-center gap-2 text-[13px] leading-[18px] font-semibold text-tinta hover:bg-arena`}
+        >
+          <IconoLinea nombre="lapiz" className="size-3.5 shrink-0" />
+          Editar terreno
+        </button>
+      )}
+
       <button
         type="button"
         onClick={() => setMas(!mas)}
         aria-expanded={mas}
-        className={`${RESALTADO} flex items-center gap-2 text-[12px] leading-[18px] font-semibold text-tinta hover:bg-arena`}
+        className={`${RESALTADO} tactil relative flex items-center gap-2 text-[13px] leading-[18px] font-semibold text-tinta hover:bg-arena`}
       >
         Ver más datos
         {/* eslint-disable-next-line @next/next/no-img-element -- ícono SVG del diseño (flecha hacia arriba = abierto) */}
@@ -110,14 +131,10 @@ export function VentanaChacra({ cultivo, onCerrar }: { cultivo: Cultivo; onCerra
 
       {mas && ctx && zona && (
         <>
-          <span className={`${RESALTADO} text-[12px] leading-[16px] text-secundario`}>{zona.descripcion}</span>
+          <span className={`${RESALTADO} text-[13px] leading-[16px] text-secundario`}>{zona.descripcion}</span>
           <div className="flex w-full gap-1.5">
             <Ficha etiqueta="Latitud" valor={cultivo.lat.toFixed(4)} />
             <Ficha etiqueta="Longitud" valor={cultivo.lon.toFixed(4)} />
-          </div>
-          <div className="flex w-full gap-1.5">
-            <Ficha etiqueta="Altura exacta" valor={`${formatoMiles(ctx.altitud_m)} m s. n. m.`} />
-            <Ficha etiqueta="Pulgar Vidal" valor={zona.nombre} />
           </div>
 
           <span className={ROTULO}>Ícono de tu cultivo</span>
@@ -139,8 +156,8 @@ export function VentanaChacra({ cultivo, onCerrar }: { cultivo: Cultivo; onCerra
           </div>
 
           <div className="flex w-full items-center justify-between gap-2">
-            <span className={`${RESALTADO} text-[11px] leading-[15px] text-secundario`}>
-              Fuente: modelo de elevación · Pulgar Vidal
+            <span className={`${RESALTADO} text-[12px] leading-[15px] text-secundario`}>
+              Fuente: mapa de alturas y regiones naturales del Perú
             </span>
             <BotonVoz texto={textoVoz} pequeno className="bg-white" />
           </div>

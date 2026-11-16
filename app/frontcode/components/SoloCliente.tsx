@@ -17,9 +17,9 @@ export function SoloCliente({ children }: { children: ReactNode }) {
   if (!enNavegador) {
     return (
       <div className="flex flex-col gap-4" aria-busy>
-        <div className="h-8 w-2/3 animate-pulse rounded-lg bg-arena" />
-        <div className="h-40 animate-pulse rounded-[20px] bg-arena" />
-        <div className="h-28 animate-pulse rounded-[20px] bg-arena" />
+        <div className="esqueleto h-8 w-2/3 rounded-[8px]" />
+        <div className="esqueleto h-40 rounded-[16px]" />
+        <div className="esqueleto h-28 rounded-[16px]" />
       </div>
     );
   }

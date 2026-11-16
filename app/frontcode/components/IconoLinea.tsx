@@ -22,6 +22,13 @@ const TRAZOS = {
   check: <path d="m4.5 12.5 4.5 4.5 10.5-10.5" />,
   equis: <path d="M6 6l12 12M18 6 6 18" />,
   flecha: <path d="m9 5 7 7-7 7" />,
+  sinSenal: (
+    <>
+      <path d="M5 12.5a10 10 0 0 1 4-2.3M15 10.2a10 10 0 0 1 4 2.3M8.5 16a5 5 0 0 1 7 0" />
+      <circle cx="12" cy="19.5" r="0.6" fill="currentColor" />
+      <path d="m3.5 3.5 17 17" />
+    </>
+  ),
   basura: (
     <>
       <path d="M4.5 6.5h15M9.5 6.5V4h5v2.5M6.5 6.5l1 13h9l1-13" />

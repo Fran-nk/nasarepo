@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { buscar, normalizarFonetico } from "./fonetica";
-import catalogo from "../../mocks/semillas.json";
+import catalogo from "../../datos/semillas.json";
 
 const semillas = catalogo.semillas;
 const primero = (q: string) => buscar(q, semillas)[0]?.id;

@@ -19,5 +19,5 @@ export function Titulo({ texto, bajada, nivel = "pagina" }: { texto: string; baj
 
 /** Rótulo corto en mayúsculas (Roboto Condensed Bold 12/16), para separar bloques del panel. */
 export function Rotulo({ texto }: { texto: string }) {
-  return <p className="font-titulo text-[12px] leading-[16px] font-bold tracking-wide text-secundario uppercase">{texto}</p>;
+  return <p className="font-titulo text-[13px] leading-[16px] font-bold tracking-wide text-secundario uppercase">{texto}</p>;
 }

@@ -76,10 +76,10 @@ function Tarjeta({ titulo, bajada, children }: { titulo: string; bajada?: string
   return (
     <section
       aria-label={titulo}
-      className="flex w-full flex-col rounded-[16px] border-[0.5px] border-borde bg-white p-3 shadow-[0_0.633px_0.95px_rgba(0,0,0,0.1),0_0.633px_0.633px_rgba(0,0,0,0.1)] lg:rounded-[12.667px] lg:p-[10px]"
+      className="flex w-full flex-col rounded-[16px] border-[0.8px] border-borde bg-white p-3 shadow-[0_0.633px_0.475px_rgba(0,0,0,0.1),0_0.633px_0.317px_rgba(0,0,0,0.1)] lg:rounded-[12.667px] lg:p-[10px]"
     >
-      <h2 className="text-[16px] leading-[22px] font-semibold text-tinta lg:text-[12.667px] lg:leading-[16.5px]">{titulo}</h2>
-      {bajada && <p className="text-[13px] leading-[18px] text-secundario lg:text-[10.134px] lg:leading-[15.2px]">{bajada}</p>}
+      <h2 className="text-[16px] leading-[22px] font-semibold text-tinta lg:text-[14px] lg:leading-[20px]">{titulo}</h2>
+      {bajada && <p className="text-[13px] leading-[18px] text-secundario lg:text-[12px] lg:leading-[15.2px]">{bajada}</p>}
       {children}
     </section>
   );
@@ -106,7 +106,7 @@ function Casilla({
         onClick={onClick}
         aria-label={etiqueta}
         title={etiqueta}
-        className={`flex h-[54px] w-full items-center justify-center rounded-[8px] border-[0.5px] border-borde transition-colors lg:h-[46.6px] lg:rounded-[7.6px] ${
+        className={`flex h-[54px] w-full items-center justify-center rounded-[8px] border-[0.8px] border-borde transition-colors lg:h-[46.6px] lg:rounded-[7.6px] ${
           semilla ? "bg-white" : "bg-arena hover:bg-arena/70"
         }`}
       >
@@ -117,7 +117,7 @@ function Casilla({
         )}
       </button>
       {semilla && (
-        <p className="w-full truncate text-center text-[10px] leading-[15px] text-secundario lg:text-[6.967px] lg:leading-[15.2px]">
+        <p className="w-full truncate text-center text-[11px] leading-[15px] text-secundario lg:text-[11px] lg:leading-[15.2px]">
           {semilla.nombre}
         </p>
       )}
