@@ -9,7 +9,7 @@ Todo lo que se muestra en la app sale de fuentes **reales, públicas y gratuitas
 | **Mapbox** | Nombre del lugar | Es el mismo servicio y el mismo token del mapa |
 | **FAO ECOCROP** (vía el paquete de R [Recocrop](https://github.com/cropmodels/Recocrop)) | Rangos reales de cada semilla: temperatura ideal y límites, lluvia que necesita en su ciclo, frío que la mata, duración del ciclo y pH | Es la base de la FAO que pide `docs/plan-modelo.md` para el catálogo |
 
-El código está en `app/front/lib/fuentes/` (pedidos) y `app/front/lib/calculos/` (cuentas, con pruebas). Las pantallas llaman a `app/front/lib/api/cliente.ts`.
+El código está en `app/frontcode/lib/fuentes/` (pedidos) y `app/frontcode/lib/calculos/` (cuentas, con pruebas). Las pantallas llaman a `app/frontcode/lib/api/cliente.ts`.
 
 ## Dato por dato
 
@@ -38,7 +38,7 @@ El código está en `app/front/lib/fuentes/` (pedidos) y `app/front/lib/calculos
 El backend lo sirve en `GET /api/v1/semillas` (`app/back/semillas.ts`). Une dos partes:
 
 - **Datos de la FAO** (`app/back/datos/ecocrop.json`) para **29 de las 32** especies: temperatura ideal y límites, lluvia durante el ciclo, frío que la mata, ciclo (rango entre variedades) y pH. Los extrae `scripts/ecocrop/extraer_ecocrop.py` de `ecocrop.rds` (Recocrop); la tabla del script dice qué entrada de ECOCROP corresponde a cada semilla (por ejemplo, ají = *Capsicum baccatum* var. *pendulum*; yacón y tomate, con sus nombres científicos antiguos). Se ven en la ficha de cada semilla, en "Lo que necesita (datos de la FAO)".
-- **Ficha del equipo** (`app/front/datos/semillas.json`): nombres locales, altura donde crece, aguante 0–5, rotación, usos y cómo guardar la semilla. ECOCROP no tiene altura ni rotación.
+- **Ficha del equipo** (`app/frontcode/datos/semillas.json`): nombres locales, altura donde crece, aguante 0–5, rotación, usos y cómo guardar la semilla. ECOCROP no tiene altura ni rotación.
 - **Sacha inchi, choloque y camu camu** no están en ECOCROP: su ficha es solo la del equipo, y la app lo dice.
 
 Si el backend no responde, el celular arma el mismo catálogo con la misma función.
@@ -56,4 +56,4 @@ Si el backend no responde, el celular arma el mismo catálogo con la misma funci
 corepack pnpm test
 ```
 
-Las pruebas no salen a internet. Usan respuestas reales guardadas en `app/front/lib/fuentes/ejemplos/` (NASA POWER y Open-Meteo para Cusco, noviembre 2026).
+Las pruebas no salen a internet. Usan respuestas reales guardadas en `app/frontcode/lib/fuentes/ejemplos/` (NASA POWER y Open-Meteo para Cusco, noviembre 2026).

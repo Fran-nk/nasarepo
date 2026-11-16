@@ -1,12 +1,12 @@
 # Backend de Semilla Siguiente
 
-Este directorio contiene la lógica de servidor. Next.js publica las rutas desde `app/api/`; cada `route.ts` debe ser una capa pequeña que llame a `app/back/`. Los componentes, utilidades y mocks del frontend están en `app/front/`; sus páginas están en el grupo de rutas `app/(front)/`.
+Este directorio contiene la lógica de servidor. Next.js publica las rutas desde `app/api/`; cada `route.ts` debe ser una capa pequeña que llame a `app/back/`. Los componentes, utilidades y mocks del frontend están en `app/frontcode/`; sus páginas están en el grupo de rutas `app/`.
 
 ## Estado
 
 - `GET /api/v1/salud`: disponible. Indica si se incorporó un modelo compatible.
 - `GET /api/v1/clima?latitud=-13.53&longitud=-71.97&dias=7`: climatología mensual NASA POWER (2002–2025) y pronóstico Open-Meteo. Si una fuente falla, su bloque es `null` y se informa en `avisos`.
-- `GET /api/v1/semillas`: catálogo de semillas. Une la ficha del equipo (`app/front/datos/semillas.json`) con los rangos reales de FAO ECOCROP (`app/back/datos/ecocrop.json`, 29 de 32 especies; lo genera `scripts/ecocrop/extraer_ecocrop.py` desde `ecocrop.rds` de Recocrop). La lógica es la función pura `catalogoSemillas()` en `semillas.ts`, que el frontend también usa si la ruta no responde.
+- `GET /api/v1/semillas`: catálogo de semillas. Une la ficha del equipo (`app/frontcode/datos/semillas.json`) con los rangos reales de FAO ECOCROP (`app/back/datos/ecocrop.json`, 29 de 32 especies; lo genera `scripts/ecocrop/extraer_ecocrop.py` desde `ecocrop.rds` de Recocrop). La lógica es la función pura `catalogoSemillas()` en `semillas.ts`, que el frontend también usa si la ruta no responde.
 - `POST /api/v1/contexto`: valida el cuerpo del contrato y devuelve `503 DATOS_NO_DISPONIBLES` mientras falten catálogo agronómico, fuentes geográficas/climáticas y artefacto entrenado. No devuelve recomendaciones inventadas.
 - `app/back/modelo/mlp.ts`: inferencia ligera de un MLP entrenado en Keras/TensorFlow. No instala TensorFlow completo en Vercel. El entrenamiento y la exportación ocurren fuera del despliegue.
 

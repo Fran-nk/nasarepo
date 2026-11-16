@@ -53,10 +53,10 @@ corepack pnpm test
 ## Estructura
 
 ```
-app/(front)/         rutas de las pantallas, sin cambiar las URL
-app/front/components/ tarjetas, mapa, semillero y calendario
-app/front/lib/       cliente, fuentes (NASA POWER, Open-Meteo), cálculos, contratos, textos, búsqueda e IndexedDB
-app/front/datos/     catálogo de semillas (curado por el equipo)
+app/                 rutas de las pantallas (page.tsx, perfil, semillas…)
+app/frontcode/components/ tarjetas, mapa, semillero y calendario
+app/frontcode/lib/       cliente, fuentes (NASA POWER, Open-Meteo), cálculos, contratos, textos, búsqueda e IndexedDB
+app/frontcode/datos/     catálogo de semillas (curado por el equipo)
 app/api/             rutas HTTP del backend
 app/back/            lógica de servidor y modelo
 ```

@@ -2,9 +2,9 @@
 
 Hoy el frontend arma todas estas respuestas por su cuenta, con datos reales de **NASA POWER** y **Open-Meteo**. Ver [fuentes-de-datos.md](fuentes-de-datos.md). Este documento sirve para el backend: si toma una parte, por ejemplo las recomendaciones con la red neuronal, debe devolver exactamente estos tipos. Así las pantallas no cambian.
 
-- **Tipos exactos (fuente de verdad):** [`app/front/lib/contratos/tipos.ts`](../app/front/lib/contratos/tipos.ts)
-- **Cómo se calcula hoy cada respuesta:** [`app/front/lib/api/cliente.ts`](../app/front/lib/api/cliente.ts), con las cuentas en [`app/front/lib/calculos/`](../app/front/lib/calculos)
-- **Catálogo de semillas:** `GET /api/v1/semillas` ([`app/back/semillas.ts`](../app/back/semillas.ts)): ficha del equipo ([`app/front/datos/semillas.json`](../app/front/datos/semillas.json)) + rangos FAO ECOCROP ([`app/back/datos/ecocrop.json`](../app/back/datos/ecocrop.json))
+- **Tipos exactos (fuente de verdad):** [`app/frontcode/lib/contratos/tipos.ts`](../app/frontcode/lib/contratos/tipos.ts)
+- **Cómo se calcula hoy cada respuesta:** [`app/frontcode/lib/api/cliente.ts`](../app/frontcode/lib/api/cliente.ts), con las cuentas en [`app/frontcode/lib/calculos/`](../app/frontcode/lib/calculos)
+- **Catálogo de semillas:** `GET /api/v1/semillas` ([`app/back/semillas.ts`](../app/back/semillas.ts)): ficha del equipo ([`app/frontcode/datos/semillas.json`](../app/frontcode/datos/semillas.json)) + rangos FAO ECOCROP ([`app/back/datos/ecocrop.json`](../app/back/datos/ecocrop.json))
 
 ## Reglas generales
 

@@ -4,9 +4,9 @@
  * Función pura sin APIs de Node: la usa la ruta GET /api/v1/semillas y, si la ruta no responde,
  * el cliente del frontend, para que el catálogo sea el mismo en los dos casos.
  */
-import curadas from "@/app/front/datos/semillas.json";
+import curadas from "@/app/frontcode/datos/semillas.json";
 import ecocrop from "./datos/ecocrop.json";
-import type { ParametrosEcocrop, RespuestaSemillas, Semilla } from "@/app/front/lib/contratos/tipos";
+import type { ParametrosEcocrop, RespuestaSemillas, Semilla } from "@/app/frontcode/lib/contratos/tipos";
 
 export const FUENTE_ECOCROP = {
   proveedor: `${ecocrop.fuente} (${ecocrop.via})`,
