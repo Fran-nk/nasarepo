@@ -1,0 +1,792 @@
+{
+  "fuente": "FAO ECOCROP",
+  "via": "Paquete de R Recocrop, inst/parameters/ecocrop.rds",
+  "url": "https://github.com/cropmodels/Recocrop",
+  "extraido": "2026-11-15",
+  "notas": "temperatura_c: temperatura promedio en que crece (Recocrop la compara con la media). temperatura_mata_c: mínima que la mata (Recocrop la compara con la mínima). lluvia_ciclo_mm: lluvia durante el ciclo (Recocrop la reparte por mes según la duración). ciclo_dias: [más corto, más largo] entre todas las variedades.",
+  "especies": {
+    "papa": {
+      "cientifico_ecocrop": "Solanum tuberosum L.",
+      "nombre_ecocrop": "Potato",
+      "ciclo_dias": [
+        90,
+        160
+      ],
+      "temperatura_mata_c": -1,
+      "temperatura_c": {
+        "min": 7,
+        "optima_min": 15,
+        "optima_max": 25,
+        "max": 30
+      },
+      "lluvia_ciclo_mm": {
+        "min": 250,
+        "optima_min": 500,
+        "optima_max": 800,
+        "max": 2000
+      },
+      "ph": {
+        "min": 4.2,
+        "optimo_min": 5,
+        "optimo_max": 6.2,
+        "max": 8.5
+      }
+    },
+    "maiz_amilaceo": {
+      "cientifico_ecocrop": "Zea mays v. amylacea Sturt",
+      "nombre_ecocrop": "Soft maize",
+      "ciclo_dias": [
+        90,
+        140
+      ],
+      "temperatura_mata_c": 0,
+      "temperatura_c": {
+        "min": 12,
+        "optima_min": 20,
+        "optima_max": 27,
+        "max": 45
+      },
+      "lluvia_ciclo_mm": {
+        "min": 450,
+        "optima_min": 600,
+        "optima_max": 1200,
+        "max": 1800
+      },
+      "ph": {
+        "min": 5,
+        "optimo_min": 5.5,
+        "optimo_max": 7,
+        "max": 8
+      }
+    },
+    "maiz_amarillo": {
+      "cientifico_ecocrop": "Zea mays v. indurata Sturt",
+      "nombre_ecocrop": "Flint maize",
+      "ciclo_dias": [
+        90,
+        140
+      ],
+      "temperatura_mata_c": 0,
+      "temperatura_c": {
+        "min": 10,
+        "optima_min": 18,
+        "optima_max": 30,
+        "max": 47
+      },
+      "lluvia_ciclo_mm": {
+        "min": 450,
+        "optima_min": 600,
+        "optima_max": 1200,
+        "max": 1800
+      },
+      "ph": {
+        "min": 4.5,
+        "optimo_min": 5,
+        "optimo_max": 7,
+        "max": 8.5
+      }
+    },
+    "haba": {
+      "cientifico_ecocrop": "Vicia faba L.",
+      "nombre_ecocrop": "Broad bean",
+      "ciclo_dias": [
+        100,
+        150
+      ],
+      "temperatura_mata_c": -10,
+      "temperatura_c": {
+        "min": 5,
+        "optima_min": 18,
+        "optima_max": 28,
+        "max": 32
+      },
+      "lluvia_ciclo_mm": {
+        "min": 250,
+        "optima_min": 650,
+        "optima_max": 1000,
+        "max": 2600
+      },
+      "ph": {
+        "min": 4.5,
+        "optimo_min": 6,
+        "optimo_max": 7,
+        "max": 8.6
+      }
+    },
+    "arveja": {
+      "cientifico_ecocrop": "Pisum sativum L.",
+      "nombre_ecocrop": "Pea",
+      "ciclo_dias": [
+        60,
+        140
+      ],
+      "temperatura_mata_c": -2,
+      "temperatura_c": {
+        "min": 4,
+        "optima_min": 10,
+        "optima_max": 24,
+        "max": 30
+      },
+      "lluvia_ciclo_mm": {
+        "min": 350,
+        "optima_min": 800,
+        "optima_max": 1200,
+        "max": 2500
+      },
+      "ph": {
+        "min": 4.5,
+        "optimo_min": 5.5,
+        "optimo_max": 7,
+        "max": 8.3
+      }
+    },
+    "frijol": {
+      "cientifico_ecocrop": "Phaseolus vulgaris L.",
+      "nombre_ecocrop": "Bean, Common",
+      "ciclo_dias": [
+        50,
+        270
+      ],
+      "temperatura_mata_c": 0,
+      "temperatura_c": {
+        "min": 7,
+        "optima_min": 16,
+        "optima_max": 25,
+        "max": 32
+      },
+      "lluvia_ciclo_mm": {
+        "min": 300,
+        "optima_min": 500,
+        "optima_max": 2000,
+        "max": 4300
+      },
+      "ph": {
+        "min": 4,
+        "optimo_min": 5.5,
+        "optimo_max": 7.5,
+        "max": 9
+      }
+    },
+    "quinua": {
+      "cientifico_ecocrop": "Chenopodium quinoa Willden.",
+      "nombre_ecocrop": "Quinoa",
+      "ciclo_dias": [
+        90,
+        240
+      ],
+      "temperatura_mata_c": -8,
+      "temperatura_c": {
+        "min": 2,
+        "optima_min": 14,
+        "optima_max": 18,
+        "max": 35
+      },
+      "lluvia_ciclo_mm": {
+        "min": 250,
+        "optima_min": 500,
+        "optima_max": 1000,
+        "max": 2600
+      },
+      "ph": {
+        "min": 4.5,
+        "optimo_min": 5.5,
+        "optimo_max": 8,
+        "max": 9.5
+      }
+    },
+    "kiwicha": {
+      "cientifico_ecocrop": "Amaranthus caudatus L.",
+      "nombre_ecocrop": "Inca wheat",
+      "ciclo_dias": [
+        30,
+        300
+      ],
+      "temperatura_mata_c": 4,
+      "temperatura_c": {
+        "min": 7,
+        "optima_min": 21,
+        "optima_max": 28,
+        "max": 40
+      },
+      "lluvia_ciclo_mm": {
+        "min": 250,
+        "optima_min": 800,
+        "optima_max": 2300,
+        "max": 4200
+      },
+      "ph": {
+        "min": 4.3,
+        "optimo_min": 5.5,
+        "optimo_max": 7.5,
+        "max": 8.5
+      }
+    },
+    "canihua": {
+      "cientifico_ecocrop": "Chenopodium pallidicaule H.",
+      "nombre_ecocrop": "Canihua",
+      "ciclo_dias": [
+        90,
+        150
+      ],
+      "temperatura_mata_c": -10,
+      "temperatura_c": {
+        "min": 5,
+        "optima_min": 10,
+        "optima_max": 16,
+        "max": 28
+      },
+      "lluvia_ciclo_mm": {
+        "min": 300,
+        "optima_min": 500,
+        "optima_max": 800,
+        "max": 1100
+      },
+      "ph": {
+        "min": 4.8,
+        "optimo_min": 6,
+        "optimo_max": 7.5,
+        "max": 8.5
+      }
+    },
+    "tarwi": {
+      "cientifico_ecocrop": "Lupinus mutabilis Sweet",
+      "nombre_ecocrop": "Tarwi",
+      "ciclo_dias": [
+        150,
+        330
+      ],
+      "temperatura_mata_c": -5,
+      "temperatura_c": {
+        "min": 6,
+        "optima_min": 18,
+        "optima_max": 24,
+        "max": 30
+      },
+      "lluvia_ciclo_mm": {
+        "min": 350,
+        "optima_min": 500,
+        "optima_max": 1000,
+        "max": 1700
+      },
+      "ph": {
+        "min": 4.5,
+        "optimo_min": 5,
+        "optimo_max": 6.5,
+        "max": 7
+      }
+    },
+    "oca": {
+      "cientifico_ecocrop": "Oxalis tuberosa Molina",
+      "nombre_ecocrop": "Oca",
+      "ciclo_dias": [
+        180,
+        270
+      ],
+      "temperatura_mata_c": 0,
+      "temperatura_c": {
+        "min": 5,
+        "optima_min": 12,
+        "optima_max": 24,
+        "max": 28
+      },
+      "lluvia_ciclo_mm": {
+        "min": 570,
+        "optima_min": 800,
+        "optima_max": 1300,
+        "max": 2150
+      },
+      "ph": {
+        "min": 5.3,
+        "optimo_min": 6,
+        "optimo_max": 7,
+        "max": 7.8
+      }
+    },
+    "olluco": {
+      "cientifico_ecocrop": "Ullucus tuberosus Caldas",
+      "nombre_ecocrop": "Ullucu",
+      "ciclo_dias": [
+        120,
+        270
+      ],
+      "temperatura_mata_c": -4,
+      "temperatura_c": {
+        "min": 5,
+        "optima_min": 12,
+        "optima_max": 20,
+        "max": 28
+      },
+      "lluvia_ciclo_mm": {
+        "min": 800,
+        "optima_min": 1100,
+        "optima_max": 1400,
+        "max": 1800
+      },
+      "ph": {
+        "min": 5,
+        "optimo_min": 5.5,
+        "optimo_max": 6.5,
+        "max": 7
+      }
+    },
+    "mashua": {
+      "cientifico_ecocrop": "Tropaeolum tuberosum R.& P.",
+      "nombre_ecocrop": "Mashua",
+      "ciclo_dias": [
+        180,
+        240
+      ],
+      "temperatura_mata_c": -2,
+      "temperatura_c": {
+        "min": 4,
+        "optima_min": 12,
+        "optima_max": 20,
+        "max": 24
+      },
+      "lluvia_ciclo_mm": {
+        "min": 700,
+        "optima_min": 1000,
+        "optima_max": 1200,
+        "max": 1600
+      },
+      "ph": {
+        "min": 5.3,
+        "optimo_min": 6,
+        "optimo_max": 7,
+        "max": 7.5
+      }
+    },
+    "cebada": {
+      "cientifico_ecocrop": "Hordeum vulgare L.",
+      "nombre_ecocrop": "Barley",
+      "ciclo_dias": [
+        90,
+        240
+      ],
+      "temperatura_mata_c": -4,
+      "temperatura_c": {
+        "min": 2,
+        "optima_min": 15,
+        "optima_max": 20,
+        "max": 40
+      },
+      "lluvia_ciclo_mm": {
+        "min": 200,
+        "optima_min": 500,
+        "optima_max": 1000,
+        "max": 2000
+      },
+      "ph": {
+        "min": 6,
+        "optimo_min": 6.5,
+        "optimo_max": 7.5,
+        "max": 8
+      }
+    },
+    "trigo": {
+      "cientifico_ecocrop": "Triticum aestivum L.",
+      "nombre_ecocrop": "Wheat, common",
+      "ciclo_dias": [
+        90,
+        250
+      ],
+      "temperatura_mata_c": 0,
+      "temperatura_c": {
+        "min": 5,
+        "optima_min": 15,
+        "optima_max": 23,
+        "max": 27
+      },
+      "lluvia_ciclo_mm": {
+        "min": 300,
+        "optima_min": 750,
+        "optima_max": 900,
+        "max": 1600
+      },
+      "ph": {
+        "min": 5.5,
+        "optimo_min": 6,
+        "optimo_max": 7,
+        "max": 8.5
+      }
+    },
+    "avena": {
+      "cientifico_ecocrop": "Avena sativa L.",
+      "nombre_ecocrop": "Oats",
+      "ciclo_dias": [
+        110,
+        270
+      ],
+      "temperatura_mata_c": -15,
+      "temperatura_c": {
+        "min": 5,
+        "optima_min": 16,
+        "optima_max": 20,
+        "max": 30
+      },
+      "lluvia_ciclo_mm": {
+        "min": 250,
+        "optima_min": 600,
+        "optima_max": 1000,
+        "max": 1500
+      },
+      "ph": {
+        "min": 4.5,
+        "optimo_min": 5,
+        "optimo_max": 6,
+        "max": 7.5
+      }
+    },
+    "yuca": {
+      "cientifico_ecocrop": "Manihot esculenta Crantz.",
+      "nombre_ecocrop": "Cassava",
+      "ciclo_dias": [
+        180,
+        365
+      ],
+      "temperatura_mata_c": 7,
+      "temperatura_c": {
+        "min": 10,
+        "optima_min": 20,
+        "optima_max": 29,
+        "max": 35
+      },
+      "lluvia_ciclo_mm": {
+        "min": 500,
+        "optima_min": 1000,
+        "optima_max": 1500,
+        "max": 5000
+      },
+      "ph": {
+        "min": 4,
+        "optimo_min": 5.5,
+        "optimo_max": 8,
+        "max": 9
+      }
+    },
+    "platano": {
+      "cientifico_ecocrop": "Musa acuminata x M. balbis.",
+      "nombre_ecocrop": "Banana",
+      "ciclo_dias": [
+        180,
+        365
+      ],
+      "temperatura_mata_c": 0,
+      "temperatura_c": {
+        "min": 15,
+        "optima_min": 25,
+        "optima_max": 35,
+        "max": 40
+      },
+      "lluvia_ciclo_mm": {
+        "min": 1000,
+        "optima_min": 1400,
+        "optima_max": 2400,
+        "max": 5000
+      },
+      "ph": {
+        "min": 4.5,
+        "optimo_min": 5.5,
+        "optimo_max": 6.5,
+        "max": 8
+      }
+    },
+    "cafe": {
+      "cientifico_ecocrop": "Coffea arabica L.",
+      "nombre_ecocrop": "Coffee arabica",
+      "ciclo_dias": [
+        210,
+        330
+      ],
+      "temperatura_mata_c": 0,
+      "temperatura_c": {
+        "min": 10,
+        "optima_min": 14,
+        "optima_max": 28,
+        "max": 34
+      },
+      "lluvia_ciclo_mm": {
+        "min": 750,
+        "optima_min": 1400,
+        "optima_max": 2300,
+        "max": 4200
+      },
+      "ph": {
+        "min": 4.3,
+        "optimo_min": 5.5,
+        "optimo_max": 7,
+        "max": 8.4
+      }
+    },
+    "cacao": {
+      "cientifico_ecocrop": "Theobroma cacao L.",
+      "nombre_ecocrop": "Cacao",
+      "ciclo_dias": [
+        180,
+        365
+      ],
+      "temperatura_mata_c": 5,
+      "temperatura_c": {
+        "min": 10,
+        "optima_min": 21,
+        "optima_max": 32,
+        "max": 38
+      },
+      "lluvia_ciclo_mm": {
+        "min": 900,
+        "optima_min": 1200,
+        "optima_max": 3000,
+        "max": 7600
+      },
+      "ph": {
+        "min": 4,
+        "optimo_min": 5,
+        "optimo_max": 6.5,
+        "max": 8
+      }
+    },
+    "arroz": {
+      "cientifico_ecocrop": "Oryza sativa L. s. indica",
+      "nombre_ecocrop": "Rice, paddy (Indica)",
+      "ciclo_dias": [
+        80,
+        200
+      ],
+      "temperatura_mata_c": 0,
+      "temperatura_c": {
+        "min": 16,
+        "optima_min": 25,
+        "optima_max": 35,
+        "max": 38
+      },
+      "lluvia_ciclo_mm": {
+        "min": 1000,
+        "optima_min": 1500,
+        "optima_max": 2000,
+        "max": 4000
+      },
+      "ph": {
+        "min": 3.5,
+        "optimo_min": 5,
+        "optimo_max": 8,
+        "max": 9
+      }
+    },
+    "camote": {
+      "cientifico_ecocrop": "Ipomoea batatas (L.) Lam.",
+      "nombre_ecocrop": "Sweet potato",
+      "ciclo_dias": [
+        80,
+        170
+      ],
+      "temperatura_mata_c": 1,
+      "temperatura_c": {
+        "min": 10,
+        "optima_min": 18,
+        "optima_max": 28,
+        "max": 38
+      },
+      "lluvia_ciclo_mm": {
+        "min": 500,
+        "optima_min": 750,
+        "optima_max": 1250,
+        "max": 5000
+      },
+      "ph": {
+        "min": 4,
+        "optimo_min": 5,
+        "optimo_max": 7,
+        "max": 8
+      }
+    },
+    "cebolla": {
+      "cientifico_ecocrop": "Allium cepa L. v cepa",
+      "nombre_ecocrop": "Onion",
+      "ciclo_dias": [
+        85,
+        175
+      ],
+      "temperatura_mata_c": 0,
+      "temperatura_c": {
+        "min": 4,
+        "optima_min": 12,
+        "optima_max": 25,
+        "max": 30
+      },
+      "lluvia_ciclo_mm": {
+        "min": 300,
+        "optima_min": 350,
+        "optima_max": 600,
+        "max": 2800
+      },
+      "ph": {
+        "min": 4.3,
+        "optimo_min": 6,
+        "optimo_max": 7,
+        "max": 8.3
+      }
+    },
+    "zanahoria": {
+      "cientifico_ecocrop": "Daucus carota L.",
+      "nombre_ecocrop": "Carrot",
+      "ciclo_dias": [
+        40,
+        150
+      ],
+      "temperatura_mata_c": -1,
+      "temperatura_c": {
+        "min": 3,
+        "optima_min": 15,
+        "optima_max": 24,
+        "max": 30
+      },
+      "lluvia_ciclo_mm": {
+        "min": 400,
+        "optima_min": 600,
+        "optima_max": 1200,
+        "max": 4000
+      },
+      "ph": {
+        "min": 4.2,
+        "optimo_min": 5.8,
+        "optimo_max": 6.8,
+        "max": 8.7
+      }
+    },
+    "tomate": {
+      "cientifico_ecocrop": "Lycopersicon esculentum M.",
+      "nombre_ecocrop": "Tomato",
+      "ciclo_dias": [
+        70,
+        150
+      ],
+      "temperatura_mata_c": 0,
+      "temperatura_c": {
+        "min": 7,
+        "optima_min": 20,
+        "optima_max": 27,
+        "max": 35
+      },
+      "lluvia_ciclo_mm": {
+        "min": 400,
+        "optima_min": 600,
+        "optima_max": 1300,
+        "max": 1800
+      },
+      "ph": {
+        "min": 5,
+        "optimo_min": 5.5,
+        "optimo_max": 6.8,
+        "max": 7.5
+      }
+    },
+    "aji": {
+      "cientifico_ecocrop": "Capsicum baccatum L.v pend.",
+      "nombre_ecocrop": "Pimentchien",
+      "ciclo_dias": [
+        120,
+        150
+      ],
+      "temperatura_mata_c": 0,
+      "temperatura_c": {
+        "min": 15,
+        "optima_min": 20,
+        "optima_max": 26,
+        "max": 32
+      },
+      "lluvia_ciclo_mm": {
+        "min": 500,
+        "optima_min": 600,
+        "optima_max": 1250,
+        "max": 1500
+      },
+      "ph": {
+        "min": 5.3,
+        "optimo_min": 6,
+        "optimo_max": 6.5,
+        "max": 7.8
+      }
+    },
+    "yacon": {
+      "cientifico_ecocrop": "Polymnia sonchifolia P.& E.",
+      "nombre_ecocrop": "Yacon",
+      "ciclo_dias": [
+        180,
+        210
+      ],
+      "temperatura_mata_c": 0,
+      "temperatura_c": {
+        "min": 5,
+        "optima_min": 12,
+        "optima_max": 22,
+        "max": 30
+      },
+      "lluvia_ciclo_mm": {
+        "min": 600,
+        "optima_min": 800,
+        "optima_max": 1200,
+        "max": 1400
+      },
+      "ph": {
+        "min": 5,
+        "optimo_min": 5.5,
+        "optimo_max": 6.5,
+        "max": 7
+      }
+    },
+    "maca": {
+      "cientifico_ecocrop": "Lepidium meyenii Walpers",
+      "nombre_ecocrop": "Maca",
+      "ciclo_dias": [
+        180,
+        270
+      ],
+      "temperatura_mata_c": -10,
+      "temperatura_c": {
+        "min": 3,
+        "optima_min": 12,
+        "optima_max": 18,
+        "max": 22
+      },
+      "lluvia_ciclo_mm": {
+        "min": 500,
+        "optima_min": 600,
+        "optima_max": 800,
+        "max": 1000
+      },
+      "ph": {
+        "min": 6,
+        "optimo_min": 6.5,
+        "optimo_max": 7.5,
+        "max": 8.5
+      }
+    },
+    "mango": {
+      "cientifico_ecocrop": "Mangifera indica L.",
+      "nombre_ecocrop": "Mango",
+      "ciclo_dias": [
+        150,
+        365
+      ],
+      "temperatura_mata_c": -1,
+      "temperatura_c": {
+        "min": 8,
+        "optima_min": 24,
+        "optima_max": 30,
+        "max": 48
+      },
+      "lluvia_ciclo_mm": {
+        "min": 300,
+        "optima_min": 600,
+        "optima_max": 1500,
+        "max": 2600
+      },
+      "ph": {
+        "min": 4.3,
+        "optimo_min": 5.5,
+        "optimo_max": 7.5,
+        "max": 8.5
+      }
+    }
+  }
+}

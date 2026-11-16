@@ -19,7 +19,7 @@ import type {
   RespuestaVsNormal,
   Semilla,
 } from "@/app/front/lib/contratos/tipos";
-import catalogo from "@/app/front/datos/semillas.json";
+import { catalogoSemillas } from "@/app/back/semillas";
 import {
   calcularAlertas,
   calcularSemaforo,
@@ -60,7 +60,34 @@ const FUENTE_PRONOSTICO = "Pronóstico Open-Meteo";
 export const AVISO_OFICIAL_ENFEN = "https://enfen.imarpe.gob.pe/";
 export const PAGINA_NASA_POWER = "https://power.larc.nasa.gov/data-access-viewer/";
 
-const SEMILLAS = (catalogo as RespuestaSemillas).semillas as Semilla[];
+/**
+ * Catálogo de semillas: lo sirve el backend (GET /api/v1/semillas, ficha del equipo + rangos FAO ECOCROP).
+ * Si no responde (sin señal, sitio estático), se arma aquí con la misma función: el catálogo es idéntico.
+ * Se pide una vez por sesión.
+ */
+let catalogoPendiente: Promise<RespuestaSemillas> | null = null;
+
+function esCatalogo(d: unknown): d is RespuestaSemillas {
+  return !!d && Array.isArray((d as RespuestaSemillas).semillas) && (d as RespuestaSemillas).semillas.length > 0;
+}
+
+export function obtenerSemillas(): Promise<RespuestaSemillas> {
+  catalogoPendiente ??= fetch("/api/v1/semillas")
+    .then(async (r) => {
+      const d: unknown = r.ok ? await r.json() : null;
+      if (!esCatalogo(d)) throw new Error("Catálogo inválido");
+      return { semillas: d.semillas, fuente: d.fuente };
+    })
+    .catch(() => catalogoSemillas());
+  return catalogoPendiente;
+}
+
+/** Solo para pruebas. */
+export function olvidarCatalogo() {
+  catalogoPendiente = null;
+}
+
+const semillas = async (): Promise<Semilla[]> => (await obtenerSemillas()).semillas;
 
 /** Fecha local de hoy ± días, en YYYY-MM-DD. */
 export function fechaRelativa(dias: number, hoy = new Date()): string {
@@ -117,12 +144,12 @@ async function lugar(p: Punto) {
 /* ---------- Lo que piden las pantallas ---------- */
 
 export async function obtenerContexto(p: Punto): Promise<RespuestaContexto> {
-  const [{ altitud, zona }, nombre] = await Promise.all([lugar(p), nombreLugar(p)]);
+  const [{ altitud, zona }, nombre, catalogo] = await Promise.all([lugar(p), nombreLugar(p), semillas()]);
   return {
     lugar: nombre,
     altitud_m: Math.round(altitud),
     zona,
-    cultivos_comunes: cultivosDeLaZona(SEMILLAS, altitud),
+    cultivos_comunes: cultivosDeLaZona(catalogo, altitud),
     fuente: "Altura: modelo de terreno de Open-Meteo · Zona: regiones de Pulgar Vidal · Lugar: Mapbox",
   };
 }
@@ -228,10 +255,6 @@ export async function obtenerRiego(p: Punto): Promise<RespuestaRiego> {
   };
 }
 
-/** Catálogo curado por el equipo (no viene de una API). */
-export async function obtenerSemillas(): Promise<RespuestaSemillas> {
-  return { semillas: SEMILLAS };
-}
 
 /**
  * Mientras la red neuronal del backend no esté lista (/api/v1/salud → modelo_disponible: false),
@@ -239,7 +262,7 @@ export async function obtenerSemillas(): Promise<RespuestaSemillas> {
  */
 export async function obtenerRecomendaciones(peticion: PeticionRecomendaciones): Promise<RespuestaRecomendaciones> {
   const p = { lat: peticion.lat, lon: peticion.lon };
-  const [prom, sitio] = await Promise.all([promedios(p), lugar(p)]);
+  const [prom, sitio, catalogo] = await Promise.all([promedios(p), lugar(p), semillas()]);
   const ajuste = (t: number) => corregirPorAltura(t, prom.alturaCelda, sitio.altitud);
   const clima: ClimaLugar = {
     altitud: sitio.altitud,
@@ -250,12 +273,12 @@ export async function obtenerRecomendaciones(peticion: PeticionRecomendaciones):
   return {
     modelo: "reglas con NASA POWER",
     recomendaciones: recomendar({
-      semillas: SEMILLAS,
+      semillas: catalogo,
       clima,
       mes: peticion.mes,
       historial: peticion.historial,
       disponibles: peticion.semillas_disponibles,
-      comunes: cultivosDeLaZona(SEMILLAS, sitio.altitud),
+      comunes: cultivosDeLaZona(catalogo, sitio.altitud),
     }),
   };
 }

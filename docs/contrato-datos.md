@@ -4,7 +4,7 @@ Hoy el frontend arma todas estas respuestas por su cuenta, con datos reales de *
 
 - **Tipos exactos (fuente de verdad):** [`app/front/lib/contratos/tipos.ts`](../app/front/lib/contratos/tipos.ts)
 - **Cómo se calcula hoy cada respuesta:** [`app/front/lib/api/cliente.ts`](../app/front/lib/api/cliente.ts), con las cuentas en [`app/front/lib/calculos/`](../app/front/lib/calculos)
-- **Catálogo de semillas:** [`app/front/datos/semillas.json`](../app/front/datos/semillas.json)
+- **Catálogo de semillas:** `GET /api/v1/semillas` ([`app/back/semillas.ts`](../app/back/semillas.ts)): ficha del equipo ([`app/front/datos/semillas.json`](../app/front/datos/semillas.json)) + rangos FAO ECOCROP ([`app/back/datos/ecocrop.json`](../app/back/datos/ecocrop.json))
 
 ## Reglas generales
 
@@ -26,7 +26,7 @@ Hoy el frontend arma todas estas respuestas por su cuenta, con datos reales de *
 | `GET /siembra/semaforo?lat&lon&mes` | `semaforo` | `RespuestaSemaforo` | Semáforo "¿Es buen momento para sembrar?" |
 | `GET /riego?lat&lon` | `riego` | `RespuestaRiego` | "¿Riego hoy?" (humedad del suelo de NASA POWER y lluvia de los próximos 3 días) |
 | `POST /recomendaciones` | `recomendaciones` | `RespuestaRecomendaciones` | Qué sembrar ahora: salida de la red neuronal (RF 7, RF 13) |
-| `GET /semillas` | — (`datos/semillas.json`) | `RespuestaSemillas` | Catálogo para el Semillero y el buscador |
+| `GET /api/v1/semillas` | — | `RespuestaSemillas` | Catálogo para el Semillero y el buscador; cada `Semilla` trae `ecocrop` (rangos de la FAO) si la especie figura en ECOCROP, y `fuente` |
 
 ### `POST /recomendaciones`
 

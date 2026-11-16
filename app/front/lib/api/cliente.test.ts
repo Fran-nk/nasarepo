@@ -7,6 +7,7 @@ import climatologia from "@/app/front/lib/fuentes/ejemplos/power-climatologia-cu
 import diario from "@/app/front/lib/fuentes/ejemplos/power-diario-cusco.json";
 import pronostico from "@/app/front/lib/fuentes/ejemplos/openmeteo-cusco.json";
 import { olvidarPedidos } from "@/app/front/lib/fuentes/red";
+import { catalogoSemillas } from "@/app/back/semillas";
 import {
   fechaRelativa,
   obtenerAlertas,
@@ -18,6 +19,7 @@ import {
   obtenerSemana,
   obtenerSemillas,
   obtenerVsNormal,
+  olvidarCatalogo,
 } from "./cliente";
 
 const CUSCO = { lat: -13.53, lon: -71.97 };
@@ -40,9 +42,13 @@ function marCaliente(url: URL) {
   return { properties: { parameter: { TS: serie } } };
 }
 
-/** Responde según la fuente; `caidas` hace fallar las que se indiquen. */
-function fuentes(caidas: ("power" | "openmeteo")[] = []) {
+/** Responde según la fuente; `caidas` hace fallar las que se indiquen ("backend" = GET /api/v1/semillas). */
+function fuentes(caidas: ("power" | "openmeteo" | "backend")[] = [], catalogoBackend?: unknown) {
   return vi.fn(async (entrada: string | URL | Request) => {
+    if (String(entrada) === "/api/v1/semillas") {
+      if (caidas.includes("backend")) return new Response("caído", { status: 503 });
+      return json(catalogoBackend ?? { version_api: "1", ...catalogoSemillas() });
+    }
     const url = new URL(String(entrada));
     if (url.hostname === "power.larc.nasa.gov") {
       if (caidas.includes("power")) return new Response("caído", { status: 503 });
@@ -57,7 +63,10 @@ function fuentes(caidas: ("power" | "openmeteo")[] = []) {
   });
 }
 
-beforeEach(() => olvidarPedidos());
+beforeEach(() => {
+  olvidarPedidos();
+  olvidarCatalogo();
+});
 afterEach(() => vi.unstubAllGlobals());
 
 describe("con las fuentes respondiendo", () => {
@@ -127,12 +136,31 @@ describe("con las fuentes respondiendo", () => {
     expect(r.recomendaciones.map((x) => x.semillaId)).not.toContain("papa");
   });
 
-  it("catálogo de semillas", async () => {
-    expect((await obtenerSemillas()).semillas.length).toBeGreaterThan(20);
+  it("catálogo de semillas: lo pide al backend, con los rangos de la FAO", async () => {
+    const c = await obtenerSemillas();
+    expect(c.semillas.length).toBeGreaterThan(20);
+    expect(c.semillas.find((s) => s.id === "papa")?.ecocrop?.temperatura_c.optima_min).toBe(15);
+    expect(c.fuente?.proveedor).toMatch(/ECOCROP/);
+    expect(vi.mocked(fetch).mock.calls.some(([u]) => String(u) === "/api/v1/semillas")).toBe(true);
+  });
+
+  it("usa lo que responde el backend", async () => {
+    const una = { ...catalogoSemillas().semillas[0], nombre: "Papa del backend" };
+    vi.stubGlobal("fetch", fuentes([], { version_api: "1", semillas: [una] }));
+    expect((await obtenerSemillas()).semillas.map((s) => s.nombre)).toEqual(["Papa del backend"]);
   });
 });
 
 describe("cuando una fuente falla", () => {
+  it("sin backend el catálogo se arma igual en el celular (mismo contenido)", async () => {
+    vi.stubGlobal("fetch", fuentes(["backend"]));
+    const c = await obtenerSemillas();
+    expect(c.semillas).toEqual(catalogoSemillas().semillas);
+    // Y las recomendaciones siguen funcionando.
+    const r = await obtenerRecomendaciones({ ...CUSCO, mes: 11, historial: [null, null, null] });
+    expect(r.recomendaciones.length).toBeGreaterThan(2);
+  });
+
   it("sin NASA POWER las alertas siguen con el pronóstico", async () => {
     vi.stubGlobal("fetch", fuentes(["power"]));
     const a = await obtenerAlertas(CUSCO);

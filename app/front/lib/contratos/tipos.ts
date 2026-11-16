@@ -179,6 +179,20 @@ export type Categoria =
 
 export type Rareza = "comun" | "rara" | "en_rescate";
 
+/**
+ * Rangos agronómicos reales de la FAO (base ECOCROP, vía el paquete Recocrop) para una especie.
+ * Ver app/back/datos/ecocrop.json y scripts/ecocrop/extraer_ecocrop.py.
+ */
+export interface ParametrosEcocrop {
+  cientifico_ecocrop: string;
+  nombre_ecocrop: string;
+  ciclo_dias: [number, number]; // [más corto, más largo] entre variedades
+  temperatura_mata_c: number; // mínima que la mata
+  temperatura_c: { min: number; optima_min: number; optima_max: number; max: number }; // promedio en que crece
+  lluvia_ciclo_mm: { min: number; optima_min: number; optima_max: number; max: number }; // durante el ciclo
+  ph: { min: number; optimo_min: number; optimo_max: number; max: number };
+}
+
 /** Una semilla del catálogo (ficha coleccionable). */
 export interface Semilla {
   id: string;
@@ -201,9 +215,14 @@ export interface Semilla {
   usos: string[];
   guardar_semilla: string;
   historia_rescate?: string;
+  /** Datos de la FAO; no está si la especie no figura en ECOCROP (sacha inchi, choloque, camu camu). */
+  ecocrop?: ParametrosEcocrop;
+  /** De dónde salen los datos de esta ficha. */
+  fuente?: string;
 }
 
-/** GET /semillas */
+/** GET /api/v1/semillas */
 export interface RespuestaSemillas {
   semillas: Semilla[];
+  fuente?: { proveedor: string; url: string; extraido: string };
 }

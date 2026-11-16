@@ -6,6 +6,7 @@ Este directorio contiene la lógica de servidor. Next.js publica las rutas desde
 
 - `GET /api/v1/salud`: disponible. Indica si se incorporó un modelo compatible.
 - `GET /api/v1/clima?latitud=-13.53&longitud=-71.97&dias=7`: climatología mensual NASA POWER (2002–2025) y pronóstico Open-Meteo. Si una fuente falla, su bloque es `null` y se informa en `avisos`.
+- `GET /api/v1/semillas`: catálogo de semillas. Une la ficha del equipo (`app/front/datos/semillas.json`) con los rangos reales de FAO ECOCROP (`app/back/datos/ecocrop.json`, 29 de 32 especies; lo genera `scripts/ecocrop/extraer_ecocrop.py` desde `ecocrop.rds` de Recocrop). La lógica es la función pura `catalogoSemillas()` en `semillas.ts`, que el frontend también usa si la ruta no responde.
 - `POST /api/v1/contexto`: valida el cuerpo del contrato y devuelve `503 DATOS_NO_DISPONIBLES` mientras falten catálogo agronómico, fuentes geográficas/climáticas y artefacto entrenado. No devuelve recomendaciones inventadas.
 - `app/back/modelo/mlp.ts`: inferencia ligera de un MLP entrenado en Keras/TensorFlow. No instala TensorFlow completo en Vercel. El entrenamiento y la exportación ocurren fuera del despliegue.
 
@@ -18,6 +19,8 @@ Colocar `modelo.json` en `app/back/modelo/artefactos/`. Debe incluir `version`, 
 El evaluador valida dimensiones y valores finitos y ofrece `puntuar(vector)`. Una vez incorporados catálogo, codificación de variables y datos de NASA/altitud/suelo, el servicio de contexto podrá puntuar cada candidato y devolver únicamente los cinco mejores. El modelo y sus archivos se leen desde el paquete de la función, sin descargas en cada petición.
 
 ## Propuesta para preparación de datos con Python (pendiente de aprobación)
+
+**Hecho (paso 1, catálogo):** `scripts/ecocrop/extraer_ecocrop.py` lee `ecocrop.rds` con `pyreadr` y genera `app/back/datos/ecocrop.json` (29 especies del catálogo, con la equivalencia de nombres científicos en el script). Lo que sigue (ejemplos de entrenamiento, MLP, `feature-spec.json`) está pendiente. Ojo: los rangos de temperatura de ECOCROP subestiman a las variedades andinas (haba, papa); calibrarlos antes de usarlos como etiquetas.
 
 En Colab, descargar Recocrop y leer `ecocrop.rds` con `pyreadr`; seleccionar especies, conservar unidades y fuentes y exportar JSON versionado para `app/back/datos/`. Curar las especies faltantes y validar las reglas con el mentor. Generar ejemplos reproducibles de contexto/candidato, separar entrenamiento y evaluación por zonas geográficas, entrenar el MLP con Keras y exportar matrices y sesgos a `modelo.json`, junto con un `feature-spec.json` que defina orden y normalización. Verificar las mismas entradas en Keras y TypeScript antes de publicar. El entrenamiento y la extracción serían operaciones fuera de Vercel; la API seguiría en Next.js. No se han creado estos scripts ni datos.
 

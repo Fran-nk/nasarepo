@@ -7,6 +7,7 @@ import { CHIP, FICHA_ARENA, ROTULO_FICHA, TARJETA_BLANCA, TITULO_SECCION, VALOR_
 import { IconoLinea, type NombreIconoLinea } from "@/app/front/components/IconoLinea";
 import { TarjetaCargando } from "@/app/front/components/tarjetas/TarjetaDato";
 import { alternarMiSemilla } from "@/app/front/lib/almacen";
+import type { ParametrosEcocrop } from "@/app/front/lib/contratos/tipos";
 import { useCatalogo, useMisSemillas } from "@/app/front/lib/hooks";
 import { formatoMiles } from "@/app/front/lib/mensajes";
 import { AVISOS, CATEGORIAS, RAREZA } from "@/app/front/lib/textos";
@@ -46,6 +47,37 @@ export function duracion(dias: number): string {
 }
 
 const TEXTO = "text-[15px] leading-[22px] text-tinta";
+
+const grados = (n: number) => `${n < 0 ? "−" : ""}${Math.abs(n)} °C`;
+
+/**
+ * Lo que la planta necesita según la FAO (ECOCROP): rangos reales medidos para la especie, en palabras
+ * sencillas. "Ideal" es el rango óptimo; "aguanta" son los límites donde todavía crece.
+ */
+function SeccionFao({ e }: { e: ParametrosEcocrop }) {
+  const t = e.temperatura_c;
+  const l = e.lluvia_ciclo_mm;
+  return (
+    <Seccion titulo="Lo que necesita (datos de la FAO)">
+      <dl className="grid grid-cols-2 gap-2 lg:gap-[6px]">
+        <Dato icono="sol" etiqueta="Temperatura ideal" valor={`${t.optima_min}–${grados(t.optima_max)}`} />
+        <Dato icono="sol" etiqueta="Aguanta" valor={`${t.min}–${grados(t.max)}`} />
+        <Dato icono="gota" etiqueta="Lluvia ideal" valor={`${formatoMiles(l.optima_min)}–${formatoMiles(l.optima_max)} mm`} />
+        <Dato icono="copo" etiqueta="La mata el frío de" valor={grados(e.temperatura_mata_c)} />
+        <Dato icono="reloj" etiqueta="Ciclo según variedad" valor={`${e.ciclo_dias[0]}–${e.ciclo_dias[1]} días`} />
+        <Dato icono="montana" etiqueta="pH ideal del suelo" valor={`${e.ph.optimo_min}–${e.ph.optimo_max}`} />
+      </dl>
+      <p className="text-[12px] leading-[16px] text-secundario">
+        La lluvia es la que necesita durante todo el cultivo; si llueve menos, hay que regar. Fuente: FAO ECOCROP (
+        <span className="italic">{e.cientifico_ecocrop}</span>), vía{" "}
+        <a href="https://github.com/cropmodels/Recocrop" target="_blank" rel="noopener noreferrer" className="font-semibold text-tinta underline">
+          Recocrop
+        </a>
+        .
+      </p>
+    </Seccion>
+  );
+}
 
 /** Ficha completa de una semilla con el estilo del panel: tarjetas blancas, fichas arena e íconos de línea. */
 export function FichaSemilla({ id }: { id: string }) {
@@ -136,7 +168,14 @@ export function FichaSemilla({ id }: { id: string }) {
           <Dato icono="montana" etiqueta="Crece a" valor={`${formatoMiles(s.altura_min_m)}–${formatoMiles(s.altura_max_m)} m`} />
           <Dato icono="reloj" etiqueta={s.perenne ? "Primera cosecha" : "Se cosecha en"} valor={duracion(s.ciclo_dias)} />
         </dl>
+        {!s.ecocrop && (
+          <p className="text-[12px] leading-[16px] text-secundario">
+            Esta especie no está en ECOCROP de la FAO: sus datos son de la ficha del equipo.
+          </p>
+        )}
       </Seccion>
+
+      {s.ecocrop && <SeccionFao e={s.ecocrop} />}
 
       {s.habilidades.length > 0 && (
         <Seccion titulo="Habilidades">
