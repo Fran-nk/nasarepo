@@ -8,6 +8,7 @@ import diario from "@/app/frontcode/lib/fuentes/ejemplos/power-diario-cusco.json
 import pronostico from "@/app/frontcode/lib/fuentes/ejemplos/openmeteo-cusco.json";
 import { olvidarPedidos } from "@/app/frontcode/lib/fuentes/red";
 import { catalogoSemillas } from "@/app/back/semillas";
+import { POST as rutaContexto } from "@/app/api/v1/contexto/route";
 import {
   fechaRelativa,
   obtenerAlertas,
@@ -42,9 +43,16 @@ function marCaliente(url: URL) {
   return { properties: { parameter: { TS: serie } } };
 }
 
-/** Responde según la fuente; `caidas` hace fallar las que se indiquen ("backend" = GET /api/v1/semillas). */
-function fuentes(caidas: ("power" | "openmeteo" | "backend")[] = [], catalogoBackend?: unknown) {
-  return vi.fn(async (entrada: string | URL | Request) => {
+/**
+ * Responde según la fuente; `caidas` hace fallar las que se indiquen. "backend" = GET /api/v1/semillas y
+ * "modelo" = POST /api/v1/contexto. El modelo es la ruta real del backend, no una simulación.
+ */
+function fuentes(caidas: ("power" | "openmeteo" | "backend" | "modelo")[] = [], catalogoBackend?: unknown) {
+  return vi.fn(async (entrada: string | URL | Request, init?: RequestInit) => {
+    if (String(entrada) === "/api/v1/contexto") {
+      if (caidas.includes("modelo")) return new Response("caído", { status: 503 });
+      return rutaContexto(new Request("http://localhost/api/v1/contexto", init));
+    }
     if (String(entrada) === "/api/v1/semillas") {
       if (caidas.includes("backend")) return new Response("caído", { status: 503 });
       return json(catalogoBackend ?? { version_api: "1", ...catalogoSemillas() });
@@ -70,7 +78,7 @@ beforeEach(() => {
 afterEach(() => vi.unstubAllGlobals());
 
 describe("con las fuentes respondiendo", () => {
-  beforeEach(() => vi.stubGlobal("fetch", fuentes()));
+  beforeEach(() => vi.stubGlobal("fetch", fuentes(["modelo"])));
 
   it("contexto: altura real del terreno, zona y cultivos de la zona", async () => {
     const c = await obtenerContexto(CUSCO);
@@ -129,9 +137,10 @@ describe("con las fuentes respondiendo", () => {
     expect(n.fuente_url).toMatch(/power\.larc\.nasa\.gov/);
   });
 
-  it("recomendaciones: reglas con el clima de la NASA y la rotación", async () => {
+  it("recomendaciones sin modelo: reglas con el clima de la NASA y la rotación", async () => {
     const r = await obtenerRecomendaciones({ ...CUSCO, mes: 11, historial: ["papa", null, null] });
     expect(r.modelo).toMatch(/NASA POWER/);
+    expect(r.avisos?.[0]).toMatch(/No pudimos consultar el modelo/);
     expect(r.recomendaciones.length).toBeGreaterThan(2);
     expect(r.recomendaciones.map((x) => x.semillaId)).not.toContain("papa");
   });
@@ -151,9 +160,54 @@ describe("con las fuentes respondiendo", () => {
   });
 });
 
+describe("recomendaciones con el modelo de red neuronal del backend", () => {
+  // El modelo tiene 646 puntos de referencia en el Perú; Tacna tiene uno en el mismo lugar.
+  const TACNA = { lat: -18.25, lon: -70.25 };
+
+  it("envía contexto e historial a POST /api/v1/contexto y adapta el resultado", async () => {
+    const f = fuentes();
+    vi.stubGlobal("fetch", f);
+    const r = await obtenerRecomendaciones({ ...TACNA, mes: 4, historial: ["papa", null, null] });
+    const llamada = f.mock.calls.find(([u]) => String(u) === "/api/v1/contexto")!;
+    expect(llamada[1]?.method).toBe("POST");
+    expect(JSON.parse(String(llamada[1]?.body))).toMatchObject({ latitud: -18.25, mes_siembra: 4, historial: [{ cultivo_id: "papa" }] });
+    expect(r.modelo).toMatch(/red-neuronal/);
+    expect(r.recomendaciones.length).toBeGreaterThan(0);
+    expect(r.recomendaciones.length).toBeLessThanOrEqual(5);
+    expect(r.recomendaciones.every((x) => x.puntaje >= 0 && x.puntaje <= 1)).toBe(true);
+    // El modelo avisa que el contexto es aproximado: la pantalla lo muestra.
+    expect(r.avisos?.some((a) => /aproximad|referencia/i.test(a))).toBe(true);
+  });
+
+  it("explica cada semilla con motivos del catálogo (el modelo no los trae)", async () => {
+    vi.stubGlobal("fetch", fuentes());
+    const r = await obtenerRecomendaciones({ ...TACNA, mes: 4, historial: ["papa", null, null] });
+    expect(r.recomendaciones.some((x) => x.motivos.length > 0)).toBe(true);
+  });
+
+  it("si el modelo no responde, cae a las reglas con datos reales", async () => {
+    vi.stubGlobal("fetch", fuentes(["modelo"]));
+    const r = await obtenerRecomendaciones({ ...TACNA, mes: 4, historial: ["papa", null, null] });
+    expect(r.modelo).toMatch(/reglas/);
+    expect(r.recomendaciones.length).toBeGreaterThan(0);
+  });
+
+  it("a más de 30 km de todo punto de referencia (en el mar) el modelo responde 503 y usa las reglas", async () => {
+    vi.stubGlobal("fetch", fuentes());
+    const r = await obtenerRecomendaciones({ lat: -5, lon: -90, mes: 11, historial: [null, null, null] });
+    expect(r.modelo).toMatch(/reglas/);
+  });
+
+  it("con un cultivo del historial que el modelo no conoce, usa las reglas", async () => {
+    vi.stubGlobal("fetch", fuentes());
+    const r = await obtenerRecomendaciones({ ...TACNA, mes: 4, historial: ["cultivo_que_no_existe", null, null] });
+    expect(r.modelo).toMatch(/reglas/);
+  });
+});
+
 describe("cuando una fuente falla", () => {
   it("sin backend el catálogo se arma igual en el celular (mismo contenido)", async () => {
-    vi.stubGlobal("fetch", fuentes(["backend"]));
+    vi.stubGlobal("fetch", fuentes(["backend", "modelo"]));
     const c = await obtenerSemillas();
     expect(c.semillas).toEqual(catalogoSemillas().semillas);
     // Y las recomendaciones siguen funcionando.

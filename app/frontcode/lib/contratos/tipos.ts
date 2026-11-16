@@ -166,6 +166,8 @@ export interface Recomendacion {
 export interface RespuestaRecomendaciones {
   recomendaciones: Recomendacion[];
   modelo: string; // "red-neuronal v1" | "reglas con NASA POWER"
+  /** Advertencias que el agricultor debe ver (por ejemplo, que el contexto del modelo es aproximado). */
+  avisos?: string[];
 }
 
 export type Categoria =

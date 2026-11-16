@@ -1,26 +1,28 @@
 # Backend de Semilla Siguiente
 
-Este directorio contiene la lógica de servidor. Next.js publica las rutas desde `app/api/`; cada `route.ts` debe ser una capa pequeña que llame a `app/back/`. Los componentes, utilidades y mocks del frontend están en `app/frontcode/`; sus páginas están en el grupo de rutas `app/`.
+Este directorio contiene la lógica de servidor. Next.js publica las rutas desde `app/api/`; cada `route.ts` debe ser una capa pequeña que llame a `app/back/`. Los componentes, utilidades y mocks del frontend están en `app/frontcode/`; las páginas permanecen en `app/` para conservar sus URL.
 
 ## Estado
 
-- `GET /api/v1/salud`: disponible. Indica si se incorporó un modelo compatible.
+- `GET /api/v1/salud`: indica si se cargaron los pesos y si el recomendador está disponible.
 - `GET /api/v1/clima?latitud=-13.53&longitud=-71.97&dias=7`: climatología mensual NASA POWER (2002–2025) y pronóstico Open-Meteo. Si una fuente falla, su bloque es `null` y se informa en `avisos`.
 - `GET /api/v1/semillas`: catálogo de semillas. Une la ficha del equipo (`app/frontcode/datos/semillas.json`) con los rangos reales de FAO ECOCROP (`app/back/datos/ecocrop.json`, 29 de 32 especies; lo genera `scripts/ecocrop/extraer_ecocrop.py` desde `ecocrop.rds` de Recocrop). La lógica es la función pura `catalogoSemillas()` en `semillas.ts`, que el frontend también usa si la ruta no responde.
-- `POST /api/v1/contexto`: valida el cuerpo del contrato y devuelve `503 DATOS_NO_DISPONIBLES` mientras falten catálogo agronómico, fuentes geográficas/climáticas y artefacto entrenado. No devuelve recomendaciones inventadas.
+- `POST /api/v1/contexto`: devuelve hasta cinco recomendaciones del MLP usando el punto de referencia más cercano del dataset curado, a una distancia máxima de 30 km. La respuesta muestra coordenadas y distancia de referencia y advierte que altitud, clima y suelo son aproximados. Más allá del límite responde `503`. El bloque `clima` proporcionado por el cliente todavía no se admite: responde `400` para no ignorarlo silenciosamente.
 - `app/back/modelo/mlp.ts`: inferencia ligera de un MLP entrenado en Keras/TensorFlow. No instala TensorFlow completo en Vercel. El entrenamiento y la exportación ocurren fuera del despliegue.
 
-La especificación del producto está en `../../../API_BACKEND.md` (en el directorio de trabajo compartido). Hay otro contrato en `docs/contrato-datos.md` que usa rutas y tipos anteriores: el cliente actual sigue ese contrato y requerirá una adaptación antes de consumir `/api/v1/contexto`.
+La especificación del producto está en `../../../API_BACKEND.md` (en el directorio de trabajo compartido). El cliente de contexto y recomendaciones consume `POST /api/v1/contexto`; las demás pantallas aún usan el contrato de demostración en `docs/contrato-datos.md`.
 
 ## Incorporar el modelo
 
-Colocar `modelo.json` en `app/back/modelo/artefactos/`. Debe incluir `version`, `featureSpecVersion`, `inputSize`, `layers` y matrices en orden `pesos[entrada][salida]`, más `bias` por capa. Cada capa usa `relu`, excepto la última que usa `sigmoid` y tiene una salida. La normalización y el orden de las variables deben definirse en un `feature-spec.json` versionado y ser idénticos en Colab y en el backend. `modelo.json` no se genera en este repositorio: debe exportarse desde Keras con las matrices en ese orden.
+Los pesos `modelo.json`, la especificación definitiva `feature-spec.json` y los casos de referencia del equipo están en `app/back/modelo/artefactos/`. Son un MLP 106 → 64 → 32 → 1 que se ejecuta directamente en TypeScript sin TensorFlow completo. La especificación contiene el orden, medias y escalas del entrenamiento; el archivo `DataSources/feature-spec.json` original es provisional y no debe usarse en inferencia. Los casos de referencia verifican la equivalencia con Keras.
 
-El evaluador valida dimensiones y valores finitos y ofrece `puntuar(vector)`. Una vez incorporados catálogo, codificación de variables y datos de NASA/altitud/suelo, el servicio de contexto podrá puntuar cada candidato y devolver únicamente los cinco mejores. El modelo y sus archivos se leen desde el paquete de la función, sin descargas en cada petición.
+El evaluador valida dimensiones y valores finitos y ofrece `puntuar(vector)` con un vector ya normalizado. `normalizarVariables` usa la especificación definitiva y rechaza variables faltantes. El contexto se obtiene de `datos/contexto_puntos.json`, no de una medición en vivo de la parcela. Su clasificación por vertiente, pH, clima y reglas provienen del conjunto de entrenamiento y requieren validación agronómica. El modelo se incluye en el paquete de la función, sin descargas en cada petición.
+
+El frontend pide las recomendaciones a `POST /api/v1/contexto` (el modelo) y, si el modelo no puede responder (por ejemplo, a más de 30 km de un punto de referencia), las calcula en el celular con reglas y clima real de NASA POWER. Mantener `NEXT_PUBLIC_API_URL` vacío cuando Next.js sirva la API en el mismo origen. Ya no hay mocks: el clima, las alertas y el resto salen de NASA POWER y Open-Meteo (ver `docs/fuentes-de-datos.md`). Los resultados del modelo son afinidades aprendidas de reglas sintéticas, no probabilidades de cosecha. `semillas_disponibles` todavía no se aplica al ranking real.
 
 ## Propuesta para preparación de datos con Python (pendiente de aprobación)
 
-**Hecho (paso 1, catálogo):** `scripts/ecocrop/extraer_ecocrop.py` lee `ecocrop.rds` con `pyreadr` y genera `app/back/datos/ecocrop.json` (29 especies del catálogo, con la equivalencia de nombres científicos en el script). Lo que sigue (ejemplos de entrenamiento, MLP, `feature-spec.json`) está pendiente. Ojo: los rangos de temperatura de ECOCROP subestiman a las variedades andinas (haba, papa); calibrarlos antes de usarlos como etiquetas.
+**Hecho:** `scripts/ecocrop/extraer_ecocrop.py` lee `ecocrop.rds` con `pyreadr` y genera `app/back/datos/ecocrop.json` (rangos FAO sin ajustar de 29 especies, con la equivalencia de nombres científicos en el script); es lo que muestra la ficha de cada semilla. El catálogo del modelo, `catalogo_cultivos.json`, parte de los mismos rangos pero los ajusta para variedades andinas (con su fuente) y está pendiente de revisión del mentor: las dos tablas no coinciden a propósito (por ejemplo, papa: ideal desde 15 °C en la FAO y desde 10 °C en el catálogo del modelo).
 
 En Colab, descargar Recocrop y leer `ecocrop.rds` con `pyreadr`; seleccionar especies, conservar unidades y fuentes y exportar JSON versionado para `app/back/datos/`. Curar las especies faltantes y validar las reglas con el mentor. Generar ejemplos reproducibles de contexto/candidato, separar entrenamiento y evaluación por zonas geográficas, entrenar el MLP con Keras y exportar matrices y sesgos a `modelo.json`, junto con un `feature-spec.json` que defina orden y normalización. Verificar las mismas entradas en Keras y TypeScript antes de publicar. El entrenamiento y la extracción serían operaciones fuera de Vercel; la API seguiría en Next.js. No se han creado estos scripts ni datos.
 

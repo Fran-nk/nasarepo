@@ -118,7 +118,7 @@ function Pantallas({ children }: { children: ReactNode }) {
       </div>
 
       {inicio ? (
-        HAY_TOKEN_MAPBOX && <CrearChacra />
+        <CrearChacra />
       ) : (
         <main className="relative z-10 mt-[42dvh] flex min-h-[58dvh] flex-col rounded-t-[20px] bg-papel px-5 pt-6 pb-24 shadow-[0_-4px_16px_rgba(38,59,53,0.12)] panel-lateral lg:fixed lg:top-[86px] lg:bottom-[18px] lg:left-[20px] lg:mt-0 lg:min-h-0 lg:overflow-y-auto lg:rounded-[10px] lg:[scrollbar-width:none] lg:px-[15px] lg:py-5 lg:shadow-none">
           <div className="panel-contenido flex flex-1 flex-col">

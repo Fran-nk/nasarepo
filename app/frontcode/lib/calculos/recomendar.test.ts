@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { Semilla } from "@/app/frontcode/lib/contratos/tipos";
 import catalogo from "@/app/frontcode/datos/semillas.json";
-import { ajusteAltura, cultivosDeLaZona, mesesDelCultivo, puntajeMargen, recomendar, type ClimaLugar } from "./recomendar";
+import { ajusteAltura, cultivosDeLaZona, mesesDelCultivo, motivosPorCatalogo, puntajeMargen, recomendar, type ClimaLugar } from "./recomendar";
 
 const SEMILLAS = catalogo.semillas as Semilla[];
 const ids = (r: { semillaId: string }[]) => r.map((x) => x.semillaId);
@@ -108,5 +108,24 @@ describe("recomendar", () => {
     for (const x of conHelada) expect(SEMILLAS.find((s) => s.id === x.semillaId)!.stats.frio).toBeGreaterThanOrEqual(3);
     const selva = recomendar({ semillas: SEMILLAS, clima: SELVA, mes: 5, historial: [null, null, null], maximo: 40 });
     expect(selva.some((x) => x.motivos.includes("aguanta_helada"))).toBe(false);
+  });
+});
+
+describe("motivos que salen solo del catálogo (para las semillas que elige el modelo)", () => {
+  const por = (id: string) => SEMILLAS.find((s) => s.id === id)!;
+  it("rotación, zona y abono natural", () => {
+    expect(motivosPorCatalogo(por("haba"), { ultimo: "papa", comunes: ["haba"] })).toEqual(["rota_bien", "comun_en_zona", "fija_nitrogeno"]);
+  });
+  it("sin historial ni zona no inventa motivos", () => {
+    expect(motivosPorCatalogo(por("papa"), {})).toEqual([]);
+  });
+  it("las especies en rescate siempre lo dicen, con a lo más 3 motivos", () => {
+    const m = motivosPorCatalogo(por("tarwi"), { ultimo: "papa", comunes: ["tarwi"], enRescate: true });
+    expect(m).toHaveLength(3);
+    expect(m.at(-1)).toBe("especie_en_rescate");
+  });
+  it("ciclo corto solo en lo que no es perenne", () => {
+    expect(motivosPorCatalogo({ ...por("arveja"), ciclo_dias: 100 }, {})).toContain("ciclo_corto");
+    expect(motivosPorCatalogo({ ...por("arveja"), ciclo_dias: 100, perenne: true }, {})).not.toContain("ciclo_corto");
   });
 });

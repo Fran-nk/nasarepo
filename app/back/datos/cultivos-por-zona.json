@@ -1,0 +1,16 @@
+{
+  "_descripcion": "Cultivos habituales por zona Pulgar Vidal (prior de zona y sugerencias RF 6). Curado por el agente de datos con semillas.json (altitudes) y conocimiento agronómico general; NO proviene de estadísticas MIDAGRI por distrito. Revisar con el mentor y reemplazar por datos MIDAGRI cuando existan.",
+  "version": "zonas-v1",
+  "fecha": "2026-11-15",
+  "zonas": {
+    "chala": ["maiz_amarillo", "frijol", "arroz", "camote", "yuca", "tomate", "aji", "cebolla", "zanahoria", "mango", "platano"],
+    "yunga_maritima": ["maiz_amarillo", "frijol", "tomate", "aji", "camote", "cebolla", "zanahoria", "arveja", "yuca", "mango", "choloque"],
+    "quechua": ["papa", "maiz_amilaceo", "haba", "arveja", "trigo", "cebada", "quinua", "kiwicha", "tarwi", "oca", "olluco", "zanahoria", "cebolla", "frijol", "yacon"],
+    "suni": ["papa", "oca", "olluco", "mashua", "quinua", "canihua", "haba", "cebada", "tarwi", "avena"],
+    "puna": ["papa", "maca", "canihua", "quinua", "avena", "cebada"],
+    "janca": [],
+    "yunga_fluvial": ["maiz_amilaceo", "maiz_amarillo", "frijol", "yuca", "arveja", "yacon", "aji", "camote", "tomate", "cafe", "platano"],
+    "rupa_rupa": ["maiz_amarillo", "yuca", "frijol", "arroz", "camote", "aji", "cafe", "cacao", "platano", "sacha_inchi"],
+    "omagua": ["yuca", "arroz", "maiz_amarillo", "frijol", "camote", "platano", "camu_camu", "cacao", "sacha_inchi"]
+  }
+}

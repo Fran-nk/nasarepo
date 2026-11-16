@@ -39,7 +39,7 @@ import {
   promedioPorFecha,
   resumenMar,
 } from "@/app/frontcode/lib/calculos/elNino";
-import { cultivosDeLaZona, recomendar, type ClimaLugar } from "@/app/frontcode/lib/calculos/recomendar";
+import { cultivosDeLaZona, motivosPorCatalogo, recomendar, type ClimaLugar } from "@/app/frontcode/lib/calculos/recomendar";
 import { vertiente, zonaPulgarVidal } from "@/app/frontcode/lib/calculos/zona";
 import { nombreLugar } from "@/app/frontcode/lib/fuentes/lugar";
 import { alturaTerreno, diasPronostico, pedirPronostico } from "@/app/frontcode/lib/fuentes/openMeteo";
@@ -54,6 +54,9 @@ import {
 } from "@/app/frontcode/lib/fuentes/power";
 
 export type { Punto };
+
+/** Vacío cuando Next.js sirve el backend en el mismo origen (lo normal). */
+const API_URL = (process.env.NEXT_PUBLIC_API_URL ?? "").replace(/\/$/, "");
 
 const FUENTE_POWER = "NASA POWER (reanálisis MERRA-2)";
 const FUENTE_PRONOSTICO = "Pronóstico Open-Meteo";
@@ -72,7 +75,7 @@ function esCatalogo(d: unknown): d is RespuestaSemillas {
 }
 
 export function obtenerSemillas(): Promise<RespuestaSemillas> {
-  catalogoPendiente ??= fetch("/api/v1/semillas")
+  catalogoPendiente ??= fetch(`${API_URL}/api/v1/semillas`)
     .then(async (r) => {
       const d: unknown = r.ok ? await r.json() : null;
       if (!esCatalogo(d)) throw new Error("Catálogo inválido");
@@ -256,13 +259,77 @@ export async function obtenerRiego(p: Punto): Promise<RespuestaRiego> {
 }
 
 
+/** Lo que responde POST /api/v1/contexto (el modelo del backend). Solo lo que se usa aquí. */
+interface RespuestaModelo {
+  recomendaciones: { cultivo_id: string; porcentaje_afinidad: number; en_rescate: boolean }[];
+  catalogo_zona: { id: string }[];
+  avisos: { codigo: string; mensaje: string }[];
+}
+
+const MODELO = "red-neuronal (contexto aproximado)";
+
 /**
- * Mientras la red neuronal del backend no esté lista (/api/v1/salud → modelo_disponible: false),
- * se recomienda con reglas: clima real del lugar durante los meses del cultivo + rotación.
+ * Pregunta al modelo de red neuronal del backend (POST /api/v1/contexto). Devuelve null si no puede
+ * responder: sin señal, el modelo no está, el punto está a más de 30 km de uno de referencia, o el
+ * historial tiene un cultivo que el modelo no conoce. Entonces se recomienda con reglas.
+ * El modelo da el puntaje pero no el porqué: los motivos se sacan del catálogo y de la zona.
+ */
+async function recomendacionesDelModelo(
+  peticion: PeticionRecomendaciones,
+  catalogo: Semilla[],
+): Promise<RespuestaRecomendaciones | null> {
+  try {
+    const res = await fetch(`${API_URL}/api/v1/contexto`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        latitud: peticion.lat,
+        longitud: peticion.lon,
+        mes_siembra: peticion.mes,
+        historial: peticion.historial.filter((id): id is string => id !== null).map((cultivo_id) => ({ cultivo_id })),
+      }),
+      signal: AbortSignal.timeout(15_000),
+    });
+    if (!res.ok) return null;
+    const r = (await res.json()) as RespuestaModelo;
+    const porId = new Map(catalogo.map((s) => [s.id, s]));
+    const comunes = r.catalogo_zona.map((c) => c.id);
+    const recomendaciones = r.recomendaciones.flatMap((x) => {
+      const s = porId.get(x.cultivo_id);
+      if (!s) return [];
+      return [
+        {
+          semillaId: x.cultivo_id,
+          puntaje: Math.round(x.porcentaje_afinidad) / 100,
+          en_rescate: x.en_rescate,
+          motivos: motivosPorCatalogo(s, { ultimo: peticion.historial[0], comunes, enRescate: x.en_rescate }),
+        },
+      ];
+    });
+    if (recomendaciones.length === 0) return null;
+    return { modelo: MODELO, avisos: r.avisos.map((a) => a.mensaje), recomendaciones };
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Qué sembrar. Primero el modelo de red neuronal del backend; si no puede responder, reglas con el clima
+ * real del lugar (NASA POWER) durante los meses del cultivo y la rotación.
  */
 export async function obtenerRecomendaciones(peticion: PeticionRecomendaciones): Promise<RespuestaRecomendaciones> {
+  const catalogo = await semillas();
+  const delModelo = await recomendacionesDelModelo(peticion, catalogo);
+  if (delModelo) return delModelo;
+  return recomendacionesPorReglas(peticion, catalogo);
+}
+
+async function recomendacionesPorReglas(
+  peticion: PeticionRecomendaciones,
+  catalogo: Semilla[],
+): Promise<RespuestaRecomendaciones> {
   const p = { lat: peticion.lat, lon: peticion.lon };
-  const [prom, sitio, catalogo] = await Promise.all([promedios(p), lugar(p), semillas()]);
+  const [prom, sitio] = await Promise.all([promedios(p), lugar(p)]);
   const ajuste = (t: number) => corregirPorAltura(t, prom.alturaCelda, sitio.altitud);
   const clima: ClimaLugar = {
     altitud: sitio.altitud,
@@ -272,6 +339,7 @@ export async function obtenerRecomendaciones(peticion: PeticionRecomendaciones):
   };
   return {
     modelo: "reglas con NASA POWER",
+    avisos: ["No pudimos consultar el modelo de recomendación: estas semillas salen de reglas con el clima de la NASA."],
     recomendaciones: recomendar({
       semillas: catalogo,
       clima,

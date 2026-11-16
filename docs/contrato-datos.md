@@ -5,6 +5,7 @@ Hoy el frontend arma todas estas respuestas por su cuenta, con datos reales de *
 - **Tipos exactos (fuente de verdad):** [`app/frontcode/lib/contratos/tipos.ts`](../app/frontcode/lib/contratos/tipos.ts)
 - **Cómo se calcula hoy cada respuesta:** [`app/frontcode/lib/api/cliente.ts`](../app/frontcode/lib/api/cliente.ts), con las cuentas en [`app/frontcode/lib/calculos/`](../app/frontcode/lib/calculos)
 - **Catálogo de semillas:** `GET /api/v1/semillas` ([`app/back/semillas.ts`](../app/back/semillas.ts)): ficha del equipo ([`app/frontcode/datos/semillas.json`](../app/frontcode/datos/semillas.json)) + rangos FAO ECOCROP ([`app/back/datos/ecocrop.json`](../app/back/datos/ecocrop.json))
+- **Recomendaciones del modelo:** `POST /api/v1/contexto` ([`app/back/recomendaciones.ts`](../app/back/recomendaciones.ts)). El cliente las adapta a `RespuestaRecomendaciones` y, si el modelo no puede responder, las calcula con reglas (ver `docs/fuentes-de-datos.md`).
 
 ## Reglas generales
 

@@ -45,6 +45,11 @@ export function ListaRecomendaciones() {
 
       {rec.cargando && <TarjetaCargando texto="Pensando qué te conviene…" />}
       {rec.error && <TarjetaError detalle={rec.error} onReintentar={rec.reintentar} />}
+      {rec.datos?.avisos?.map((aviso) => (
+        <p key={aviso} className="text-[12px] leading-[16px] text-secundario">
+          {aviso}
+        </p>
+      ))}
 
       <ol className="flex flex-col gap-1.5">
         {top.map((r, i) => {

@@ -146,3 +146,24 @@ export function recomendar(entrada: {
   }
   return resultado.sort((x, y) => y.puntaje - x.puntaje).slice(0, maximo);
 }
+
+/**
+ * Motivos de una recomendación que no vienen con clima: solo con lo que dice el catálogo y la zona
+ * (rotación, abono natural, ciclo corto, común en la zona, en rescate). Sirve para explicar las
+ * semillas que elige el modelo del backend, que devuelve el puntaje pero no el porqué.
+ */
+export function motivosPorCatalogo(
+  s: Pick<Semilla, "id" | "despues_de_bien" | "habilidades" | "perenne" | "ciclo_dias" | "rareza">,
+  contexto: { ultimo?: string | null; comunes?: readonly string[]; enRescate?: boolean },
+): MotivoRecomendacion[] {
+  const candidatos: [boolean, MotivoRecomendacion][] = [
+    [!!contexto.ultimo && s.despues_de_bien.includes(contexto.ultimo), "rota_bien"],
+    [!!contexto.comunes?.includes(s.id), "comun_en_zona"],
+    [s.habilidades.some((h) => h.toLowerCase().includes("nitrógeno")), "fija_nitrogeno"],
+    [!s.perenne && s.ciclo_dias <= 120, "ciclo_corto"],
+  ];
+  const motivos = candidatos.filter(([si]) => si).map(([, m]) => m);
+  const enRescate = contexto.enRescate ?? s.rareza === "en_rescate";
+  // La insignia de rescate siempre se explica, aunque haya otros motivos antes.
+  return enRescate ? [...motivos.slice(0, 2), "especie_en_rescate"] : motivos.slice(0, 3);
+}
