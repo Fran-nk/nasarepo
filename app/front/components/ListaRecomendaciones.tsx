@@ -10,7 +10,8 @@ import { BarraStat } from "@/app/front/components/semillas/BarraStat";
 import { duracion } from "@/app/front/components/semillas/FichaSemilla";
 import { TarjetaCargando, TarjetaError } from "@/app/front/components/tarjetas/TarjetaDato";
 import type { Recomendacion, Semilla } from "@/app/front/lib/contratos/tipos";
-import { useCatalogo, useMisSemillas, useRecomendaciones } from "@/app/front/lib/hooks";
+import { useCatalogo, useHistorial, useMisSemillas, useRecomendaciones } from "@/app/front/lib/hooks";
+import { evitarPorFila, motivoCorto } from "@/app/front/lib/mensajes";
 import { CATEGORIAS, MOTIVOS, RAREZA } from "@/app/front/lib/textos";
 
 /** Qué tan buena opción es, en palabras (el puntaje va de 0 a 1). */
@@ -21,15 +22,20 @@ function calidad(puntaje: number) {
 }
 
 /**
- * "Te recomendamos sembrar": las 3 mejores semillas para el cultivo abierto, en filas mínimas
- * (puesto, dibujo y nombre). Al tocar una se abre a la derecha del panel el detalle completo.
+ * "Te recomendamos sembrar" (Figma 89:996): las 3 mejores semillas para el cultivo abierto, en orden.
+ * Cada fila: dibujo, nombre y la razón más importante para elegirla en una línea corta (lo que decide
+ * al agricultor). Al tocar una se abre a la derecha del panel el detalle completo.
  */
 export function ListaRecomendaciones() {
   const rec = useRecomendaciones();
   const { porId } = useCatalogo();
   const mias = useMisSemillas();
+  const historial = useHistorial();
+  const ultimo = historial[0] ? porId.get(historial[0]) : undefined;
   const [elegida, setElegida] = useState<string | null>(null);
   const top = (rec.datos?.recomendaciones ?? []).slice(0, 3);
+  // Cada fila dice la razón que la distingue de las otras (no la que comparten todas).
+  const evitar = evitarPorFila(top);
   const abierta = top.find((r) => r.semillaId === elegida);
   const semillaAbierta = abierta ? porId.get(abierta.semillaId) : undefined;
 
@@ -38,40 +44,42 @@ export function ListaRecomendaciones() {
       <h2 className="font-titulo text-[24px] leading-[30px] font-bold text-tinta">Te recomendamos sembrar</h2>
 
       {rec.cargando && <TarjetaCargando texto="Pensando qué te conviene…" />}
-      {rec.error && <TarjetaError texto={rec.error} />}
+      {rec.error && <TarjetaError detalle={rec.error} onReintentar={rec.reintentar} />}
 
       <ol className="flex flex-col gap-1.5">
         {top.map((r, i) => {
           const s = porId.get(r.semillaId);
           if (!s) return null;
           const activa = elegida === s.id;
-          const notas = [r.en_rescate && "En rescate", mias.has(s.id) && "Ya la tienes"].filter(Boolean).join(" · ");
+          const razon = motivoCorto(r, s, { ultimo, tengo: mias.has(s.id), evitar: evitar[i] });
           return (
             <li key={r.semillaId}>
               <button
                 type="button"
                 onClick={() => setElegida(activa ? null : s.id)}
                 aria-expanded={activa}
-                className={`flex w-full items-center gap-2.5 rounded-[12px] border p-2 text-left transition-colors ${
+                aria-label={`${i + 1}. ${s.nombre}${razon ? `: ${razon}` : ""}`}
+                className={`flex w-full items-center gap-2.5 rounded-[12px] border-[0.8px] p-2 text-left transition-colors ${
                   activa ? "border-tinta bg-white" : "border-borde bg-arena hover:bg-arena/70"
                 }`}
               >
-                <span className="flex size-6 shrink-0 items-center justify-center bg-tinta font-titulo text-[14px] leading-none font-bold text-white">
-                  {i + 1}
-                </span>
                 <span
                   aria-hidden
-                  className="flex size-10 shrink-0 items-center justify-center rounded-[8px] border-[0.5px] border-borde bg-white text-[24px] leading-none"
+                  className="flex size-10 shrink-0 items-center justify-center rounded-[8px] border-[0.8px] border-borde bg-white text-[24px] leading-[24px]"
                 >
                   {s.emoji}
                 </span>
-                <span className="flex min-w-0 flex-1 flex-col">
+                <span className="flex min-w-0 flex-1 flex-col gap-0.5">
                   <span className="truncate font-titulo text-[18px] leading-[22px] font-bold text-tinta">{s.nombre}</span>
-                  {notas && <span className="text-[11px] leading-[14px] text-secundario">{notas}</span>}
+                  {razon && <span className="text-[12px] leading-[15px] text-secundario">{razon}</span>}
                 </span>
-                <IconoLinea
-                  nombre="flecha"
-                  className={`size-4 shrink-0 text-tinta transition-transform duration-200 ${activa ? "translate-x-0.5" : ""}`}
+                {/* eslint-disable-next-line @next/next/no-img-element -- flecha del diseño (Figma 89:1013) */}
+                <img
+                  src="/iconos/flecha-derecha.svg"
+                  alt=""
+                  width={16}
+                  height={16}
+                  className={`size-4 shrink-0 transition-transform duration-200 ${activa ? "translate-x-0.5" : ""}`}
                 />
               </button>
             </li>
@@ -165,7 +173,7 @@ function DetalleRecomendacion({
             type="button"
             onClick={onCerrar}
             aria-label="Cerrar detalle"
-            className="flex size-8 items-center justify-center rounded-[8px] border border-borde text-tinta hover:bg-arena"
+            className="tactil relative flex size-8 items-center justify-center rounded-[8px] border border-borde text-tinta hover:bg-arena"
           >
             <IconoLinea nombre="equis" className="size-4" />
           </button>

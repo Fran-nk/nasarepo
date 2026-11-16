@@ -13,18 +13,23 @@ import Map, {
   type MapRef,
 } from "react-map-gl/mapbox";
 import MapboxDraw from "@mapbox/mapbox-gl-draw";
-import area from "@turf/area";
-import centroid from "@turf/centroid";
+import { protegerQuitar } from "./quitarDibujo";
 import type { Feature, FeatureCollection, Polygon } from "geojson";
 import "mapbox-gl/dist/mapbox-gl.css";
 import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
-import type { Cultivo, TerrenoNuevo } from "@/app/front/lib/almacen";
+import { actualizarTerreno, type Cultivo, type TerrenoNuevo } from "@/app/front/lib/almacen";
+import { useAviso } from "@/app/front/components/Avisos";
+import { BOTON_ARENA, BOTON_OSCURO } from "@/app/front/components/estilos";
 import { ESTILO_MAPBOX, TOKEN_MAPBOX as TOKEN } from "@/app/front/lib/mapbox";
 import { ICONOS_CHACRA } from "@/app/front/lib/textos";
 import type { ApiMapa } from "./ContextoMapa";
 import { LeyendaMapa } from "./LeyendaMapa";
 import { VentanaChacra } from "./VentanaChacra";
 import { aplicarVista, type Vista } from "./vistaSatelite";
+import { datosTerreno } from "./terreno";
+
+/** id del terreno que se está editando dentro de Draw. */
+const ID_EDICION = "terreno-en-edicion";
 
 export interface MapaChacraProps {
   /** Todos los cultivos: se dibujan sus terrenos y un círculo con su ícono. */
@@ -41,6 +46,8 @@ export interface MapaChacraProps {
   onDibujando?: (dibujando: boolean) => void;
   /** Muestra el selector Mapa / Satélite y los círculos de los cultivos (se ocultan al crear uno). */
   mostrarVista?: boolean;
+  /** El panel izquierdo está ensanchado (Semillas): el mapa corre su centro para no quedar tapado. */
+  panelAncho?: boolean;
 }
 
 /** Dónde se abre el cuadro de datos: al costado del polígono, o sobre el círculo si no cabe. */
@@ -66,17 +73,29 @@ function limites(p: Polygon): [[number, number], [number, number]] {
 
 /**
  * En escritorio (Figma 38:622) el panel de 324 px va a 20 px del borde izquierdo, el menú arriba
- * y los controles de Mapbox a 34 px del borde derecho.
+ * y los controles de Mapbox a 34 px del borde derecho. En Semillas el panel crece `--panel-extra`.
  */
-const OCUPADO_IZQUIERDA = 20 + 324;
 const OCUPADO_DERECHA = 34 + 300; // columna del clima (semana y alertas)
+
+/** Cuánto creció el panel ahora mismo (0 o 306 px), leído de la variable CSS que lo controla. */
+function extraPanel(): number {
+  if (typeof window === "undefined") return 0;
+  return parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--panel-extra")) || 0;
+}
+
+function ocupadoIzquierda() {
+  return 20 + 324 + extraPanel();
+}
 
 /** Márgenes para que el terreno quede en la parte visible (sin el panel ni los controles encima). */
 function relleno() {
   const ancho = typeof window === "undefined" ? 0 : window.innerWidth;
   if (ancho < 1024) return { top: 30, bottom: 40, left: 30, right: 30 };
-  return { top: 40, bottom: 60, left: OCUPADO_IZQUIERDA + 30, right: OCUPADO_DERECHA + 30 };
+  return { top: 40, bottom: 60, left: ocupadoIzquierda() + 30, right: OCUPADO_DERECHA + 30 };
 }
+
+/** Curva "move" (0.25, 1, 0.5, 1) aproximada para Mapbox, que pide una función. */
+const curvaMover = (t: number) => 1 - Math.pow(1 - t, 4);
 
 /** Textos de los controles de Mapbox en español. */
 const TEXTOS_MAPA = {
@@ -167,13 +186,16 @@ function DrawControl(props: DrawProps) {
 
   const draw = useControl<MapboxDraw>(
     () =>
-      new MapboxDraw({
-        // Sin botones propios: se dibuja con los botones del asistente. Draw solo tiene el terreno
-        // que se está marcando; los guardados se dibujan como capa aparte.
-        displayControlsDefault: false,
-        defaultMode: "simple_select",
-        styles: ESTILOS_DIBUJO,
-      }),
+      // protegerQuitar: al desmontar el mapa, Draw no debe preguntar por capas de un estilo ya borrado.
+      protegerQuitar(
+        new MapboxDraw({
+          // Sin botones propios: se dibuja con los botones del asistente. Draw solo tiene el terreno
+          // que se está marcando; los guardados se dibujan como capa aparte.
+          displayControlsDefault: false,
+          defaultMode: "simple_select",
+          styles: ESTILOS_DIBUJO,
+        }),
+      ),
     ({ map }) => {
       map.on("draw.create", manejadores.crear);
       map.on("draw.modechange", manejadores.modo);
@@ -208,14 +230,37 @@ export default function MapaChacra({
   onTerrenoNuevo,
   onDibujando,
   mostrarVista = true,
+  panelAncho = false,
 }: MapaChacraProps) {
   const mapaRef = useRef<MapRef>(null);
+
+  // Cuando el panel crece o vuelve, el centro del mapa se corre lo mismo y a la vez (misma duración y curva),
+  // así lo que se miraba no queda tapado. Solo cambia el margen izquierdo: no hay zoom ni salto.
+  const extraAplicado = useRef(0);
+  useEffect(() => {
+    const mapa = mapaRef.current?.getMap();
+    const extra = extraPanel();
+    const cambio = extra - extraAplicado.current;
+    extraAplicado.current = extra;
+    if (!mapa || cambio === 0) return;
+    const reducido = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const margen = mapa.getPadding();
+    mapa.easeTo({
+      padding: { ...margen, left: Math.max(0, (margen.left ?? 0) + cambio) },
+      duration: reducido ? 0 : cambio > 0 ? 300 : 220,
+      easing: curvaMover,
+    });
+  }, [panelAncho]);
   const inicio = abierto ?? puntoInicial;
   const [vista, setVista] = useState<Vista>("mapa");
   const [cargado, setCargado] = useState(false);
   const [ventana, setVentana] = useState<PosicionVentana | null>(null);
   // En el celular el mapa es bajo: el cuadro va arriba del mapa en vez de flotar junto al polígono.
   const [compacto, setCompacto] = useState(false);
+  // Terreno que se está editando (sus puntos se mueven con Draw); mientras tanto no se dibuja su copia guardada.
+  const [editando, setEditando] = useState<number | null>(null);
+  const drawRef = useRef<MapboxDraw | null>(null);
+  const avisar = useAviso();
 
   useEffect(() => {
     const mapa = mapaRef.current?.getMap();
@@ -233,7 +278,7 @@ export default function MapaChacra({
     setCompacto(ancho < 640);
     // Espacio libre del mapa: en escritorio el panel está a la izquierda y los controles a la derecha.
     const limiteDerecho = escritorio ? ancho - OCUPADO_DERECHA - 16 : ancho - 16;
-    const limiteIzquierdo = escritorio ? OCUPADO_IZQUIERDA + 16 : 16;
+    const limiteIzquierdo = escritorio ? ocupadoIzquierda() + 16 : 16;
     if (c.poligono) {
       const [[oeste], [este]] = limites(c.poligono);
       const xEste = mapa.project([este, c.lat]).x;
@@ -259,10 +304,14 @@ export default function MapaChacra({
   }
 
   function encuadrar(c: Cultivo) {
-    const mapa = mapaRef.current;
+    const mapa = mapaRef.current?.getMap();
     if (!mapa) return;
-    if (c.poligono) mapa.fitBounds(limites(c.poligono), { padding: relleno(), maxZoom: 17 });
-    else mapa.flyTo({ center: [c.lon, c.lat], zoom: 15, padding: relleno() });
+    if (c.poligono) {
+      const caja = limites(c.poligono);
+      const vista = { pitch: mapa.getPitch(), bearing: mapa.getBearing(), maxZoom: 17 };
+      if (mapa.cameraForBounds(caja, { ...vista, padding: relleno() })) mapa.fitBounds(caja, { ...vista, padding: relleno() });
+      else mapa.flyTo({ center: [c.lon, c.lat], zoom: 15, padding: relleno() });
+    } else mapa.flyTo({ center: [c.lon, c.lat], zoom: 15, padding: relleno() });
   }
 
   /**
@@ -295,19 +344,15 @@ export default function MapaChacra({
 
     if (c.poligono) {
       const caja = limites(c.poligono);
-      // Zoom para que el terreno quepa dejando sitio al cuadro (y un margen igual al otro lado)…
-      const camara = mapa.cameraForBounds(caja, {
-        padding: { ...base, left: base.left + separacion, right: base.right + reserva + separacion },
-        maxZoom: 18,
-      });
-      // …y el terreno centrado en el espacio que queda a la izquierda del cuadro.
-      const centro: [number, number] = [(caja[0][0] + caja[1][0]) / 2, (caja[0][1] + caja[1][1]) / 2];
-      mapa.flyTo({
-        center: centro,
-        zoom: camara?.zoom ?? 17,
-        padding: { ...base, right: base.right + reserva },
-        duration: 1000,
-      });
+      // El mapa está inclinado (3D): Mapbox calcula el encuadre en plano si no se le dan la inclinación
+      // y el giro de ahora, y entonces el terreno queda grande o corrido. Con ellos cabe entero.
+      const vista = { pitch: mapa.getPitch(), bearing: mapa.getBearing(), maxZoom: 18, duration: 1000 };
+      // Primero dejando sitio al cuadro de datos a la derecha; si no cabe (pantalla angosta), sin reservarlo.
+      const conCuadro = { ...base, left: base.left + separacion, right: base.right + reserva + separacion };
+      const opciones = [conCuadro, base, { top: 20, bottom: 20, left: 20, right: 20 }];
+      const padding = opciones.find((p) => mapa.cameraForBounds(caja, { ...vista, padding: p }));
+      if (padding) mapa.fitBounds(caja, { ...vista, padding });
+      else mapa.flyTo({ center: [c.lon, c.lat], zoom: 15, duration: 1000 });
     } else {
       mapa.flyTo({ center: [c.lon, c.lat], zoom: 17, padding: { ...base, right: base.right + reserva }, duration: 1000 });
     }
@@ -323,6 +368,7 @@ export default function MapaChacra({
   const abierta = ventana !== null && mostrarVista && !!enVentana;
 
   function alDraw(d: MapboxDraw) {
+    drawRef.current = d;
     // changeMode() hecho por código no dispara "draw.modechange", así que se avisa aquí.
     onListo?.({
       dibujar: () => {
@@ -350,14 +396,63 @@ export default function MapaChacra({
   }
 
   function alCrear(f: Feature<Polygon>) {
-    const [lon, lat] = centroid(f).geometry.coordinates;
-    onTerrenoNuevo?.({ lat, lon, poligono: f.geometry, area_ha: area(f) / 10_000, origen: "poligono" });
+    const datos = datosTerreno(f);
+    if (datos) onTerrenoNuevo?.({ ...datos, origen: "poligono" });
+    // El terreno guardado se dibuja en su propia capa: la copia en Draw se quita para que no quede una
+    // forma suelta que, al moverle los puntos, parezca otro terreno (los cambios no se guardaban).
+    const id = f.id;
+    window.setTimeout(() => {
+      if (id !== undefined && drawRef.current?.get(String(id))) drawRef.current.delete(String(id));
+    }, 0);
+  }
+
+  /* ---------- Editar la forma de un terreno guardado ---------- */
+
+  function editarTerreno(c: Cultivo) {
+    const d = drawRef.current;
+    if (!d || !c.poligono || c.id === undefined) return;
+    setVentana(null);
+    d.deleteAll();
+    d.add({ type: "Feature", id: ID_EDICION, properties: {}, geometry: c.poligono });
+    d.changeMode("direct_select", { featureId: ID_EDICION });
+    setEditando(c.id);
+  }
+
+  function salirDeEdicion() {
+    const d = drawRef.current;
+    if (d) {
+      if (d.getMode() !== "simple_select") d.changeMode("simple_select");
+      d.deleteAll();
+    }
+    setEditando(null);
+  }
+
+  async function guardarTerreno() {
+    const c = cultivos.find((x) => x.id === editando);
+    const datos = datosTerreno(drawRef.current?.get(ID_EDICION));
+    salirDeEdicion();
+    if (!c || c.id === undefined) return;
+    if (!datos) {
+      avisar({ texto: "El terreno necesita al menos 3 puntos: no se cambió.", icono: "equis" });
+      return;
+    }
+    const anterior = { lat: c.lat, lon: c.lon, poligono: c.poligono, area_ha: c.area_ha };
+    await actualizarTerreno(c.id, datos);
+    avisar({ texto: "Terreno actualizado", deshacer: () => void actualizarTerreno(c.id!, anterior) });
+  }
+
+  /** Tocar el relleno de un terreno hace lo mismo que tocar su círculo (salvo mientras se dibuja o se edita). */
+  function alTocarMapa(e: { features?: { layer?: { id?: string }; properties?: { id?: unknown } | null }[] }) {
+    if (editando !== null || (drawRef.current && drawRef.current.getMode() !== "simple_select")) return;
+    const id = Number(e.features?.find((f) => f.layer?.id === "terrenos-relleno")?.properties?.id);
+    const c = cultivos.find((x) => x.id === id);
+    if (c) enfocarYAbrir(c);
   }
 
   return (
     <div className="relative size-full">
       {mostrarVista && (
-        <div className="absolute top-3 left-3 z-10 flex overflow-hidden rounded-full border border-borde bg-papel text-[14px] leading-[20px] font-semibold shadow-sm lg:top-auto lg:bottom-[40px] lg:left-[377px]">
+        <div className="absolute top-3 left-3 z-10 flex rounded-full border border-borde bg-papel text-[14px] leading-[20px] font-semibold shadow-sm junto-al-panel lg:top-auto lg:bottom-[40px] lg:left-[377px]">
           {(
             [
               ["mapa", "🗺️ Mapa"],
@@ -369,7 +464,7 @@ export default function MapaChacra({
               type="button"
               aria-pressed={vista === valor}
               onClick={() => setVista(valor)}
-              className={`px-3 py-2 ${vista === valor ? "bg-tinta text-white" : "text-tinta"}`}
+              className={`tactil relative rounded-full px-3 py-2 ${vista === valor ? "bg-tinta text-white" : "text-tinta"}`}
             >
               {texto}
             </button>
@@ -379,11 +474,21 @@ export default function MapaChacra({
       <Map
         ref={mapaRef}
         onLoad={() => setCargado(true)}
+        interactiveLayerIds={mostrarVista ? ["terrenos-relleno"] : []}
+        onClick={alTocarMapa}
         mapboxAccessToken={TOKEN}
         initialViewState={
           abierto?.poligono
-            ? { bounds: limites(abierto.poligono), fitBoundsOptions: { padding: relleno(), maxZoom: 17 } }
-            : { longitude: inicio.lon, latitude: inicio.lat, zoom: abierto ? 15 : 12, padding: relleno() }
+            ? {
+                bounds: limites(abierto.poligono),
+                fitBoundsOptions: { padding: relleno(), maxZoom: 17 },
+              }
+            : {
+                longitude: inicio.lon,
+                latitude: inicio.lat,
+                zoom: abierto ? 15 : 12,
+                padding: relleno(),
+              }
         }
         mapStyle={ESTILO_MAPBOX}
         locale={TEXTOS_MAPA}
@@ -394,7 +499,7 @@ export default function MapaChacra({
         {/* Solo centra el mapa y muestra el punto azul; guardar un cultivo es con "Usar dónde estoy". */}
         <GeolocateControl position="top-right" positionOptions={{ enableHighAccuracy: true }} showAccuracyCircle />
         <ScaleControl position="top-right" unit="metric" maxWidth={100} />
-        <Source id="terrenos" type="geojson" data={capaTerrenos(cultivos)}>
+        <Source id="terrenos" type="geojson" data={capaTerrenos(cultivos.filter((c) => c.id !== editando))}>
           <Layer id="terrenos-relleno" type="fill" paint={{ "fill-color": PRADERA, "fill-opacity": 0.3 }} />
           <Layer
             id="terrenos-borde"
@@ -406,7 +511,9 @@ export default function MapaChacra({
         <DrawControl onCrear={alCrear} onDraw={alDraw} onModo={(modo) => onDibujando?.(modo === "draw_polygon")} />
         {/* Un círculo con el ícono de cada cultivo en el centro de su terreno: al tocarlo se ven sus datos. */}
         {mostrarVista &&
-          cultivos.map((c) => (
+          cultivos
+            .filter((c) => c.id !== editando)
+            .map((c) => (
             <Marker
               key={c.id}
               longitude={c.lon}
@@ -424,7 +531,7 @@ export default function MapaChacra({
                 aria-label={`Ver los datos de ${c.nombre}`}
                 aria-expanded={abierta && ventana?.cultivoId === c.id}
                 title={c.nombre}
-                className="flex size-11 cursor-pointer items-center justify-center rounded-full border-[2.4px] border-white bg-petroleo text-[22px] shadow-[0_2px_5px_rgba(38,59,53,0.35)] transition-transform hover:scale-105"
+                className="tactil relative flex size-11 cursor-pointer items-center justify-center rounded-full border-[2.4px] border-white bg-petroleo text-[22px] shadow-[0_2px_5px_rgba(38,59,53,0.35)] transition-transform hover:scale-105"
               >
                 {c.icono ?? ICONOS_CHACRA[0]}
               </button>
@@ -441,7 +548,11 @@ export default function MapaChacra({
             className="ventana-chacra"
             onClose={() => setVentana(null)}
           >
-            <VentanaChacra cultivo={enVentana} onCerrar={() => setVentana(null)} />
+            <VentanaChacra
+              cultivo={enVentana}
+              onCerrar={() => setVentana(null)}
+              onEditarTerreno={enVentana.poligono ? () => editarTerreno(enVentana) : undefined}
+            />
           </Popup>
         )}
       </Map>
@@ -451,7 +562,34 @@ export default function MapaChacra({
       )}
       {abierta && compacto && enVentana && (
         <div className="absolute inset-x-3 top-14 z-20 max-h-[calc(100%-68px)] overflow-y-auto [scrollbar-width:none] [&>section]:w-full">
-          <VentanaChacra cultivo={enVentana} onCerrar={() => setVentana(null)} />
+          <VentanaChacra
+            cultivo={enVentana}
+            onCerrar={() => setVentana(null)}
+            onEditarTerreno={enVentana.poligono ? () => editarTerreno(enVentana) : undefined}
+          />
+        </div>
+      )}
+      {/* Barra de edición: arriba, en el espacio libre entre el panel y el clima (como los avisos). */}
+      {editando !== null && (
+        <div className="despues-del-panel pointer-events-none absolute inset-x-3 top-14 z-30 flex justify-center lg:top-[18px] lg:right-[334px]">
+          <div
+            role="region"
+            aria-label="Editar terreno"
+            className="pointer-events-auto flex w-full max-w-[360px] flex-col gap-2 rounded-[12px] bg-white p-3 shadow-[0_6px_20px_rgba(38,59,53,0.3)]"
+          >
+            <p className="text-[14px] leading-[20px] text-tinta">
+              <strong className="font-titulo text-[16px]">Mueve los puntos</strong> de las esquinas para cambiar tu terreno.
+              Toca un punto medio para agregar una esquina.
+            </p>
+            <div className="grid grid-cols-2 gap-2">
+              <button type="button" onClick={salirDeEdicion} className={BOTON_ARENA}>
+                Cancelar
+              </button>
+              <button type="button" onClick={() => void guardarTerreno()} className={BOTON_OSCURO}>
+                Guardar terreno
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

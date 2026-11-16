@@ -1,7 +1,5 @@
 import { errorApi, validarContexto } from "@/app/back/http";
 
-export const runtime = "nodejs";
-
 export async function POST(request: Request): Promise<Response> {
   let cuerpo: unknown;
   try {

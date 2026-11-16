@@ -49,7 +49,7 @@ export default function Semillero() {
               role="tab"
               aria-selected={activa}
               onClick={() => setPestana(p.id)}
-              className={`h-[34px] flex-auto border px-1.5 font-titulo text-[14px] leading-none font-bold whitespace-nowrap transition-colors duration-200 ${
+              className={`tactil relative h-[34px] flex-auto border px-1.5 font-titulo text-[14px] leading-none font-bold whitespace-nowrap transition-colors duration-200 ${
                 activa ? "border-tinta bg-tinta text-white" : "border-tinta bg-arena text-tinta hover:bg-papel"
               }`}
             >
@@ -87,7 +87,7 @@ export default function Semillero() {
             : "No hay semillas para mostrar."}
         </p>
       ) : (
-        <div className="flex flex-col gap-3">
+        <div key={pestana} className="surcos grid grid-cols-1 gap-3 xl:grid-cols-2">
           {lista.map((s) => (
             <TarjetaSemilla key={s.id} semilla={s} tengo={mias.has(s.id)} />
           ))}

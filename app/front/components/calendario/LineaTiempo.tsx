@@ -79,7 +79,7 @@ export function LineaTiempo({ actividades, porId }: { actividades: Actividad[]; 
             {columnas.map((c) => (
               <th
                 key={c}
-                className={`font-titulo text-[11px] leading-[16px] font-bold ${c === mesHoy ? "bg-tinta text-white" : "text-secundario"}`}
+                className={`font-titulo text-[12px] leading-[16px] font-bold ${c === mesHoy ? "bg-tinta text-white" : "text-secundario"}`}
               >
                 {MESES[c % 12]}
               </th>
@@ -100,7 +100,7 @@ export function LineaTiempo({ actividades, porId }: { actividades: Actividad[]; 
                 return (
                   <td
                     key={c}
-                    className={`h-8 rounded-[3px] text-[12px] ${c === f.cosecha ? "bg-senal" : creciendo ? "bg-pradera/60" : "bg-arena"}`}
+                    className={`h-8 rounded-[3px] text-[13px] ${c === f.cosecha ? "bg-senal" : creciendo ? "bg-pradera/60" : "bg-arena"}`}
                     title={c === f.cosecha ? "Cosecha estimada" : undefined}
                   >
                     {simbolo}
@@ -111,7 +111,7 @@ export function LineaTiempo({ actividades, porId }: { actividades: Actividad[]; 
           ))}
         </tbody>
       </table>
-      <p className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] leading-[14px] text-secundario">
+      <p className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] leading-[14px] text-secundario">
         <span className="flex items-center gap-1">
           <span aria-hidden className="size-2.5 rounded-[2px] bg-pradera/60" />
           Creciendo

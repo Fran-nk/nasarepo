@@ -1,7 +1,5 @@
 import { cargarModelo } from "@/app/back/modelo/cargar";
 
-export const runtime = "nodejs";
-
 export async function GET(): Promise<Response> {
   try {
     const modelo = await cargarModelo();

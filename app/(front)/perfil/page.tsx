@@ -7,16 +7,15 @@ import { Rotulo } from "@/app/front/components/Titulo";
 import { useMapa } from "@/app/front/components/mapa/ContextoMapa";
 import { SeccionCalendario } from "@/app/front/components/secciones/SeccionCalendario";
 import type { Cultivo } from "@/app/front/lib/almacen";
-import { USAR_MOCKS } from "@/app/front/lib/api/cliente";
 import { ESCENARIOS, LISTA_ESCENARIOS } from "@/app/front/lib/escenarios";
 import { useCatalogo, useContexto, useUbicacion } from "@/app/front/lib/hooks";
-import { useCultivoActivo, useEscenario } from "@/app/front/lib/preferencias";
+import { useCultivoActivo, useEscenario, useNombreUsuario } from "@/app/front/lib/preferencias";
 import { ICONOS_CHACRA, REGIONES, ZONAS } from "@/app/front/lib/textos";
 
 const TARJETA =
-  "flex w-full flex-col rounded-[16px] border-[0.5px] border-borde bg-white p-3 shadow-[0_0.633px_0.95px_rgba(0,0,0,0.1),0_0.633px_0.633px_rgba(0,0,0,0.1)] lg:rounded-[12.667px] lg:p-[10px]";
-const TITULO_TARJETA = "text-[16px] leading-[22px] font-semibold text-tinta lg:text-[12.667px] lg:leading-[16.5px]";
-const FILA = "flex w-full items-center rounded-[8px] border-[0.5px] border-borde bg-arena py-[10px] pl-[7.6px] lg:rounded-[7.6px]";
+  "flex w-full flex-col rounded-[16px] border-[0.8px] border-borde bg-white p-3 shadow-[0_0.633px_0.475px_rgba(0,0,0,0.1),0_0.633px_0.317px_rgba(0,0,0,0.1)] lg:rounded-[12.667px] lg:p-[10px]";
+const TITULO_TARJETA = "text-[16px] leading-[22px] font-semibold text-tinta lg:text-[14px] lg:leading-[20px]";
+const FILA = "flex w-full items-center rounded-[8px] border-[0.8px] border-borde bg-arena py-[10px] pl-[7.6px] lg:rounded-[7.6px]";
 
 /** Fila de "Mis Cultivos" (Figma 40:1078): ícono, nombre, lo último sembrado y la región. */
 function FilaCultivo({ cultivo, abierto, onAbrir }: { cultivo: Cultivo; abierto: boolean; onAbrir: () => void }) {
@@ -44,11 +43,11 @@ function FilaCultivo({ cultivo, abierto, onAbrir }: { cultivo: Cultivo; abierto:
             {cultivo.nombre}
           </span>
           <span className="flex items-center gap-[10px]">
-            <span className="font-titulo text-[14px] leading-none font-medium whitespace-nowrap text-tinta lg:text-[12px]">
+            <span className="font-titulo text-[14px] leading-none font-medium whitespace-nowrap text-tinta lg:text-[13px]">
               {ultimo ? ultimo.nombre : "Sin cultivo anterior"}
             </span>
             {zona && (
-              <span className="rounded-[1.5px] bg-senal px-[7.3px] py-[2.9px] font-titulo text-[10px] leading-[11.64px] font-bold whitespace-nowrap text-tinta uppercase lg:text-[8.73px]">
+              <span className="rounded-[1.5px] bg-senal px-[7.3px] py-[2.9px] font-titulo text-[11px] leading-[14px] font-bold whitespace-nowrap text-tinta uppercase lg:text-[11px]">
                 {REGIONES[zona.region]}
               </span>
             )}
@@ -67,7 +66,7 @@ function BotonMas({ onClick, etiqueta }: { onClick: () => void; etiqueta: string
       onClick={onClick}
       aria-label={etiqueta}
       title={etiqueta}
-      className="flex shrink-0 items-center justify-center rounded-[10px] bg-petroleo p-[10px] active:bg-petroleo/85 lg:rounded-[8.867px] lg:p-[6.334px]"
+      className="tactil relative flex shrink-0 items-center justify-center rounded-[10px] bg-petroleo-fuerte p-[10px] active:bg-petroleo-fuerte/85 lg:rounded-[8.867px] lg:p-[6.334px]"
     >
       {/* eslint-disable-next-line @next/next/no-img-element -- ícono SVG del diseño */}
       <img src="/iconos/plus.svg" alt="" width={15.201} height={15.201} />
@@ -82,6 +81,7 @@ export default function MiPerfil() {
   const [, setActivo] = useCultivoActivo();
   const [escenario, setEscenario] = useEscenario();
   const { iniciarAsistente } = useMapa();
+  const [usuario, setUsuario] = useNombreUsuario();
 
   function abrir(c: Cultivo) {
     setActivo(c.id!);
@@ -89,7 +89,20 @@ export default function MiPerfil() {
   }
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="surcos flex flex-col gap-5">
+      {usuario && (
+        <div className="flex items-baseline justify-between gap-3 px-1">
+          <p className="min-w-0 truncate font-titulo text-[22px] leading-[26px] font-bold text-tinta">Hola, {usuario}</p>
+          {/* Sin cuentas: "cambiar" olvida el nombre y vuelve a preguntarlo. Los cultivos no se tocan. */}
+          <button
+            type="button"
+            onClick={() => setUsuario("")}
+            className="tactil relative shrink-0 text-[13px] leading-[18px] font-semibold text-secundario underline underline-offset-2"
+          >
+            Cambiar nombre
+          </button>
+        </div>
+      )}
       <section aria-label="Mis cultivos" className={TARJETA}>
         <h2 className={TITULO_TARJETA}>Mis Cultivos</h2>
         <ul className="flex flex-col gap-[5px] pt-2 lg:pt-[7.6px]">
@@ -108,7 +121,7 @@ export default function MiPerfil() {
 
       <Link
         href="/"
-        className="rounded-[10px] bg-petroleo px-[10px] py-3 text-center text-[15px] leading-[20px] font-semibold text-[#fffdf6] active:bg-petroleo/85 lg:rounded-[8.867px] lg:py-[8.867px] lg:text-[11.401px] lg:leading-[15.2px]"
+        className="flex min-h-12 items-center justify-center rounded-[10px] bg-petroleo-fuerte px-[10px] py-3 text-center text-[15px] leading-[20px] font-semibold text-[#fffdf6] active:bg-petroleo-fuerte/85 lg:rounded-[8.867px] lg:py-[8.867px] lg:text-[14px] lg:leading-[20px]"
       >
         ¿Qué siembro ahora?
       </Link>
@@ -119,13 +132,16 @@ export default function MiPerfil() {
         <SeccionCalendario />
       </section>
 
-      {USAR_MOCKS && (
-        <section className={`${TARJETA} gap-2`} aria-label="Datos de prueba">
-          <Rotulo texto="Datos de prueba" />
+      {cultivos.length === 0 && (
+        <section className={`${TARJETA} gap-2`} aria-label="Lugar de ejemplo">
+          <Rotulo texto="Lugar de ejemplo" />
+          <p className="text-[13px] leading-[18px] text-secundario">
+            Mientras no marques tu cultivo, mostramos el clima real de este lugar.
+          </p>
           {LISTA_ESCENARIOS.map((id) => (
             <label
               key={id}
-              className="flex cursor-pointer items-center gap-3 rounded-[10px] p-2 text-[14px] leading-[20px] text-tinta hover:bg-arena/40"
+              className="flex min-h-12 cursor-pointer items-center gap-3 rounded-[10px] p-2 text-[14px] leading-[20px] text-tinta hover:bg-arena/40"
             >
               <input
                 type="radio"

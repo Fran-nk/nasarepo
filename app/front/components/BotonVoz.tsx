@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { useAviso } from "@/app/front/components/Avisos";
+import { AVISOS } from "@/app/front/lib/textos";
 import { callar, hablar, vozDisponible } from "@/app/front/lib/voz";
 
 /**
@@ -9,6 +11,7 @@ import { callar, hablar, vozDisponible } from "@/app/front/lib/voz";
  */
 export function BotonVoz({ texto, pequeno = false, className = "" }: { texto: string; pequeno?: boolean; className?: string }) {
   const [leyendo, setLeyendo] = useState(false);
+  const avisar = useAviso();
 
   function alTocar() {
     if (leyendo) {
@@ -17,7 +20,7 @@ export function BotonVoz({ texto, pequeno = false, className = "" }: { texto: st
       return;
     }
     if (!vozDisponible()) {
-      alert("Tu navegador no puede leer en voz alta.");
+      avisar({ texto: AVISOS.sinVoz, icono: "equis" });
       return;
     }
     setLeyendo(true);
@@ -39,7 +42,7 @@ export function BotonVoz({ texto, pequeno = false, className = "" }: { texto: st
         onClick={alTocar}
         aria-label={etiqueta}
         title={etiqueta}
-        className={`relative flex size-[28px] shrink-0 items-center justify-center rounded-[14px] border border-borde before:absolute before:-inset-2 active:bg-arena/60 ${className}`}
+        className={`tactil relative flex size-[28px] shrink-0 items-center justify-center rounded-[14px] border border-borde active:bg-arena/60 ${className}`}
       >
         {icono}
       </button>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
 import { obtenerElNino, obtenerRiego, obtenerSemaforo, obtenerSemana, obtenerVsNormal } from "@/app/front/lib/api/cliente";
 import { useConsulta, useUbicacion } from "@/app/front/lib/hooks";
 import { capitalizar, fraseRiego, fraseVsNormal, nombreMes } from "@/app/front/lib/mensajes";
@@ -21,21 +21,50 @@ interface Widget {
   queHacer?: string;
 }
 
-const PUNTO: Record<Nivel, string> = { normal: "", atencion: "bg-senal", peligro: "bg-terracota" };
+// "Atención" respira despacio para invitar a mirar; "peligro" queda fijo (la alerta ya avisó una vez).
+const PUNTO: Record<Nivel, string> = { normal: "", atencion: "bg-senal animar-respirar", peligro: "bg-terracota" };
+
+const GOTA = "M12 3.5c-3 3.8-5.5 7-5.5 10a5.5 5.5 0 0 0 11 0c0-3-2.5-6.2-5.5-10Z";
+
+/** Gota de "¿Riego hoy?" que se llena hasta la humedad de la tierra: el dato se entiende con la imagen. */
+function GotaRiego({ nivel, className }: { nivel: number; className?: string }) {
+  const recorte = `gota-${useId().replace(/[^a-zA-Z0-9]/g, "")}`;
+  const alto = 16 * Math.min(1, Math.max(0.08, nivel));
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden className={className}>
+      <defs>
+        <clipPath id={recorte}>
+          <path d={GOTA} />
+        </clipPath>
+      </defs>
+      <g clipPath={`url(#${recorte})`}>
+        <rect
+          x="0"
+          y={19.5 - alto}
+          width="24"
+          height={alto + 1}
+          className="animar-llenar fill-petroleo"
+          style={{ transformBox: "fill-box" }}
+        />
+      </g>
+      <path d={GOTA} fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
+    </svg>
+  );
+}
 
 /**
  * "Tu cultivo hoy": datos del clima que dependen del cultivo abierto (siembra, riego, El Niño y el mes),
  * como widgets de un vistazo en una cuadrícula de 2 × 2. Al tocar uno se ve el porqué y qué hacer.
  */
 export function WidgetsCultivo() {
-  const { punto, escenario, clave } = useUbicacion();
+  const { punto, clave } = useUbicacion();
   const mes = new Date().getMonth() + 1;
   const k = (nombre: string) => (clave === null ? null : `${nombre}|${clave}`);
-  const nino = useConsulta(k("nino"), () => obtenerElNino(punto, escenario));
-  const semana = useConsulta(k("semana"), () => obtenerSemana(punto, escenario));
-  const semaforo = useConsulta(k(`semaforo|${mes}`), () => obtenerSemaforo(punto, escenario, mes));
-  const riego = useConsulta(k("riego"), () => obtenerRiego(punto, escenario));
-  const vsNormal = useConsulta(k("vsnormal"), () => obtenerVsNormal(punto, escenario));
+  const nino = useConsulta(k("nino"), () => obtenerElNino(punto));
+  const semana = useConsulta(k("semana"), () => obtenerSemana(punto));
+  const semaforo = useConsulta(k(`semaforo|${mes}`), () => obtenerSemaforo(punto, mes));
+  const riego = useConsulta(k("riego"), () => obtenerRiego(punto));
+  const vsNormal = useConsulta(k("vsnormal"), () => obtenerVsNormal(punto));
   const [abierto, setAbierto] = useState<string | null>(null);
 
   const widgets: (Widget | null)[] = [
@@ -66,10 +95,11 @@ export function WidgetsCultivo() {
           etiqueta: "El Niño",
           valor: { no_activo: "Tranquilo", vigilancia: "Vigilancia", alerta: "Alerta" }[nino.datos.estado],
           nivel: nino.datos.estado === "alerta" ? "peligro" : nino.datos.estado === "vigilancia" ? "atencion" : "normal",
-          detalle:
+          detalle: `${
             nino.datos.estado === "no_activo"
               ? "No hay El Niño ni La Niña ahora."
-              : `${nino.datos.fenomeno === "nino_costero" ? "El Niño costero" : "La Niña costera"}: ${ESTADO_NINO[nino.datos.estado].nombre.toLowerCase()}. ${EFECTO_NINO[nino.datos.efecto_zona].respuesta}`,
+              : `${nino.datos.fenomeno === "nino_costero" ? "El Niño costero" : "La Niña costera"}: ${ESTADO_NINO[nino.datos.estado].nombre.toLowerCase()}. ${EFECTO_NINO[nino.datos.efecto_zona].respuesta}`
+          } Estimado con la temperatura del mar medida por la NASA; el aviso oficial es del ENFEN.`,
           queHacer: nino.datos.estado === "no_activo" ? undefined : EFECTO_NINO[nino.datos.efecto_zona].queHacer,
         }
       : null,
@@ -88,7 +118,7 @@ export function WidgetsCultivo() {
 
   return (
     <section aria-label="Tu cultivo hoy" className="flex flex-col gap-2">
-      <h2 className="font-titulo text-[12px] leading-[16px] font-bold text-tinta uppercase">Tu cultivo hoy</h2>
+      <h2 className="font-titulo text-[13px] leading-[16px] font-bold text-tinta uppercase">Tu cultivo hoy</h2>
       <ul className="grid grid-cols-2 gap-2 lg:gap-[6px]">
         {widgets.map((w, i) =>
           w ? (
@@ -97,13 +127,17 @@ export function WidgetsCultivo() {
                 type="button"
                 onClick={() => setAbierto(abierto === w.id ? null : w.id)}
                 aria-expanded={abierto === w.id}
-                className={`relative flex h-full w-full flex-col gap-1 rounded-[12px] border-[0.5px] border-borde bg-arena p-2.5 text-left transition-colors hover:bg-arena/70 ${
+                className={`relative flex h-full w-full flex-col gap-1 rounded-[12px] border-[0.8px] border-borde bg-arena p-2.5 text-left transition-colors hover:bg-arena/70 ${
                   abierto === w.id ? "outline-2 outline-offset-1 outline-tinta" : ""
                 }`}
               >
                 <span className="flex items-center gap-1.5">
-                  <IconoClima nombre={w.icono} className="size-5 shrink-0 text-tinta lg:size-4" />
-                  <span className="text-[11px] leading-[14px] font-semibold text-secundario uppercase lg:text-[9.5px] lg:leading-[12px]">
+                  {w.id === "riego" && riego.datos ? (
+                    <GotaRiego nivel={riego.datos.humedad_suelo} className="size-5 shrink-0 text-tinta lg:size-4" />
+                  ) : (
+                    <IconoClima nombre={w.icono} className="size-5 shrink-0 text-tinta lg:size-4" />
+                  )}
+                  <span className="text-[12px] leading-[14px] font-semibold text-secundario uppercase lg:text-[11px] lg:leading-[14px]">
                     {w.etiqueta}
                   </span>
                 </span>
@@ -116,12 +150,12 @@ export function WidgetsCultivo() {
               </button>
             </li>
           ) : (
-            <li key={`cargando-${i}`} className="h-[64px] animate-pulse rounded-[12px] bg-arena lg:h-[56px]" />
+            <li key={`cargando-${i}`} className="esqueleto h-[64px] rounded-[12px] lg:h-[56px]" />
           ),
         )}
       </ul>
       {elegido && (
-        <div className="flex flex-col gap-1 rounded-[12px] border-[0.5px] border-borde bg-white p-2.5 text-[13px] leading-[18px] text-tinta lg:text-[11px] lg:leading-[15px]">
+        <div className="flex flex-col gap-1 rounded-[12px] border-[0.5px] border-borde bg-white p-2.5 text-[13px] leading-[18px] text-tinta lg:text-[12px] lg:leading-[15px]">
           <p>{elegido.detalle}</p>
           {elegido.queHacer && (
             <p>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
 import { db, HISTORIAL_VACIO } from "@/app/front/lib/almacen";
 import { ESCENARIOS } from "@/app/front/lib/escenarios";
@@ -12,6 +12,47 @@ interface Estado<T> {
   clave: string;
   datos?: T;
   error?: string;
+  /** true si `datos` viene de lo guardado en el celular (no llegó la respuesta nueva). */
+  guardado?: boolean;
+}
+
+/**
+ * Última respuesta buena de cada consulta, guardada en el celular: sin señal se muestra eso
+ * en vez de un error. Puede fallar (modo privado, almacenamiento lleno): entonces no se guarda nada.
+ */
+const PREFIJO_GUARDADO = "ss.dato.";
+function leerGuardado<T>(clave: string): T | undefined {
+  try {
+    const texto = localStorage.getItem(PREFIJO_GUARDADO + clave);
+    return texto ? (JSON.parse(texto) as T) : undefined;
+  } catch {
+    return undefined;
+  }
+}
+function escribirGuardado(clave: string, datos: unknown) {
+  try {
+    localStorage.setItem(PREFIJO_GUARDADO + clave, JSON.stringify(datos));
+  } catch {
+    // Sin espacio o sin permiso: se sigue sin copia.
+  }
+}
+
+function suscribirConexion(avisar: () => void) {
+  window.addEventListener("online", avisar);
+  window.addEventListener("offline", avisar);
+  return () => {
+    window.removeEventListener("online", avisar);
+    window.removeEventListener("offline", avisar);
+  };
+}
+
+/** false cuando el celular perdió la señal (en el servidor se asume que hay). */
+export function useEnLinea() {
+  return useSyncExternalStore(
+    suscribirConexion,
+    () => navigator.onLine,
+    () => true,
+  );
 }
 
 /**
@@ -20,27 +61,44 @@ interface Estado<T> {
  */
 export function useConsulta<T>(clave: string | null, pedir: () => Promise<T>) {
   const [estado, setEstado] = useState<Estado<T>>({ clave: "" });
+  const [intento, setIntento] = useState(0);
 
   useEffect(() => {
     if (clave === null) return;
     let vigente = true;
     pedir()
-      .then((datos) => vigente && setEstado({ clave, datos }))
-      .catch((e: unknown) =>
-        vigente && setEstado({ clave, error: e instanceof Error ? e.message : String(e) }),
-      );
+      .then((datos) => {
+        if (!vigente) return;
+        setEstado({ clave, datos });
+        escribirGuardado(clave, datos);
+      })
+      .catch((e: unknown) => {
+        if (!vigente) return;
+        const guardado = leerGuardado<T>(clave);
+        setEstado(
+          guardado !== undefined
+            ? { clave, datos: guardado, guardado: true }
+            : { clave, error: e instanceof Error ? e.message : String(e) },
+        );
+      });
     return () => {
       vigente = false;
     };
     // `pedir` cambia en cada render; la clave resume sus dependencias.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [clave]);
+  }, [clave, intento]);
 
   const actual = estado.clave === clave;
   return {
     datos: actual ? estado.datos : undefined,
     error: actual ? estado.error : undefined,
     cargando: clave !== null && !actual,
+    guardado: actual ? Boolean(estado.guardado) : false,
+    /** Vuelve a pedir el dato (botón "Intentar de nuevo"). */
+    reintentar: () => {
+      setEstado({ clave: "" });
+      setIntento((n) => n + 1);
+    },
   };
 }
 
@@ -61,15 +119,18 @@ export function useCultivoAbierto() {
   return { cultivo, cultivos: lista, cargada: cultivos !== undefined };
 }
 
+/** Clave de un punto para las consultas (≈10 m de precisión). */
+const claveDe = (p: Punto) => `${p.lat.toFixed(4)},${p.lon.toFixed(4)}`;
+
 /**
- * Ubicación usada para pedir datos: el cultivo abierto o, si no hay, el punto del escenario.
+ * Ubicación usada para pedir datos: el cultivo abierto o, si no hay, el lugar de ejemplo elegido.
  * `clave` es null mientras IndexedDB no responde, para no pedir datos con el punto equivocado.
  */
 export function useUbicacion() {
   const [escenario] = useEscenario();
   const { cultivo, cultivos, cargada } = useCultivoAbierto();
   const punto: Punto = cultivo ? { lat: cultivo.lat, lon: cultivo.lon } : ESCENARIOS[escenario].punto;
-  const clave = cargada ? `${escenario}|${punto.lat.toFixed(4)},${punto.lon.toFixed(4)}` : null;
+  const clave = cargada ? claveDe(punto) : null;
   return { punto, escenario, cultivo, cultivos, cargada, clave };
 }
 
@@ -96,15 +157,15 @@ export function useMisSemillasLista(): string[] {
 
 /** Lugar, altitud, zona y cultivos comunes del cultivo abierto (o del punto que se pase). */
 export function useContexto(otro?: Punto) {
-  const { punto: abierto, escenario, clave } = useUbicacion();
+  const { punto: abierto, clave } = useUbicacion();
   const punto = otro ?? abierto;
-  const claveFinal = clave === null ? null : otro ? `${escenario}|${otro.lat.toFixed(4)},${otro.lon.toFixed(4)}` : clave;
-  return useConsulta(claveFinal, () => obtenerContexto(punto, escenario));
+  const claveFinal = clave === null ? null : otro ? claveDe(otro) : clave;
+  return useConsulta(claveFinal === null ? null : `ctx|${claveFinal}`, () => obtenerContexto(punto));
 }
 
 /** Recomendaciones para el cultivo abierto, con su historial y las semillas que tiene. */
 export function useRecomendaciones() {
-  const { punto, escenario, clave } = useUbicacion();
+  const { punto, clave } = useUbicacion();
   const historial = useHistorialGuardado();
   const mias = useMisSemillasLista();
   const mes = new Date().getMonth() + 1;
@@ -112,7 +173,6 @@ export function useRecomendaciones() {
   return useConsulta(listo ? `rec|${clave}|${mes}|${historial.join(",")}|${mias.join(",")}` : null, () =>
     obtenerRecomendaciones(
       { lat: punto.lat, lon: punto.lon, mes, historial: historial!, semillas_disponibles: mias },
-      escenario,
     ),
   );
 }

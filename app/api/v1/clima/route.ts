@@ -1,8 +1,6 @@
 import { obtenerClima } from "@/app/back/clima";
 import { errorApi } from "@/app/back/http";
 
-export const runtime = "nodejs";
-
 export async function GET(request: Request): Promise<Response> {
   const parametros = new URL(request.url).searchParams;
   const lat = parametros.get("latitud");

@@ -11,9 +11,10 @@ const ID_SATELITE = "vista-satelite";
 
 const ocultasPorVista = new WeakMap<MapaGL, string[]>();
 
-/** Capas de Mapbox Draw (el terreno dibujado): se dejan visibles en las dos vistas. */
+/** Capas de Mapbox Draw y los terrenos guardados: se dejan visibles en las dos vistas. */
 function esDelDibujo(capa: { id: string; source?: unknown }): boolean {
-  return capa.id.startsWith("gl-draw-") || (typeof capa.source === "string" && capa.source.startsWith("mapbox-gl-draw"));
+  const fuente = typeof capa.source === "string" ? capa.source : "";
+  return capa.id.startsWith("gl-draw-") || fuente.startsWith("mapbox-gl-draw") || fuente === "terrenos";
 }
 
 function asegurarSatelite(mapa: MapaGL) {

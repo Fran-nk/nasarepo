@@ -19,10 +19,11 @@ export interface ApiMapa {
 
 /**
  * Pasos para crear un cultivo:
+ * - "datos": cómo se llama el cultivo (y la persona, la primera vez);
  * - "terreno": marcar las esquinas en el mapa o usar la ubicación del celular;
  * - "cultivos": qué sembró antes y qué semillas tiene (se puede saltar).
  */
-export type PasoAsistente = "terreno" | "cultivos";
+export type PasoAsistente = "datos" | "terreno" | "cultivos";
 
 interface ValorContexto {
   /** Siempre la última API que entregó el mapa (o null si aún no carga). */
@@ -35,7 +36,12 @@ interface ValorContexto {
   /** id del cultivo que se acaba de crear (para las preguntas del paso "cultivos"). */
   cultivoNuevo: number | null;
   setCultivoNuevo: (id: number | null) => void;
+  /** Nombre que se le dará al cultivo que se está creando (null = el de siempre, "Mi cultivo 2"…). */
+  nombreNuevo: string | null;
+  /** Abre el asistente en el paso "datos". */
   iniciarAsistente: () => void;
+  /** Con el nombre ya escrito, pasa a marcar el terreno. */
+  empezarTerreno: (nombre: string | null) => void;
   cancelarAsistente: () => void;
 }
 
@@ -46,9 +52,17 @@ export function ProveedorMapa({ children }: { children: ReactNode }) {
   const [dibujando, setDibujando] = useState(false);
   const [paso, setPaso] = useState<PasoAsistente | null>(null);
   const [cultivoNuevo, setCultivoNuevo] = useState<number | null>(null);
+  const [nombreNuevo, setNombreNuevo] = useState<string | null>(null);
 
   const iniciarAsistente = useCallback(() => {
     setCultivoNuevo(null);
+    setNombreNuevo(null);
+    apiRef.current?.cancelar();
+    setPaso("datos");
+  }, []);
+
+  const empezarTerreno = useCallback((nombre: string | null) => {
+    setNombreNuevo(nombre?.trim() || null);
     setPaso("terreno");
     apiRef.current?.dibujar();
   }, []);
@@ -67,10 +81,12 @@ export function ProveedorMapa({ children }: { children: ReactNode }) {
       setPaso,
       cultivoNuevo,
       setCultivoNuevo,
+      nombreNuevo,
       iniciarAsistente,
+      empezarTerreno,
       cancelarAsistente,
     }),
-    [dibujando, paso, cultivoNuevo, iniciarAsistente, cancelarAsistente],
+    [dibujando, paso, cultivoNuevo, nombreNuevo, iniciarAsistente, empezarTerreno, cancelarAsistente],
   );
   return <Contexto.Provider value={valor}>{children}</Contexto.Provider>;
 }

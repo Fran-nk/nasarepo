@@ -2,7 +2,7 @@
 
 /*
  * Guía de estilo "Territorio" (Figma): colores minerales, fondos arena/papel
- * y acentos señal/terracota. Títulos en Roboto Condensed, lectura en Inter.
+ * y acentos señal/terracota. Títulos en Roboto Condensed (Bold), lectura en Inter.
  */
 @theme inline {
   --font-sans: var(--font-inter), system-ui, sans-serif;
@@ -20,14 +20,213 @@
   /* Acentos */
   --color-senal: #f3d35f;
   --color-terracota: #cb684d;
+  /*
+   * Variantes más oscuras del mismo tono para cuando hay texto encima (o son el texto), y así pasar
+   * WCAG AA (4,5:1) con sol fuerte: texto claro sobre terracota fuerte 5,0:1; blanco sobre petróleo fuerte 6,0:1.
+   */
+  --color-terracota-fuerte: #a9503a;
+  --color-petroleo-fuerte: #3f6b67;
   /* Texto y bordes */
   --color-tinta: #263b35;
   --color-secundario: #56665b;
   --color-borde: #d4d8c7;
+  /* Borde de campos y controles: 3,2:1 sobre papel (WCAG 1.4.11), para ver dónde se toca con sol fuerte. */
+  --color-borde-fuerte: #858d7a;
 }
 
 body {
   font-family: var(--font-sans);
+}
+
+/*
+ * Foco visible para teclado y lectores de pantalla: anillo tinta con un respiro claro,
+ * que se ve igual sobre papel, arena o bloques oscuros.
+ */
+:focus-visible {
+  outline: 3px solid var(--color-tinta);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 2px var(--color-papel);
+}
+
+/*
+ * Movimiento "Territorio": entra como algo que crece de la tierra (ease-out suave, sin rebotes bruscos).
+ * Solo transform y opacity, para celulares modestos.
+ */
+@keyframes surco {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes brote {
+  0% {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes sello {
+  0% {
+    opacity: 0;
+    transform: scale(1.4) rotate(-10deg);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(0.94) rotate(-4deg);
+  }
+  100% {
+    transform: scale(1) rotate(-4deg);
+  }
+}
+
+@keyframes alerta-entra {
+  0% {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  55% {
+    opacity: 1;
+    transform: translateY(0) scale(1.02);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes respirar {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
+@keyframes llenar {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+@keyframes brillo {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
+/* Tarjetas que aparecen escalonadas, como surcos: se entiende qué se cargó y en qué orden leer. */
+@utility surcos {
+  /* "backwards": al terminar no deja transform fijado (no pisa el hover/active de cada tarjeta). */
+  & > * {
+    animation: surco 320ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  }
+  & > *:nth-child(2) {
+    animation-delay: 45ms;
+  }
+  & > *:nth-child(3) {
+    animation-delay: 90ms;
+  }
+  & > *:nth-child(4) {
+    animation-delay: 135ms;
+  }
+  & > *:nth-child(5) {
+    animation-delay: 180ms;
+  }
+  & > *:nth-child(n + 6) {
+    animation-delay: 225ms;
+  }
+}
+
+/* La semilla "brota" al agregarla: confirma sin palabras. */
+@utility animar-brote {
+  animation: brote 360ms cubic-bezier(0.34, 1.4, 0.64, 1) backwards;
+}
+
+/* Sello al guardar: algo quedó anotado, como en un cuaderno. */
+@utility animar-sello {
+  animation: sello 380ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* El aviso entra desde abajo, tranquilo. */
+@utility animar-surco {
+  animation: surco 280ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+
+/* Alerta de peligro: llama la atención una sola vez, sin parpadear. */
+@utility animar-alerta {
+  animation: alerta-entra 520ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+
+/* "Con cuidado": un punto que respira despacio, para mirar sin alarmar. */
+@utility animar-respirar {
+  animation: respirar 2.4s ease-in-out infinite;
+}
+
+/* La gota de riego se llena de abajo arriba hasta su nivel. */
+@utility animar-llenar {
+  transform-origin: bottom;
+  animation: llenar 650ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+
+/* Esqueleto de carga color arena con un brillo lento (en vez de "Cargando…"): muestra la forma de lo que viene. */
+@utility esqueleto {
+  position: relative;
+  overflow: hidden;
+  background-color: var(--color-arena);
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, rgb(249 247 238 / 0.55), transparent);
+    animation: brillo 1.6s ease-in-out infinite;
+  }
+}
+
+/* Quien pide menos movimiento ve todo en su lugar, sin animaciones (también las del mapa y el pulso de carga). */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    animation-delay: 0ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/*
+ * Área táctil mínima de 48 px sin agrandar lo que se ve: una capa invisible centrada en el control.
+ * El control debe estar posicionado (relative/absolute). Los dedos gruesos o con tierra fallan en blancos chicos.
+ */
+@utility tactil {
+  &::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: max(100%, 48px);
+    height: max(100%, 48px);
+    transform: translate(-50%, -50%);
+  }
 }
 
 /* Controles de Mapbox (zoom, brújula, GPS y escala) con la guía "Territorio". */
@@ -42,12 +241,27 @@ body {
   height: 40px !important;
 }
 
+/* En pantallas táctiles los controles del mapa llegan a 48 px. */
+@media (pointer: coarse) {
+  .mapboxgl-ctrl-group button {
+    width: 48px !important;
+    height: 48px !important;
+  }
+}
+
 .mapboxgl-ctrl-scale {
   border-color: var(--color-tinta) !important;
   background-color: rgb(249 247 238 / 0.9) !important;
   color: var(--color-tinta) !important;
   font-family: var(--font-sans);
   font-size: 11px !important;
+}
+
+/* En el celular el mapa es pequeño: la escala tapaba el terreno y casi no se usa. Se muestra solo en escritorio. */
+@media (max-width: 1023px) {
+  .mapboxgl-ctrl-scale {
+    display: none !important;
+  }
 }
 
 /* En escritorio los controles van abajo a la derecha (Figma 55:25), sobre los créditos del mapa. */
@@ -59,6 +273,125 @@ body {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
+  }
+}
+
+/*
+ * Panel izquierdo de escritorio: 324 px, y en Semillas (pantallas de 1280 px o más) crece 306 px para una
+ * grilla de 2 semillas. Lo que está al lado del panel (selector Mapa/Satélite, avisos, mapa) se corre lo mismo,
+ * con la misma duración y curva (curva "move"; crecer 300 ms, volver 220 ms: la salida es más rápida).
+ * Con 1024–1279 px no crece: chocaría con el clima de la derecha.
+ */
+:root {
+  --panel-extra: 0px;
+  --panel-dur: 220ms;
+  --panel-ease: cubic-bezier(0.25, 1, 0.5, 1);
+}
+:root[data-panel="ancho"] {
+  --panel-dur: 300ms;
+}
+@media (min-width: 1280px) {
+  :root[data-panel="ancho"] {
+    --panel-extra: 306px;
+  }
+}
+@media (min-width: 1024px) {
+  .panel-lateral {
+    width: calc(324px + var(--panel-extra));
+    overflow-x: hidden;
+    transition: width var(--panel-dur) var(--panel-ease);
+  }
+  /* El contenido ya tiene su ancho final: el panel lo va descubriendo, sin aplastar las tarjetas. */
+  .panel-contenido {
+    width: calc(294px + var(--panel-extra));
+  }
+  .junto-al-panel {
+    translate: var(--panel-extra) 0;
+    transition: translate var(--panel-dur) var(--panel-ease);
+  }
+  .despues-del-panel {
+    left: calc(344px + var(--panel-extra));
+    transition: left var(--panel-dur) var(--panel-ease);
+  }
+}
+
+/*
+ * Paso 1 (inicio): una página de vidrio sobre el mapa. El mapa se ve desenfocado detrás; encima,
+ * manchas de color de la paleta (petróleo, pradera, señal) que se mueven despacio. Solo se anima
+ * `transform` (barato) y la tarjeta entra una vez. Con "menos movimiento" todo queda quieto.
+ */
+.inicio-vidrio {
+  background: rgb(249 247 238 / 0.3);
+  -webkit-backdrop-filter: blur(14px) saturate(1.3);
+  backdrop-filter: blur(14px) saturate(1.3);
+  animation: inicio-entra 360ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.mancha {
+  position: absolute;
+  border-radius: 9999px;
+  will-change: transform;
+}
+.mancha-1 {
+  top: -28vmax;
+  left: -22vmax;
+  width: 72vmax;
+  height: 72vmax;
+  background: radial-gradient(closest-side, rgb(87 137 133 / 0.55), transparent);
+  animation: deriva-a 16s ease-in-out infinite alternate;
+}
+.mancha-2 {
+  right: -24vmax;
+  bottom: -32vmax;
+  width: 78vmax;
+  height: 78vmax;
+  background: radial-gradient(closest-side, rgb(182 190 127 / 0.6), transparent);
+  animation: deriva-b 20s ease-in-out infinite alternate;
+}
+.mancha-3 {
+  top: 28%;
+  left: 38%;
+  width: 46vmax;
+  height: 46vmax;
+  background: radial-gradient(closest-side, rgb(243 211 95 / 0.42), transparent);
+  animation: deriva-c 13s ease-in-out infinite alternate;
+}
+.inicio-tarjeta {
+  background: rgb(255 255 255 / 0.52);
+  border: 1px solid rgb(255 255 255 / 0.75);
+  -webkit-backdrop-filter: blur(24px) saturate(1.4);
+  backdrop-filter: blur(24px) saturate(1.4);
+  box-shadow:
+    0 24px 60px rgb(38 59 53 / 0.18),
+    inset 0 1px 0 rgb(255 255 255 / 0.85);
+  animation: inicio-tarjeta 560ms cubic-bezier(0.22, 1, 0.36, 1) 80ms both;
+}
+@keyframes inicio-entra {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes inicio-tarjeta {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.98);
+  }
+}
+@keyframes deriva-a {
+  to {
+    transform: translate3d(18vmax, 12vmax, 0) scale(1.15);
+  }
+}
+@keyframes deriva-b {
+  to {
+    transform: translate3d(-20vmax, -14vmax, 0) scale(1.2);
+  }
+}
+@keyframes deriva-c {
+  from {
+    transform: translate3d(-10vmax, 6vmax, 0) scale(0.9);
+  }
+  to {
+    transform: translate3d(12vmax, -10vmax, 0) scale(1.12);
   }
 }
 

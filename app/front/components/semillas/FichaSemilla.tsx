@@ -2,13 +2,15 @@
 
 import Link from "next/link";
 import { BotonVoz } from "@/app/front/components/BotonVoz";
+import { Volver } from "@/app/front/components/Volver";
 import { CHIP, FICHA_ARENA, ROTULO_FICHA, TARJETA_BLANCA, TITULO_SECCION, VALOR_FICHA } from "@/app/front/components/estilos";
 import { IconoLinea, type NombreIconoLinea } from "@/app/front/components/IconoLinea";
 import { TarjetaCargando } from "@/app/front/components/tarjetas/TarjetaDato";
 import { alternarMiSemilla } from "@/app/front/lib/almacen";
 import { useCatalogo, useMisSemillas } from "@/app/front/lib/hooks";
 import { formatoMiles } from "@/app/front/lib/mensajes";
-import { CATEGORIAS, RAREZA } from "@/app/front/lib/textos";
+import { AVISOS, CATEGORIAS, RAREZA } from "@/app/front/lib/textos";
+import { useAviso } from "@/app/front/components/Avisos";
 import { BarraStat } from "./BarraStat";
 
 /** Bloque blanco de la ficha con su título en Roboto (sin emojis: el diseño usa pocos colores). */
@@ -49,6 +51,7 @@ const TEXTO = "text-[15px] leading-[22px] text-tinta";
 export function FichaSemilla({ id }: { id: string }) {
   const { porId, cargando } = useCatalogo();
   const mias = useMisSemillas();
+  const avisar = useAviso();
   const s = porId.get(id);
 
   if (cargando) return <TarjetaCargando />;
@@ -83,10 +86,8 @@ export function FichaSemilla({ id }: { id: string }) {
     .join(". ");
 
   return (
-    <div className="flex flex-col gap-3">
-      <Link href="/semillas" className="w-max text-[18px] leading-[28px] font-semibold text-tinta">
-        ← Semillero
-      </Link>
+    <div className="surcos flex flex-col gap-3">
+      <Volver href="/semillas" texto="Semillero" />
 
       {/* Cabecera como la de "Mi Cultivo": dibujo grande a la izquierda, nombre y chips a la derecha. */}
       <header className={`${TARJETA_BLANCA} relative flex items-center gap-3 ${enRescate ? "border-terracota" : ""}`}>
@@ -98,7 +99,7 @@ export function FichaSemilla({ id }: { id: string }) {
         </span>
         <div className="flex min-w-0 flex-1 flex-col gap-1">
           <h1 className="pr-8 font-titulo text-[28px] leading-[30px] font-bold text-tinta">{s.nombre}</h1>
-          <p className="text-[12px] leading-[16px] text-secundario italic">
+          <p className="text-[13px] leading-[16px] text-secundario italic">
             {s.cientifico} · {s.familia}
           </p>
           <div className="flex flex-wrap gap-1 pt-0.5">
@@ -180,7 +181,14 @@ export function FichaSemilla({ id }: { id: string }) {
 
       <button
         type="button"
-        onClick={() => void alternarMiSemilla(s.id)}
+        onClick={() => {
+          void alternarMiSemilla(s.id);
+          avisar(
+            tengo
+              ? { texto: AVISOS.semillaQuitada(s.nombre), icono: "equis", deshacer: () => void alternarMiSemilla(s.id) }
+              : { texto: AVISOS.semillaAgregada(s.nombre) },
+          );
+        }}
         aria-pressed={tengo}
         className={`sticky bottom-[76px] flex items-center justify-center gap-2 rounded-[14px] px-4 py-3 text-[16px] leading-[24px] font-semibold shadow-[0_2px_8px_rgba(38,59,53,0.25)] transition-colors lg:bottom-0 ${
           tengo ? "border-[1.6px] border-tinta bg-white text-tinta" : "bg-tinta text-white hover:bg-tinta/90"
@@ -207,7 +215,7 @@ function ListaRotacion({
 }) {
   return (
     <div className="flex flex-col gap-1.5">
-      <p className={`flex items-center gap-1.5 text-[13px] leading-[18px] font-semibold ${mala ? "text-terracota" : "text-tinta"}`}>
+      <p className={`flex items-center gap-1.5 text-[13px] leading-[18px] font-semibold ${mala ? "text-terracota-fuerte" : "text-tinta"}`}>
         <IconoLinea nombre={icono} className="size-4 shrink-0" />
         {titulo}
       </p>

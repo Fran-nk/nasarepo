@@ -1,5 +1,6 @@
 /**
- * Preferencias por dispositivo (escenario de demo y cultivo abierto) en localStorage.
+ * Preferencias por dispositivo (nombre de la persona, escenario de demo y cultivo abierto) en localStorage.
+ * No hay cuentas ni contraseñas: nada de esto sale del celular.
  * Se leen con useSyncExternalStore para evitar diferencias entre servidor y cliente.
  */
 "use client";
@@ -7,7 +8,7 @@
 import { useSyncExternalStore } from "react";
 import { ESCENARIO_INICIAL, LISTA_ESCENARIOS, type IdEscenario } from "@/app/front/lib/escenarios";
 
-const CLAVES = { escenario: "ss.escenario", cultivo: "ss.cultivo" } as const;
+const CLAVES = { escenario: "ss.escenario", cultivo: "ss.cultivo", usuario: "ss.usuario" } as const;
 const EVENTO = "ss-preferencias";
 
 function leer(clave: string): string | null {
@@ -20,7 +21,8 @@ function leer(clave: string): string | null {
 
 function escribir(clave: string, valor: string) {
   try {
-    window.localStorage.setItem(clave, valor);
+    if (valor === "") window.localStorage.removeItem(clave);
+    else window.localStorage.setItem(clave, valor);
   } catch {
     /* sin almacenamiento: el cambio dura solo esta sesión */
   }
@@ -62,4 +64,20 @@ export function useCultivoActivo(): [number | null, (id: number) => void] {
     () => null,
   );
   return [valor, (id) => escribir(CLAVES.cultivo, String(id))];
+}
+
+/**
+ * Nombre con el que la persona entró (el "inicio" sin contraseña). `undefined` mientras no se sabe
+ * (en el servidor y en el primer dibujo), `null` si todavía no lo dio. Con "" se olvida.
+ */
+export function useNombreUsuario(): [string | null | undefined, (nombre: string) => void] {
+  const valor = useSyncExternalStore<string | null | undefined>(
+    suscribir,
+    () => {
+      const v = leer(CLAVES.usuario) ?? memoria[CLAVES.usuario] ?? null;
+      return v?.trim() ? v : null;
+    },
+    () => undefined,
+  );
+  return [valor, (nombre) => escribir(CLAVES.usuario, nombre.trim())];
 }

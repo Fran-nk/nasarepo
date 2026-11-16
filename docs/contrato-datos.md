@@ -1,17 +1,10 @@
 # Contrato de datos frontend ↔ backend
 
-Este documento es para quien construye el backend. El frontend ya funciona con **datos de prueba** que siguen este contrato al pie de la letra. Cuando el backend esté listo:
-
-```bash
-# .env.local
-NEXT_PUBLIC_USE_MOCKS=false
-NEXT_PUBLIC_API_URL=https://tu-backend.example.com
-```
+Hoy el frontend arma todas estas respuestas por su cuenta, con datos reales de **NASA POWER** y **Open-Meteo**. Ver [fuentes-de-datos.md](fuentes-de-datos.md). Este documento sirve para el backend: si toma una parte, por ejemplo las recomendaciones con la red neuronal, debe devolver exactamente estos tipos. Así las pantallas no cambian.
 
 - **Tipos exactos (fuente de verdad):** [`app/front/lib/contratos/tipos.ts`](../app/front/lib/contratos/tipos.ts)
-- **Ejemplos reales de respuesta:** [`app/front/mocks/escenarios/`](../app/front/mocks/escenarios). Cada clave del archivo es la respuesta de un endpoint. En los mocks, `"D+3"` significa "hoy + 3 días"; el backend debe enviar fechas reales `YYYY-MM-DD`.
-- **Catálogo de semillas de ejemplo:** [`app/front/mocks/semillas.json`](../app/front/mocks/semillas.json)
-- **Cliente que consume la API:** [`app/front/lib/api/cliente.ts`](../app/front/lib/api/cliente.ts)
+- **Cómo se calcula hoy cada respuesta:** [`app/front/lib/api/cliente.ts`](../app/front/lib/api/cliente.ts), con las cuentas en [`app/front/lib/calculos/`](../app/front/lib/calculos)
+- **Catálogo de semillas:** [`app/front/datos/semillas.json`](../app/front/datos/semillas.json)
 
 ## Reglas generales
 
@@ -23,17 +16,17 @@ NEXT_PUBLIC_API_URL=https://tu-backend.example.com
 
 ## Endpoints
 
-| Método y ruta | Clave en el mock | Tipo de respuesta | Para qué se usa |
+| Método y ruta | Clave | Tipo de respuesta | Para qué se usa |
 |---|---|---|---|
 | `GET /contexto?lat&lon` | `contexto` | `RespuestaContexto` | Lugar, altitud, zona Pulgar Vidal y cultivos comunes de la zona (RF 6) |
 | `GET /clima/semana?lat&lon` | `semana` | `RespuestaSemana` | "¿Llueve esta semana?" (7 días desde hoy) |
 | `GET /clima/alertas?lat&lon` | `alertas` | `RespuestaAlertas` | Helada, granizo, sequía, calor, lluvia fuerte y huaico |
-| `GET /clima/vs-normal?lat&lon` | `vsNormal` | `RespuestaVsNormal` | "Este año vs. lo normal" (mes actual contra el promedio histórico de NASA POWER) |
-| `GET /el-nino?lat&lon` | `elNino` | `RespuestaElNino` | Estado oficial del ENFEN y efecto esperado en la zona |
+| `GET /clima/vs-normal?lat&lon` | `vsNormal` | `RespuestaVsNormal` | "Este año vs. lo normal" (días medidos del mes contra el promedio de NASA POWER) |
+| `GET /el-nino?lat&lon` | `elNino` | `RespuestaElNino` | Condición estimada de El Niño costero (mar de NASA POWER) y efecto esperado en la zona |
 | `GET /siembra/semaforo?lat&lon&mes` | `semaforo` | `RespuestaSemaforo` | Semáforo "¿Es buen momento para sembrar?" |
-| `GET /riego?lat&lon` | `riego` | `RespuestaRiego` | "¿Riego hoy?" (humedad del suelo SMAP/POWER y lluvia de los próximos 3 días) |
+| `GET /riego?lat&lon` | `riego` | `RespuestaRiego` | "¿Riego hoy?" (humedad del suelo de NASA POWER y lluvia de los próximos 3 días) |
 | `POST /recomendaciones` | `recomendaciones` | `RespuestaRecomendaciones` | Qué sembrar ahora: salida de la red neuronal (RF 7, RF 13) |
-| `GET /semillas` | — (`mocks/semillas.json`) | `RespuestaSemillas` | Catálogo para el Semillero y el buscador |
+| `GET /semillas` | — (`datos/semillas.json`) | `RespuestaSemillas` | Catálogo para el Semillero y el buscador |
 
 ### `POST /recomendaciones`
 
@@ -53,7 +46,7 @@ Cuerpo de la petición (`PeticionRecomendaciones`):
 - **`alerta.nivel`:** `atencion` (ámbar), `peligro` (rojo).
 - **`vsNormal.lluvia`:** `mas_seco`, `normal`, `mas_lluvioso`.
 - **`vsNormal.temperatura`:** `mas_frio`, `normal`, `mas_calido`.
-- **`elNino.estado`:** `no_activo`, `vigilancia`, `alerta`. Son los mismos nombres de estado que usa el ENFEN.
+- **`elNino.estado`:** `no_activo`, `vigilancia`, `alerta`. Son los mismos nombres de estado que usa el ENFEN, pero aquí es una **estimación** con la temperatura del mar de NASA POWER. El aviso oficial se enlaza en `aviso_oficial_url`.
 - **`elNino.fenomeno`:** `nino_costero`, `nina_costera`.
 - **`elNino.magnitud`** (opcional): `debil`, `moderada`, `fuerte`, `extraordinaria`.
 - **`elNino.efecto_zona`:** `mas_lluvia`, `menos_lluvia`, `mas_calor`, `sin_efecto_claro`.
