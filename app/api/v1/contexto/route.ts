@@ -1,8 +1,6 @@
 import { errorApi, validarContexto } from "@/app/back/http";
 import { ErrorContexto, recomendar } from "@/app/back/recomendaciones";
 
-export const runtime = "nodejs";
-
 export async function POST(request: Request): Promise<Response> {
   let cuerpo: unknown;
   try {

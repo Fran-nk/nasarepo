@@ -1,7 +1,5 @@
-/**
- * Cliente de datos. Con NEXT_PUBLIC_USE_MOCKS distinto de "false" lee los
- * escenarios de prueba de /mocks; si no, llama al backend en NEXT_PUBLIC_API_URL.
- * Las pantallas solo usan estas funciones: conectar el backend real no las cambia.
+/** Cliente de datos. El contexto y las recomendaciones usan el modelo del backend.
+ * Las otras pantallas conservan los escenarios de prueba hasta que existan sus rutas.
  */
 import type {
   Alerta,
@@ -17,10 +15,11 @@ import type {
   RespuestaSemillas,
   RespuestaVsNormal,
 } from "@/app/frontcode/lib/contratos/tipos";
-import { ESCENARIOS, type IdEscenario } from "@/app/frontcode/lib/escenarios";
-import catalogo from "@/app/frontcode/mocks/semillas.json";
+import { ESCENARIOS, type IdEscenario } from "../escenarios";
+import catalogo from "../../mocks/semillas.json";
 
 export const USAR_MOCKS = process.env.NEXT_PUBLIC_USE_MOCKS !== "false";
+const USAR_MOCKS_MODELO = process.env.NEXT_PUBLIC_USE_MOCKS_MODELO === "true";
 const API_URL = (process.env.NEXT_PUBLIC_API_URL ?? "").replace(/\/$/, "");
 
 export interface Punto {
@@ -60,7 +59,7 @@ const qs = (p: Punto, extra: Record<string, string | number> = {}) =>
   }).toString();
 
 export function obtenerContexto(p: Punto, esc: IdEscenario): Promise<RespuestaContexto> {
-  if (USAR_MOCKS) return espera(ESCENARIOS[esc].datos.contexto as RespuestaContexto);
+  if (USAR_MOCKS_MODELO) return espera(ESCENARIOS[esc].datos.contexto as RespuestaContexto);
   return pedir<ContextoV1>("/api/v1/contexto", { method: "POST", body: JSON.stringify({ latitud: p.lat, longitud: p.lon, mes_siembra: new Date().getMonth() + 1 }) }).then((r) => ({
     lugar: `Referencia a ${r.referencia.distancia_km} km`, altitud_m: r.altitud_m,
     zona: r.zona.id.replaceAll("-", "_") as RespuestaContexto["zona"], cultivos_comunes: r.catalogo_zona.map((c) => c.id),
@@ -131,7 +130,7 @@ export async function obtenerRecomendaciones(
   peticion: PeticionRecomendaciones,
   esc: IdEscenario,
 ): Promise<RespuestaRecomendaciones> {
-  if (!USAR_MOCKS) {
+  if (!USAR_MOCKS_MODELO) {
     const respuesta = await pedir<ContextoV1>("/api/v1/contexto", { method: "POST", body: JSON.stringify({
       latitud: peticion.lat, longitud: peticion.lon, mes_siembra: peticion.mes,
       historial: peticion.historial.filter((id): id is string => id !== null).map((cultivo_id) => ({ cultivo_id })),

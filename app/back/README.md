@@ -4,12 +4,12 @@ Este directorio contiene la lógica de servidor. Next.js publica las rutas desde
 
 ## Estado
 
-- `GET /api/v1/salud`: indica si se cargaron los pesos y si el recomendador está disponible. El modelo todavía no está conectado al flujo de contexto.
+- `GET /api/v1/salud`: indica si se cargaron los pesos y si el recomendador está disponible.
 - `GET /api/v1/clima?latitud=-13.53&longitud=-71.97&dias=7`: climatología mensual NASA POWER (2002–2025) y pronóstico Open-Meteo. Si una fuente falla, su bloque es `null` y se informa en `avisos`.
 - `POST /api/v1/contexto`: devuelve hasta cinco recomendaciones del MLP usando el punto de referencia más cercano del dataset curado, a una distancia máxima de 30 km. La respuesta muestra coordenadas y distancia de referencia y advierte que altitud, clima y suelo son aproximados. Más allá del límite responde `503`. El bloque `clima` proporcionado por el cliente todavía no se admite: responde `400` para no ignorarlo silenciosamente.
 - `app/back/modelo/mlp.ts`: inferencia ligera de un MLP entrenado en Keras/TensorFlow. No instala TensorFlow completo en Vercel. El entrenamiento y la exportación ocurren fuera del despliegue.
 
-La especificación del producto está en `../../../API_BACKEND.md` (en el directorio de trabajo compartido). Hay otro contrato en `docs/contrato-datos.md` que usa rutas y tipos anteriores: el cliente actual sigue ese contrato y requerirá una adaptación antes de consumir `/api/v1/contexto`.
+La especificación del producto está en `../../../API_BACKEND.md` (en el directorio de trabajo compartido). El cliente de contexto y recomendaciones consume `POST /api/v1/contexto`; las demás pantallas aún usan el contrato de demostración en `docs/contrato-datos.md`.
 
 ## Incorporar el modelo
 
@@ -17,7 +17,7 @@ Los pesos `modelo.json`, la especificación definitiva `feature-spec.json` y los
 
 El evaluador valida dimensiones y valores finitos y ofrece `puntuar(vector)` con un vector ya normalizado. `normalizarVariables` usa la especificación definitiva y rechaza variables faltantes. El contexto se obtiene de `datos/contexto_puntos.json`, no de una medición en vivo de la parcela. Su clasificación por vertiente, pH, clima y reglas provienen del conjunto de entrenamiento y requieren validación agronómica. El modelo se incluye en el paquete de la función, sin descargas en cada petición.
 
-Para probar el frontend real, configurar `NEXT_PUBLIC_USE_MOCKS=false` y dejar `NEXT_PUBLIC_API_URL` vacío cuando Next.js sirva la API en el mismo origen. Se conectaron el contexto y las recomendaciones; las demás rutas de clima y alertas del contrato antiguo siguen pendientes. Los resultados del modelo son afinidades aprendidas de reglas sintéticas, no probabilidades de cosecha. `semillas_disponibles` todavía no se aplica al ranking real.
+El frontend usa el contexto y las recomendaciones reales por defecto. `NEXT_PUBLIC_USE_MOCKS_MODELO=true` activa la demostración de esas dos consultas. Mantener `NEXT_PUBLIC_API_URL` vacío cuando Next.js sirva la API en el mismo origen. Las demás rutas de clima y alertas del contrato antiguo siguen pendientes y usan mocks con `NEXT_PUBLIC_USE_MOCKS=true`. Los resultados del modelo son afinidades aprendidas de reglas sintéticas, no probabilidades de cosecha. `semillas_disponibles` todavía no se aplica al ranking real.
 
 ## Propuesta para preparación de datos con Python (pendiente de aprobación)
 

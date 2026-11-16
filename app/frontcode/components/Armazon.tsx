@@ -11,7 +11,7 @@ import { CrearChacra } from "@/app/frontcode/components/mapa/CrearChacra";
 import type { MapaChacraProps } from "@/app/frontcode/components/mapa/MapaChacra";
 import { crearCultivo } from "@/app/frontcode/lib/almacen";
 import { useUbicacion } from "@/app/frontcode/lib/hooks";
-import { useCultivoActivo } from "@/app/frontcode/lib/preferencias";
+import { useCultivoActivo, useNombreUsuario } from "@/app/frontcode/lib/preferencias";
 import { HAY_TOKEN_MAPBOX } from "@/app/frontcode/lib/mapbox";
 
 const MapaChacra = dynamic<MapaChacraProps>(() => import("@/app/frontcode/components/mapa/MapaChacra"), {
@@ -22,7 +22,7 @@ const MapaChacra = dynamic<MapaChacraProps>(() => import("@/app/frontcode/compon
 /** El mapa ocupa todo el fondo y se mantiene montado al cambiar de pestaña. */
 function MapaFondo({ inicio }: { inicio: boolean }) {
   const { punto, cultivo, cultivos, cargada } = useUbicacion();
-  const { apiRef, setDibujando, paso, setPaso, setCultivoNuevo } = useMapa();
+  const { apiRef, setDibujando, paso, setPaso, setCultivoNuevo, nombreNuevo } = useMapa();
   const [, setActivo] = useCultivoActivo();
 
   // Sin cultivos el mapa muestra el lugar de la demostración: si cambia el escenario, vuela allá.
@@ -60,7 +60,7 @@ function MapaFondo({ inicio }: { inicio: boolean }) {
       // Terminado el terreno se guarda como cultivo nuevo y el asistente pregunta por sus cultivos.
       onTerrenoNuevo={(terreno) => {
         if (paso !== "terreno") return;
-        void crearCultivo(terreno).then((id) => {
+        void crearCultivo(terreno, nombreNuevo).then((id) => {
           setCultivoNuevo(id);
           setActivo(id);
           setPaso("cultivos");
@@ -89,9 +89,11 @@ function Pantallas({ children }: { children: ReactNode }) {
   const ruta = usePathname();
   const { cultivos, cargada } = useUbicacion();
   const { paso } = useMapa();
+  const [usuario] = useNombreUsuario();
   // Asistente: creando un cultivo (con un "+", desde cualquier pestaña) o en la pestaña Mapa sin cultivos.
   // Al comienzo solo se ven el mapa, el menú y "Crear mi cultivo".
-  const inicio = paso !== null || (ruta === "/" && cargada && cultivos.length === 0);
+  const sinUsuario = usuario === null;
+  const inicio = paso !== null || sinUsuario || (ruta === "/" && cargada && cultivos.length === 0);
 
   return (
     <>
@@ -100,7 +102,7 @@ function Pantallas({ children }: { children: ReactNode }) {
       </div>
 
       {inicio ? (
-        HAY_TOKEN_MAPBOX && <CrearChacra />
+        <CrearChacra />
       ) : (
         <main className="relative z-10 mt-[42dvh] flex min-h-[58dvh] flex-col rounded-t-[20px] bg-papel px-5 pt-6 pb-24 shadow-[0_-4px_16px_rgba(38,59,53,0.12)] lg:fixed lg:top-[66px] lg:bottom-[18px] lg:left-[20px] lg:mt-0 lg:min-h-0 lg:w-[324px] lg:overflow-y-auto lg:rounded-[10px] lg:[scrollbar-width:none] lg:px-[15px] lg:py-5 lg:shadow-none">
           <SoloCliente>{children}</SoloCliente>
@@ -113,7 +115,7 @@ function Pantallas({ children }: { children: ReactNode }) {
       */}
       {!inicio && <ClimaFijo className="fixed top-[18px] right-[34px] z-20 hidden max-h-[calc(100dvh-273px)] lg:flex" />}
 
-      <Navegacion />
+      {!sinUsuario && <Navegacion />}
     </>
   );
 }

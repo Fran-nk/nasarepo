@@ -1,7 +1,7 @@
 /** Escenarios de demostración (solo se usan con datos de prueba). */
-import cusco from "@/app/frontcode/mocks/escenarios/cusco.json";
-import piuraNino from "@/app/frontcode/mocks/escenarios/piura-nino.json";
-import punoHelada from "@/app/frontcode/mocks/escenarios/puno-helada.json";
+import cusco from "../mocks/escenarios/cusco.json";
+import piuraNino from "../mocks/escenarios/piura-nino.json";
+import punoHelada from "../mocks/escenarios/puno-helada.json";
 
 export type IdEscenario = "cusco" | "piura-nino" | "puno-helada";
 

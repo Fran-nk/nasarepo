@@ -29,7 +29,8 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="es-PE" className={`${inter.variable} ${robotoCondensed.variable} h-full antialiased`}>
+    // Algunas extensiones agregan atributos al <html> antes de la hidratación (p. ej. data-kantu).
+    <html lang="es-PE" className={`${inter.variable} ${robotoCondensed.variable} h-full antialiased`} suppressHydrationWarning>
       <body className="min-h-full bg-arena text-tinta">
         <Armazon>{children}</Armazon>
       </body>

@@ -11,6 +11,7 @@ export function usarUbicacionActual(
   onError: (mensaje: string) => void,
   onExito?: (cultivoId: number) => void,
   vigente: () => boolean = () => true,
+  nombre?: string | null,
 ) {
   if (!("geolocation" in navigator)) {
     onError("Tu celular no permite saber la ubicación.");
@@ -20,7 +21,7 @@ export function usarUbicacionActual(
     (pos) => {
       if (!vigente()) return;
       const { latitude: lat, longitude: lon } = pos.coords;
-      void crearCultivo({ lat, lon, origen: "ubicacion" }).then((id) => onExito?.(id));
+      void crearCultivo({ lat, lon, origen: "ubicacion" }, nombre).then((id) => onExito?.(id));
       api?.irA(lat, lon);
     },
     () => vigente() && onError("No pudimos saber dónde estás. Revisa que el GPS esté prendido y da permiso."),

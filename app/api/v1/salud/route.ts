@@ -1,8 +1,6 @@
 import { cargarModelo } from "@/app/back/modelo/cargar";
 import { validarEspecificacion } from "@/app/back/modelo/variables";
 
-export const runtime = "nodejs";
-
 export async function GET(): Promise<Response> {
   try {
     const modelo = await cargarModelo();

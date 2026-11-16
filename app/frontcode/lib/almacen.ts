@@ -96,11 +96,11 @@ export function nombreCultivo(cuantosHay: number) {
 }
 
 /** Guarda un terreno recién marcado como cultivo nuevo y devuelve su id. */
-export async function crearCultivo(terreno: TerrenoNuevo): Promise<number> {
+export async function crearCultivo(terreno: TerrenoNuevo, nombre?: string | null): Promise<number> {
   const cuantos = await db.cultivos.count();
   const id = await db.cultivos.add({
     ...terreno,
-    nombre: nombreCultivo(cuantos),
+    nombre: nombre?.trim() || nombreCultivo(cuantos),
     historial: HISTORIAL_VACIO,
     creado: new Date().toISOString(),
   });

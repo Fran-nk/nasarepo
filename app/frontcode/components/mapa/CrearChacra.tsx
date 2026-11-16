@@ -1,11 +1,13 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useRef, useState } from "react";
+import { useId, useRef, useState, type FormEvent } from "react";
 import { PreguntaCultivosAnteriores, PreguntaMisSemillas } from "@/app/frontcode/components/CultivosChacra";
+import { CAMPO } from "@/app/frontcode/components/estilos";
 import { BOTON_PIE_PRINCIPAL, BOTON_PIE_SECUNDARIO } from "@/app/frontcode/components/SelectorSemillas";
+import { nombreCultivo } from "@/app/frontcode/lib/almacen";
 import { useCultivos } from "@/app/frontcode/lib/hooks";
-import { useCultivoActivo } from "@/app/frontcode/lib/preferencias";
+import { useCultivoActivo, useNombreUsuario } from "@/app/frontcode/lib/preferencias";
 import { useMapa } from "./ContextoMapa";
 import { usarUbicacionActual } from "./ubicacion";
 
@@ -15,17 +17,63 @@ const BOTON_PRINCIPAL =
   "rounded-[14px] bg-tinta px-4 py-3.5 text-[16px] leading-[24px] font-semibold text-white active:bg-tinta/90";
 const BOTON_TEXTO = "text-[14px] leading-[20px] font-semibold text-tinta underline underline-offset-2";
 
+function FormularioInicio({ pedirNombre, pedirCultivo, nombreSugerido, onListo, onCancelar }: {
+  pedirNombre: boolean;
+  pedirCultivo: boolean;
+  nombreSugerido: string;
+  onListo: (datos: { nombre: string; cultivo: string }) => void;
+  onCancelar?: () => void;
+}) {
+  const id = useId();
+  const [nombre, setNombre] = useState("");
+  const [cultivo, setCultivo] = useState("");
+
+  function enviar(evento: FormEvent) {
+    evento.preventDefault();
+    if (pedirNombre && !nombre.trim()) return;
+    onListo({ nombre: nombre.trim(), cultivo: cultivo.trim() || nombreSugerido });
+  }
+
+  return (
+    <div className="fixed inset-0 z-40 flex items-center justify-center overflow-y-auto bg-tinta/50 p-4 backdrop-blur-sm">
+      <form onSubmit={enviar} aria-label="Datos iniciales" className="flex w-full max-w-[440px] flex-col gap-4 rounded-[20px] bg-papel p-6 shadow-xl">
+        <h1 className="font-titulo text-[28px] leading-[32px] font-bold text-tinta">
+          {pedirNombre ? "Hola, empecemos por tu chacra" : "Tu nuevo cultivo"}
+        </h1>
+        {pedirNombre && (
+          <>
+            <p className="text-[14px] leading-[20px] text-secundario">Tu nombre y los datos de tu chacra se guardan en este dispositivo.</p>
+            <label htmlFor={`${id}-nombre`} className="flex flex-col gap-2 font-semibold text-tinta">
+              ¿Cómo te llamas?
+              <input id={`${id}-nombre`} value={nombre} onChange={(e) => setNombre(e.target.value)} autoComplete="given-name" maxLength={40} required className={CAMPO} />
+            </label>
+          </>
+        )}
+        {pedirCultivo && <label htmlFor={`${id}-cultivo`} className="flex flex-col gap-2 font-semibold text-tinta">
+          {pedirNombre ? "¿Cómo se llama tu primera chacra?" : "¿Cómo se llama tu nuevo cultivo?"}
+          <input id={`${id}-cultivo`} value={cultivo} onChange={(e) => setCultivo(e.target.value)} autoComplete="off" maxLength={40} placeholder={nombreSugerido} className={CAMPO} />
+          <span className="text-[12px] font-normal text-secundario">Si lo dejas vacío, se llamará “{nombreSugerido}”.</span>
+        </label>}
+        <button type="submit" className={BOTON_PRINCIPAL}>{pedirCultivo ? "Seguir: marcar mi terreno" : "Entrar"}</button>
+        {onCancelar && <button type="button" onClick={onCancelar} className="text-[14px] text-secundario">Cancelar</button>}
+      </form>
+    </div>
+  );
+}
+
 /**
  * Asistente para crear un cultivo (también con los botones "+"):
- * 1. sin cultivos, sobre el mapa solo se ve el botón "Crear mi cultivo";
- * 2. se marcan las esquinas del terreno (o se usa la ubicación del celular): ahí se guarda el cultivo;
- * 3. en ventanas de pantalla completa se pregunta qué sembró antes y qué semillas tiene (se pueden saltar);
- * 4. al terminar se abre el cultivo con sus recomendaciones.
+ * 1. pide el nombre de la persona y la primera chacra;
+ * 2. marca el terreno en el mapa o con GPS;
+ * 3. pregunta por cultivos anteriores y semillas disponibles;
+ * 4. abre las recomendaciones.
  */
 export function CrearChacra() {
-  const { apiRef, dibujando, paso, setPaso, cultivoNuevo, setCultivoNuevo, iniciarAsistente, cancelarAsistente } =
+  const { apiRef, dibujando, paso, setPaso, cultivoNuevo, setCultivoNuevo, nombreNuevo, iniciarAsistente, empezarTerreno, cancelarAsistente } =
     useMapa();
-  const hayCultivos = (useCultivos()?.length ?? 0) > 0;
+  const cultivos = useCultivos();
+  const hayCultivos = (cultivos?.length ?? 0) > 0;
+  const [usuario, setUsuario] = useNombreUsuario();
   const [, setActivo] = useCultivoActivo();
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
@@ -52,6 +100,7 @@ export function CrearChacra() {
         setPaso((p) => (p === "terreno" ? "cultivos" : p));
       },
       () => intento === intentoGps.current,
+      nombreNuevo,
     );
   }
 
@@ -60,6 +109,23 @@ export function CrearChacra() {
     setError(null);
     setBuscandoGps(false);
     cancelarAsistente();
+  }
+
+  if (usuario === undefined || cultivos === undefined) return null;
+  const sugerido = nombreCultivo(cultivos.length);
+
+  if (usuario === null && (paso === null || paso === "datos")) {
+    return <FormularioInicio pedirNombre pedirCultivo={!hayCultivos} nombreSugerido={sugerido} onListo={({ nombre, cultivo }) => {
+      setUsuario(nombre);
+      if (hayCultivos) setPaso(null);
+      else empezarTerreno(cultivo);
+    }} />;
+  }
+
+  if (paso === "datos") {
+    return <FormularioInicio pedirNombre={false} pedirCultivo nombreSugerido={sugerido} onListo={({ cultivo }) => {
+      empezarTerreno(cultivo);
+    }} onCancelar={hayCultivos ? cancelar : undefined} />;
   }
 
   if (paso === null) {
@@ -127,6 +193,7 @@ export function CrearChacra() {
   return (
     <section aria-label="Marcar mi cultivo" className={TARJETA}>
       <div aria-hidden className="absolute inset-x-0 top-0 h-1 bg-petroleo" />
+      {nombreNuevo && <p className="text-[13px] font-semibold text-secundario">{nombreNuevo}</p>}
       {buscandoGps ? (
         <p className="text-[16px] leading-[24px] text-tinta">📍 Buscando dónde estás…</p>
       ) : dibujando ? (
