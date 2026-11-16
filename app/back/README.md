@@ -1,6 +1,6 @@
 # Backend de Semilla Siguiente
 
-Este directorio contiene la lógica de servidor. Next.js publica las rutas desde `app/api/`; cada `route.ts` debe ser una capa pequeña que llame a `app/back/`. Los componentes, utilidades y mocks del frontend están en `app/front/`; sus páginas están en el grupo de rutas `app/(front)/`.
+Este directorio contiene la lógica de servidor. Next.js publica las rutas desde `app/api/`; cada `route.ts` debe ser una capa pequeña que llame a `app/back/`. Los componentes, utilidades y mocks del frontend están en `app/frontcode/`; las páginas permanecen en `app/` para conservar sus URL.
 
 ## Estado
 

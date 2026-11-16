@@ -53,10 +53,10 @@ corepack pnpm test
 ## Estructura
 
 ```
-app/(front)/         rutas de las pantallas, sin cambiar las URL
-app/front/components/ tarjetas, mapa, semillero y calendario
-app/front/lib/       cliente API, contratos, textos, búsqueda e IndexedDB
-app/front/mocks/     escenarios de prueba y catálogo de semillas
+app/                 rutas de las pantallas, sin cambiar las URL
+app/frontcode/components/ tarjetas, mapa, semillero y calendario
+app/frontcode/lib/   cliente API, contratos, textos, búsqueda e IndexedDB
+app/frontcode/mocks/ escenarios de prueba y catálogo de semillas
 app/api/             rutas HTTP del backend
 app/back/            lógica de servidor y modelo
 ```
