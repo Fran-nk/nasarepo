@@ -190,6 +190,7 @@ describe("recomendaciones con el modelo de red neuronal del backend", () => {
     const r = await obtenerRecomendaciones({ ...TACNA, mes: 4, historial: ["papa", null, null] });
     expect(r.modelo).toMatch(/reglas/);
     expect(r.recomendaciones.length).toBeGreaterThan(0);
+    expect(r.recomendaciones.length).toBeLessThanOrEqual(5); // el mismo máximo que el modelo
   });
 
   it("a más de 30 km de todo punto de referencia (en el mar) el modelo responde 503 y usa las reglas", async () => {

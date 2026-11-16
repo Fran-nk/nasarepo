@@ -164,6 +164,6 @@ export function motivosPorCatalogo(
   ];
   const motivos = candidatos.filter(([si]) => si).map(([, m]) => m);
   const enRescate = contexto.enRescate ?? s.rareza === "en_rescate";
-  // La insignia de rescate siempre se explica, aunque haya otros motivos antes.
-  return enRescate ? [...motivos.slice(0, 2), "especie_en_rescate"] : motivos.slice(0, 3);
+  // Todos los que aplican (la fila elige el que la distingue de las otras); el de rescate va al final.
+  return enRescate ? [...motivos, "especie_en_rescate"] : motivos;
 }

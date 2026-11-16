@@ -267,6 +267,8 @@ interface RespuestaModelo {
 }
 
 const MODELO = "red-neuronal (contexto aproximado)";
+/** Lo que devuelve el modelo como máximo; las reglas de respaldo dan lo mismo para que se vea igual. */
+const MAXIMO_RECOMENDACIONES = 5;
 
 /**
  * Pregunta al modelo de red neuronal del backend (POST /api/v1/contexto). Devuelve null si no puede
@@ -347,6 +349,7 @@ async function recomendacionesPorReglas(
       historial: peticion.historial,
       disponibles: peticion.semillas_disponibles,
       comunes: cultivosDeLaZona(catalogo, sitio.altitud),
+      maximo: MAXIMO_RECOMENDACIONES,
     }),
   };
 }

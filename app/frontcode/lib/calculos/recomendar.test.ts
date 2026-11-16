@@ -119,10 +119,9 @@ describe("motivos que salen solo del catálogo (para las semillas que elige el m
   it("sin historial ni zona no inventa motivos", () => {
     expect(motivosPorCatalogo(por("papa"), {})).toEqual([]);
   });
-  it("las especies en rescate siempre lo dicen, con a lo más 3 motivos", () => {
+  it("las especies en rescate lo dicen al final, después de los demás motivos", () => {
     const m = motivosPorCatalogo(por("tarwi"), { ultimo: "papa", comunes: ["tarwi"], enRescate: true });
-    expect(m).toHaveLength(3);
-    expect(m.at(-1)).toBe("especie_en_rescate");
+    expect(m).toEqual(["rota_bien", "comun_en_zona", "fija_nitrogeno", "especie_en_rescate"]);
   });
   it("ciclo corto solo en lo que no es perenne", () => {
     expect(motivosPorCatalogo({ ...por("arveja"), ciclo_dias: 100 }, {})).toContain("ciclo_corto");

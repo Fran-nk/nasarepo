@@ -22,7 +22,7 @@ function calidad(puntaje: number) {
 }
 
 /**
- * "Te recomendamos sembrar" (Figma 89:996): las 3 mejores semillas para el cultivo abierto, en orden.
+ * "Te recomendamos sembrar" (Figma 89:996): las semillas que recomienda el modelo para el cultivo abierto, en su orden.
  * Cada fila: dibujo, nombre y la razón más importante para elegirla en una línea corta (lo que decide
  * al agricultor). Al tocar una se abre a la derecha del panel el detalle completo.
  */
@@ -33,7 +33,8 @@ export function ListaRecomendaciones() {
   const historial = useHistorial();
   const ultimo = historial[0] ? porId.get(historial[0]) : undefined;
   const [elegida, setElegida] = useState<string | null>(null);
-  const top = (rec.datos?.recomendaciones ?? []).slice(0, 3);
+  // Todas las que da el modelo, en su orden (hasta 5): el modelo manda, no el diseño.
+  const top = rec.datos?.recomendaciones ?? [];
   // Cada fila dice la razón que la distingue de las otras (no la que comparten todas).
   const evitar = evitarPorFila(top);
   const abierta = top.find((r) => r.semillaId === elegida);
