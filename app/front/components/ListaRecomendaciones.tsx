@@ -29,7 +29,7 @@ export function ListaRecomendaciones() {
   const { porId } = useCatalogo();
   const mias = useMisSemillas();
   const [elegida, setElegida] = useState<string | null>(null);
-  const top = (rec.datos?.recomendaciones ?? []).slice(0, 3);
+  const top = (rec.datos?.recomendaciones ?? []).slice(0, 5);
   const abierta = top.find((r) => r.semillaId === elegida);
   const semillaAbierta = abierta ? porId.get(abierta.semillaId) : undefined;
 
@@ -39,6 +39,7 @@ export function ListaRecomendaciones() {
 
       {rec.cargando && <TarjetaCargando texto="Pensando qué te conviene…" />}
       {rec.error && <TarjetaError texto={rec.error} />}
+      {rec.datos?.avisos?.map((aviso) => <p key={aviso} className="text-sm text-secundario">{aviso}</p>)}
 
       <ol className="flex flex-col gap-1.5">
         {top.map((r, i) => {

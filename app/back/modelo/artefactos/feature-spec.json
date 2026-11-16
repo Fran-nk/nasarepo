@@ -1,0 +1,580 @@
+{
+  "version": "dataset-v1",
+  "reglas": "reglas-v1",
+  "generado": "2026-11-15",
+  "features": [
+    {
+      "nombre": "altitud_m",
+      "media": 1795.4415283203125,
+      "escala": 1677.6591796875
+    },
+    {
+      "nombre": "ph_suelo",
+      "media": 5.906694412231445,
+      "escala": 1.1571683883666992
+    },
+    {
+      "nombre": "lluvia_anual_mm",
+      "media": 1034.33349609375,
+      "escala": 949.1509399414062
+    },
+    {
+      "nombre": "humedad_raices_siembra",
+      "media": 0.5624774098396301,
+      "escala": 0.19377607107162476
+    },
+    {
+      "nombre": "temp_media_siembra_c",
+      "media": 18.190446853637695,
+      "escala": 8.324225425720215
+    },
+    {
+      "nombre": "mes_sin",
+      "media": 0.006136929616332054,
+      "escala": 0.7078021764755249
+    },
+    {
+      "nombre": "mes_cos",
+      "media": -0.009930187836289406,
+      "escala": 0.7062482237815857
+    },
+    {
+      "nombre": "zona_chala",
+      "media": 0.05741127207875252,
+      "escala": 0.2327985316514969
+    },
+    {
+      "nombre": "zona_yunga_maritima",
+      "media": 0.0897703543305397,
+      "escala": 0.28599196672439575
+    },
+    {
+      "nombre": "zona_quechua",
+      "media": 0.1085594967007637,
+      "escala": 0.3109966516494751
+    },
+    {
+      "nombre": "zona_suni",
+      "media": 0.0991649255156517,
+      "escala": 0.29881012439727783
+    },
+    {
+      "nombre": "zona_puna",
+      "media": 0.16701461374759674,
+      "escala": 0.3731347620487213
+    },
+    {
+      "nombre": "zona_janca",
+      "media": 0.0,
+      "escala": 1.0
+    },
+    {
+      "nombre": "zona_yunga_fluvial",
+      "media": 0.08141962438821793,
+      "escala": 0.2735038995742798
+    },
+    {
+      "nombre": "zona_rupa_rupa",
+      "media": 0.09290187805891037,
+      "escala": 0.290408194065094
+    },
+    {
+      "nombre": "zona_omagua",
+      "media": 0.30375781655311584,
+      "escala": 0.45963600277900696
+    },
+    {
+      "nombre": "prev1_familia_amarantaceas",
+      "media": 0.07698329538106918,
+      "escala": 0.2664753496646881
+    },
+    {
+      "nombre": "prev1_familia_amarilidaceas",
+      "media": 0.01983298547565937,
+      "escala": 0.1393488645553589
+    },
+    {
+      "nombre": "prev1_familia_apiaceas",
+      "media": 0.027139874175190926,
+      "escala": 0.16247864067554474
+    },
+    {
+      "nombre": "prev1_familia_asteraceas",
+      "media": 0.017223382368683815,
+      "escala": 0.1300341784954071
+    },
+    {
+      "nombre": "prev1_familia_baselaceas",
+      "media": 0.017745302990078926,
+      "escala": 0.13208776712417603
+    },
+    {
+      "nombre": "prev1_familia_brasicaceas",
+      "media": 0.02270354889333248,
+      "escala": 0.14887571334838867
+    },
+    {
+      "nombre": "prev1_familia_convolvulaceas",
+      "media": 0.08168058097362518,
+      "escala": 0.27398720383644104
+    },
+    {
+      "nombre": "prev1_familia_euforbiaceas",
+      "media": 0.0850730687379837,
+      "escala": 0.27906787395477295
+    },
+    {
+      "nombre": "prev1_familia_fabaceas",
+      "media": 0.14352817833423615,
+      "escala": 0.350508451461792
+    },
+    {
+      "nombre": "prev1_familia_oxalidaceas",
+      "media": 0.01435281801968813,
+      "escala": 0.11893205344676971
+    },
+    {
+      "nombre": "prev1_familia_poaceas",
+      "media": 0.2382567822933197,
+      "escala": 0.4259105920791626
+    },
+    {
+      "nombre": "prev1_familia_solanaceas",
+      "media": 0.11169102042913437,
+      "escala": 0.3150929808616638
+    },
+    {
+      "nombre": "prev1_familia_tropeolaceas",
+      "media": 0.010438413359224796,
+      "escala": 0.10168414562940598
+    },
+    {
+      "nombre": "prev1_familia_ninguno",
+      "media": 0.13335072994232178,
+      "escala": 0.339785635471344
+    },
+    {
+      "nombre": "prev2_familia_amarantaceas",
+      "media": 0.06550104171037674,
+      "escala": 0.24755366146564484
+    },
+    {
+      "nombre": "prev2_familia_amarilidaceas",
+      "media": 0.01644050143659115,
+      "escala": 0.12708094716072083
+    },
+    {
+      "nombre": "prev2_familia_apiaceas",
+      "media": 0.025313152000308037,
+      "escala": 0.1570207178592682
+    },
+    {
+      "nombre": "prev2_familia_asteraceas",
+      "media": 0.012265135534107685,
+      "escala": 0.10998188704252243
+    },
+    {
+      "nombre": "prev2_familia_baselaceas",
+      "media": 0.01435281801968813,
+      "escala": 0.11893098056316376
+    },
+    {
+      "nombre": "prev2_familia_brasicaceas",
+      "media": 0.02165970765054226,
+      "escala": 0.14562658965587616
+    },
+    {
+      "nombre": "prev2_familia_convolvulaceas",
+      "media": 0.06367432326078415,
+      "escala": 0.244073748588562
+    },
+    {
+      "nombre": "prev2_familia_euforbiaceas",
+      "media": 0.0704592913389206,
+      "escala": 0.25584539771080017
+    },
+    {
+      "nombre": "prev2_familia_fabaceas",
+      "media": 0.11143006384372711,
+      "escala": 0.31462347507476807
+    },
+    {
+      "nombre": "prev2_familia_oxalidaceas",
+      "media": 0.011743214912712574,
+      "escala": 0.10771137475967407
+    },
+    {
+      "nombre": "prev2_familia_poaceas",
+      "media": 0.22625261545181274,
+      "escala": 0.41823363304138184
+    },
+    {
+      "nombre": "prev2_familia_solanaceas",
+      "media": 0.11064717918634415,
+      "escala": 0.3136788308620453
+    },
+    {
+      "nombre": "prev2_familia_tropeolaceas",
+      "media": 0.007567849475890398,
+      "escala": 0.08668326586484909
+    },
+    {
+      "nombre": "prev2_familia_ninguno",
+      "media": 0.24269311130046844,
+      "escala": 0.4285770356655121
+    },
+    {
+      "nombre": "prev3_familia_amarantaceas",
+      "media": 0.05845511332154274,
+      "escala": 0.23460783064365387
+    },
+    {
+      "nombre": "prev3_familia_amarilidaceas",
+      "media": 0.014613778330385685,
+      "escala": 0.11997663229703903
+    },
+    {
+      "nombre": "prev3_familia_apiaceas",
+      "media": 0.016179541125893593,
+      "escala": 0.12612861394882202
+    },
+    {
+      "nombre": "prev3_familia_asteraceas",
+      "media": 0.010960333980619907,
+      "escala": 0.10412514954805374
+    },
+    {
+      "nombre": "prev3_familia_baselaceas",
+      "media": 0.013048016466200352,
+      "escala": 0.11346722394227982
+    },
+    {
+      "nombre": "prev3_familia_brasicaceas",
+      "media": 0.021137787029147148,
+      "escala": 0.14386725425720215
+    },
+    {
+      "nombre": "prev3_familia_convolvulaceas",
+      "media": 0.058716073632240295,
+      "escala": 0.23504948616027832
+    },
+    {
+      "nombre": "prev3_familia_euforbiaceas",
+      "media": 0.061586637049913406,
+      "escala": 0.24052776396274567
+    },
+    {
+      "nombre": "prev3_familia_fabaceas",
+      "media": 0.11586638540029526,
+      "escala": 0.3199383318424225
+    },
+    {
+      "nombre": "prev3_familia_oxalidaceas",
+      "media": 0.009133611805737019,
+      "escala": 0.09511206299066544
+    },
+    {
+      "nombre": "prev3_familia_poaceas",
+      "media": 0.17145094275474548,
+      "escala": 0.37682104110717773
+    },
+    {
+      "nombre": "prev3_familia_solanaceas",
+      "media": 0.08350730687379837,
+      "escala": 0.27664893865585327
+    },
+    {
+      "nombre": "prev3_familia_tropeolaceas",
+      "media": 0.006524008233100176,
+      "escala": 0.0804867371916771
+    },
+    {
+      "nombre": "prev3_familia_ninguno",
+      "media": 0.35882046818733215,
+      "escala": 0.4796530306339264
+    },
+    {
+      "nombre": "prev1_categoria_cereal",
+      "media": 0.2382567822933197,
+      "escala": 0.4259105920791626
+    },
+    {
+      "nombre": "prev1_categoria_pseudocereal",
+      "media": 0.07698329538106918,
+      "escala": 0.2664753496646881
+    },
+    {
+      "nombre": "prev1_categoria_leguminosa",
+      "media": 0.14352817833423615,
+      "escala": 0.350508451461792
+    },
+    {
+      "nombre": "prev1_categoria_tuberculo",
+      "media": 0.30140918493270874,
+      "escala": 0.45901381969451904
+    },
+    {
+      "nombre": "prev1_categoria_hortaliza",
+      "media": 0.10647181421518326,
+      "escala": 0.30839332938194275
+    },
+    {
+      "nombre": "prev1_categoria_ninguno",
+      "media": 0.13335072994232178,
+      "escala": 0.339785635471344
+    },
+    {
+      "nombre": "temp_media_ciclo_c",
+      "media": 18.190698623657227,
+      "escala": 8.299697875976562
+    },
+    {
+      "nombre": "temp_min_ciclo_c",
+      "media": 7.879963397979736,
+      "escala": 9.745512962341309
+    },
+    {
+      "nombre": "temp_max_ciclo_c",
+      "media": 30.19428062438965,
+      "escala": 7.562089920043945
+    },
+    {
+      "nombre": "lluvia_ciclo_mm",
+      "media": 488.1585693359375,
+      "escala": 504.6724853515625
+    },
+    {
+      "nombre": "humedad_relativa_ciclo_pct",
+      "media": 73.21575927734375,
+      "escala": 13.190116882324219
+    },
+    {
+      "nombre": "radiacion_ciclo_mj_m2_dia",
+      "media": 18.295059204101562,
+      "escala": 3.0535030364990234
+    },
+    {
+      "nombre": "humedad_raices_ciclo",
+      "media": 0.5620856285095215,
+      "escala": 0.18996155261993408
+    },
+    {
+      "nombre": "candidato_tmin",
+      "media": 6.239999771118164,
+      "escala": 3.669121503829956
+    },
+    {
+      "nombre": "candidato_topmn",
+      "media": 14.720000267028809,
+      "escala": 4.218328952789307
+    },
+    {
+      "nombre": "candidato_topmx",
+      "media": 23.31999969482422,
+      "escala": 4.2109599113464355
+    },
+    {
+      "nombre": "candidato_tmax",
+      "media": 32.47999954223633,
+      "escala": 5.783731937408447
+    },
+    {
+      "nombre": "candidato_rmin",
+      "media": 410.8117370605469,
+      "escala": 166.837890625
+    },
+    {
+      "nombre": "candidato_ropmn",
+      "media": 672.0,
+      "escala": 218.2197723388672
+    },
+    {
+      "nombre": "candidato_ropmx",
+      "media": 1216.0,
+      "escala": 388.2887268066406
+    },
+    {
+      "nombre": "candidato_rmax",
+      "media": 2470.2978515625,
+      "escala": 1191.29833984375
+    },
+    {
+      "nombre": "candidato_phmin",
+      "media": 4.728638172149658,
+      "escala": 0.6156018972396851
+    },
+    {
+      "nombre": "candidato_phopmn",
+      "media": 5.632214069366455,
+      "escala": 0.4315710663795471
+    },
+    {
+      "nombre": "candidato_phopmx",
+      "media": 7.052271842956543,
+      "escala": 0.5254327058792114
+    },
+    {
+      "nombre": "candidato_phmax",
+      "media": 8.161118507385254,
+      "escala": 0.654826819896698
+    },
+    {
+      "nombre": "candidato_ktmp",
+      "media": -2.4000000953674316,
+      "escala": 4.80762243270874
+    },
+    {
+      "nombre": "candidato_altura_min_m",
+      "media": 1468.08349609375,
+      "escala": 1301.3424072265625
+    },
+    {
+      "nombre": "candidato_altura_max_m",
+      "media": 3316.180419921875,
+      "escala": 957.337158203125
+    },
+    {
+      "nombre": "candidato_ciclo_dias",
+      "media": 164.8000030517578,
+      "escala": 49.9599494934082
+    },
+    {
+      "nombre": "candidato_familia_amarantaceas",
+      "media": 0.11999999731779099,
+      "escala": 0.32489824295043945
+    },
+    {
+      "nombre": "candidato_familia_amarilidaceas",
+      "media": 0.03999999910593033,
+      "escala": 0.19606393575668335
+    },
+    {
+      "nombre": "candidato_familia_apiaceas",
+      "media": 0.03999999910593033,
+      "escala": 0.19606393575668335
+    },
+    {
+      "nombre": "candidato_familia_asteraceas",
+      "media": 0.03999999910593033,
+      "escala": 0.19606392085552216
+    },
+    {
+      "nombre": "candidato_familia_baselaceas",
+      "media": 0.03999999910593033,
+      "escala": 0.19606396555900574
+    },
+    {
+      "nombre": "candidato_familia_brasicaceas",
+      "media": 0.03999999910593033,
+      "escala": 0.19606392085552216
+    },
+    {
+      "nombre": "candidato_familia_convolvulaceas",
+      "media": 0.03999999910593033,
+      "escala": 0.19606393575668335
+    },
+    {
+      "nombre": "candidato_familia_euforbiaceas",
+      "media": 0.03999999910593033,
+      "escala": 0.19606393575668335
+    },
+    {
+      "nombre": "candidato_familia_fabaceas",
+      "media": 0.1599999964237213,
+      "escala": 0.36648306250572205
+    },
+    {
+      "nombre": "candidato_familia_oxalidaceas",
+      "media": 0.03999999910593033,
+      "escala": 0.19606396555900574
+    },
+    {
+      "nombre": "candidato_familia_poaceas",
+      "media": 0.23999999463558197,
+      "escala": 0.42699745297431946
+    },
+    {
+      "nombre": "candidato_familia_solanaceas",
+      "media": 0.11999999731779099,
+      "escala": 0.3248983323574066
+    },
+    {
+      "nombre": "candidato_familia_tropeolaceas",
+      "media": 0.03999999910593033,
+      "escala": 0.19606396555900574
+    },
+    {
+      "nombre": "candidato_categoria_cereal",
+      "media": 0.23999999463558197,
+      "escala": 0.42699745297431946
+    },
+    {
+      "nombre": "candidato_categoria_pseudocereal",
+      "media": 0.11999999731779099,
+      "escala": 0.32489824295043945
+    },
+    {
+      "nombre": "candidato_categoria_leguminosa",
+      "media": 0.1599999964237213,
+      "escala": 0.36648306250572205
+    },
+    {
+      "nombre": "candidato_categoria_tuberculo",
+      "media": 0.3199999928474426,
+      "escala": 0.4663693606853485
+    },
+    {
+      "nombre": "candidato_categoria_hortaliza",
+      "media": 0.1599999964237213,
+      "escala": 0.36648309230804443
+    },
+    {
+      "nombre": "candidato_comun_en_zona",
+      "media": 0.31022965908050537,
+      "escala": 0.4626659154891968
+    }
+  ],
+  "nota_normalizacion": "media/escala provisionales; entrenamiento_colab.py las recalcula SOLO con el split de entrenamiento y reescribe este archivo.",
+  "codificacion": {
+    "zonas": [
+      "chala",
+      "yunga_maritima",
+      "quechua",
+      "suni",
+      "puna",
+      "janca",
+      "yunga_fluvial",
+      "rupa_rupa",
+      "omagua"
+    ],
+    "familias": [
+      "amarantaceas",
+      "amarilidaceas",
+      "apiaceas",
+      "asteraceas",
+      "baselaceas",
+      "brasicaceas",
+      "convolvulaceas",
+      "euforbiaceas",
+      "fabaceas",
+      "oxalidaceas",
+      "poaceas",
+      "solanaceas",
+      "tropeolaceas"
+    ],
+    "categorias": [
+      "cereal",
+      "pseudocereal",
+      "leguminosa",
+      "tuberculo",
+      "hortaliza"
+    ],
+    "prev_familia": "one-hot por posición (prev1=último ... prev3=antepenúltimo) sobre familias + 'ninguno'",
+    "prev1_categoria": "one-hot de la categoría del último cultivo + 'ninguno'",
+    "clima_ciclo": "Por candidato: meses = min(12, ceil(ciclo_dias/30)) desde mes_siembra. temp media = promedio T2M; temp min = mínimo de T2M_MIN; temp max = máximo de T2M_MAX; lluvia = suma de PRECTOTCORR*días; HR, radiación y GWETROOT = promedio. Temperaturas corregidas: T - 0.0065*(alt_dem - alt_celda_power).",
+    "mes": "mes_sin = sin(2*pi*mes/12), mes_cos = cos(2*pi*mes/12)",
+    "ph_suelo": "SoilGrids phh2o 0-30 cm ponderado por espesor (5 km), /10",
+    "candidato_comun_en_zona": "1 si el cultivo figura en curado/cultivos-por-zona.json para la zona",
+    "candidato_*": "rangos de curado/catalogo_cultivos.json (ECOCROP) y altitud/ciclo de semillas.json"
+  }
+}

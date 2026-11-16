@@ -147,6 +147,7 @@ export interface Recomendacion {
 export interface RespuestaRecomendaciones {
   recomendaciones: Recomendacion[];
   modelo: string; // "red-neuronal v1" | "reglas"
+  avisos?: string[];
 }
 
 export type Categoria =

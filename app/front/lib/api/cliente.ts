@@ -61,7 +61,19 @@ const qs = (p: Punto, extra: Record<string, string | number> = {}) =>
 
 export function obtenerContexto(p: Punto, esc: IdEscenario): Promise<RespuestaContexto> {
   if (USAR_MOCKS) return espera(ESCENARIOS[esc].datos.contexto as RespuestaContexto);
-  return pedir(`/contexto${qs(p)}`);
+  return pedir<ContextoV1>("/api/v1/contexto", { method: "POST", body: JSON.stringify({ latitud: p.lat, longitud: p.lon, mes_siembra: new Date().getMonth() + 1 }) }).then((r) => ({
+    lugar: `Referencia a ${r.referencia.distancia_km} km`, altitud_m: r.altitud_m,
+    zona: r.zona.id.replaceAll("-", "_") as RespuestaContexto["zona"], cultivos_comunes: r.catalogo_zona.map((c) => c.id),
+  }));
+}
+
+interface ContextoV1 {
+  altitud_m: number;
+  zona: { id: string };
+  referencia: { distancia_km: number };
+  catalogo_zona: { id: string }[];
+  recomendaciones: { cultivo_id: string; porcentaje_afinidad: number; en_rescate: boolean }[];
+  avisos: { codigo: string; mensaje: string }[];
 }
 
 export async function obtenerSemana(p: Punto, esc: IdEscenario): Promise<RespuestaSemana> {
@@ -106,8 +118,7 @@ export function obtenerRiego(p: Punto, esc: IdEscenario): Promise<RespuestaRiego
 }
 
 export function obtenerSemillas(): Promise<RespuestaSemillas> {
-  if (USAR_MOCKS) return espera(catalogo as RespuestaSemillas);
-  return pedir(`/semillas`);
+  return espera(catalogo as RespuestaSemillas);
 }
 
 /**
@@ -120,8 +131,15 @@ export async function obtenerRecomendaciones(
   peticion: PeticionRecomendaciones,
   esc: IdEscenario,
 ): Promise<RespuestaRecomendaciones> {
-  if (!USAR_MOCKS)
-    return pedir(`/recomendaciones`, { method: "POST", body: JSON.stringify(peticion) });
+  if (!USAR_MOCKS) {
+    const respuesta = await pedir<ContextoV1>("/api/v1/contexto", { method: "POST", body: JSON.stringify({
+      latitud: peticion.lat, longitud: peticion.lon, mes_siembra: peticion.mes,
+      historial: peticion.historial.filter((id): id is string => id !== null).map((cultivo_id) => ({ cultivo_id })),
+    }) });
+    return { modelo: "red-neuronal (contexto aproximado)", avisos: respuesta.avisos.map((a) => a.mensaje), recomendaciones: respuesta.recomendaciones.map((r) => ({
+      semillaId: r.cultivo_id, puntaje: r.porcentaje_afinidad / 100, en_rescate: r.en_rescate, motivos: [],
+    })) };
+  }
 
   const base = (await espera(ESCENARIOS[esc].datos.recomendaciones)) as RespuestaRecomendaciones;
   const semillas = (catalogo as RespuestaSemillas).semillas;
